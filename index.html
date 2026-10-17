@@ -225,6 +225,57 @@ html.release details.dev{display:none}
 .herowrap{filter:none !important}
 .hero:has(#btnShowToday),.hero:has(#btnTurn){background:var(--ped) center 192px/176px 22px no-repeat,radial-gradient(circle at 50% 104px,var(--glow) 0,transparent 128px),var(--dot) 0 0/8px 8px repeat,var(--surface) !important;background-clip:padding-box !important}
 .hero #btnShowToday,.hero #btnTurn{margin-bottom:10px}
+/* ---- 0.23: realm games ---- */
+.pg{border-radius:0;border:3px solid rgba(255,255,255,.28)}
+.pgbtnrow{display:flex;gap:10px;justify-content:center;width:100%;max-width:320px}
+.pgbtnrow .ghost,.pgbtnrow .primary{flex:1}
+.seed{position:absolute;bottom:-44px;width:48px;height:48px;border:0;background:none;padding:0;animation:drift linear forwards}
+.seed::before{content:'';position:absolute;left:14px;top:8px;width:20px;height:20px;background:radial-gradient(circle,#FFFFFF 0 3px,transparent 3.5px),conic-gradient(from 0deg,#F4F0E8 0 10%,transparent 10% 25%,#F4F0E8 25% 35%,transparent 35% 50%,#F4F0E8 50% 60%,transparent 60% 75%,#F4F0E8 75% 85%,transparent 85%);border-radius:50%;opacity:.95}
+.seed::after{content:'';position:absolute;left:23px;top:27px;width:2px;height:12px;background:#CFE8C0}
+.seed.caught,.emb.caught,.flake.caught{animation:none;opacity:0;transform:scale(1.8);transition:.15s}
+@keyframes drift{0%{transform:translate(0,0)}25%{transform:translate(14px,-110px)}50%{transform:translate(-10px,-220px)}75%{transform:translate(12px,-320px)}100%{transform:translate(0,-420px)}}
+.fire{position:absolute;left:50%;bottom:40px;width:64px;height:120px;transform:translateX(-50%);transform-origin:50% 100%;pointer-events:none}
+.fire i{position:absolute;left:0;right:0;bottom:0;height:var(--h,60%);background:linear-gradient(#FFF3B0,#FFD36B 30%,#FF8A2E 65%,#E5441E);clip-path:polygon(50% 0,64% 22%,78% 14%,82% 46%,100% 62%,92% 100%,8% 100%,0 62%,18% 46%,22% 14%,36% 22%);transition:height .15s}
+.fire b{position:absolute;left:-16px;right:-16px;bottom:-12px;height:14px;background:repeating-linear-gradient(90deg,#6B4A2E 0 10px,#4B331F 10px 12px)}
+.heat{position:absolute;left:12px;right:12px;top:10px;height:10px;background:rgba(255,255,255,.15)}
+.heat i{display:block;height:100%;background:linear-gradient(90deg,#E5441E,#FFD36B);width:60%;transition:width .1s}
+.emb{position:absolute;width:48px;height:48px;border:0;padding:0;background:none;animation:embIn .2s ease-out}
+.emb::before{content:'';position:absolute;inset:12px;background:#FF8A2E;box-shadow:0 0 0 4px #E5441E,0 0 14px 4px rgba(255,140,40,.6);clip-path:polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%)}
+@keyframes embIn{from{transform:scale(.3);opacity:0}}
+.water{position:absolute;left:12px;right:12px;top:150px;height:40px;background:repeating-linear-gradient(90deg,#3E7FB8 0 8px,#4F93C8 8px 16px)}
+.calm{position:absolute;top:0;bottom:0;background:#A6D8F2;box-shadow:inset 0 0 0 2px #FFFFFF}
+.stone{position:absolute;top:-22px;width:22px;height:14px;margin-left:-11px;background:#9AA0A8;box-shadow:inset 0 -4px 0 #6E737C;clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%)}
+.skips{position:absolute;left:0;right:0;top:220px;text-align:center;font:600 15px var(--display);color:#D9D2F5}
+.ripple{position:absolute;top:160px;width:20px;height:20px;margin-left:-10px;border:2px solid #FFFFFF;border-radius:50%;animation:rip .5s ease-out forwards}
+@keyframes rip{to{transform:scale(3);opacity:0}}
+.basket{position:absolute;bottom:14px;width:64px;height:22px;margin-left:-32px;background:#B9A6F0;box-shadow:inset 0 -6px 0 #7E6BC4;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%)}
+.flake{position:absolute;width:20px;height:20px;margin-left:-10px;background:#FFFFFF;clip-path:polygon(45% 0,55% 0,55% 38%,88% 18%,94% 27%,62% 46%,62% 54%,94% 73%,88% 82%,55% 62%,55% 100%,45% 100%,45% 62%,12% 82%,6% 73%,38% 54%,38% 46%,6% 27%,12% 18%,45% 38%)}
+.lanterns{position:absolute;inset:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.lant{border:0;background:#2B2352;box-shadow:inset 0 0 0 3px #4A4180;display:grid;place-items:center;min-height:44px;transition:background .12s,box-shadow .12s}
+.lant::before{content:'';width:34px;height:46px;background:var(--lc);opacity:.35;clip-path:polygon(30% 0,70% 0,70% 10%,90% 22%,90% 84%,70% 100%,30% 100%,10% 84%,10% 22%,30% 10%)}
+.lant.on{background:#4A3E86;box-shadow:inset 0 0 0 3px #FFE9A8,0 0 22px 6px color-mix(in srgb,var(--lc) 60%,transparent)}
+.lant.on::before{opacity:1}
+.lant:disabled{cursor:default}
+.pgmsg{position:absolute;left:0;right:0;bottom:12px;text-align:center;color:#D9D2F5;font-size:14px}
+.arrows{display:flex;gap:10px;justify-content:center;width:100%;max-width:320px}
+.arrows button{flex:1;min-height:48px;font:600 22px var(--display)}
+@media (prefers-reduced-motion: reduce){.lant{transition:none}}
+.pg-meadow{background:linear-gradient(#1B2C4A,#2A4A5A 62%,#3F7A45 62%,#356A3C) !important}
+.pg-ember{background:linear-gradient(#1E0F18,#3A1A1A 70%,#2B1B16 70%,#21140F) !important}
+.pg-tide{background:linear-gradient(#18284A,#2B4870 44%,#C9B27A 74%,#B59C66) !important}
+.pg-frost{background:linear-gradient(#162139,#2C3F66 80%,#DCE8F7 80%,#C7D6EE) !important}
+.pg-dusk{background:linear-gradient(#21183F,#3A2B66 78%,#1B1633 78%) !important}
+.pgmate{position:absolute;width:96px;height:96px;image-rendering:pixelated;pointer-events:none;z-index:1}
+.pgmate.hop{animation:mateHop .28s ease-out}
+@keyframes mateHop{40%{transform:translateY(-10px)}}
+.pg-meadow .pgmate{left:8px;bottom:6px}
+.pg-ember .pgmate{left:14px;bottom:30px}
+.pg-tide .pgmate{left:10px;bottom:4px}
+.pg-dusk .pgmate{left:50%;margin-left:-48px;bottom:-6px}
+.pg-dusk .lanterns{inset:20px 24px 104px}
+.basket{background:none !important;box-shadow:none !important;clip-path:none !important;width:80px;height:80px;margin-left:-40px;bottom:2px}
+.basket .pgmate{position:static;width:80px;height:80px}
+@media (prefers-reduced-motion: reduce){.pgmate.hop{animation:none}}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -850,7 +901,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.22.3';
+const VERSION='prototype 0.23.0';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -912,7 +963,7 @@ const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00')
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[]};}
+function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -953,6 +1004,7 @@ function sanitize(s){
   if(s.wander)s.wander.realm=Number.isInteger(s.wander.realm)&&s.wander.realm>=0&&s.wander.realm<=4?s.wander.realm:-1;
   const rq=s.request;s.request=(rq&&typeof rq==='object'&&ids.has(rq.cid)&&Number.isInteger(rq.realm)&&rq.realm>=0&&rq.realm<=4)?{cid:rq.cid,realm:rq.realm,made:typeof rq.made==='string'?rq.made:''}:null;
   s.reqLast=typeof s.reqLast==='string'?s.reqLast:'';s.reqDone=int(s.reqDone,0,1e6,0);
+  {const g=s.games&&typeof s.games==='object'&&!Array.isArray(s.games)?s.games:{};const b=g.best&&typeof g.best==='object'&&!Array.isArray(g.best)?g.best:{};const ok={};['meadow','ember','tide','frost','dusk'].forEach(k=>{if(Number.isFinite(b[k])&&b[k]>0)ok[k]=Math.min(999,Math.round(b[k]));});s.games={best:ok,played:int(g.played,0,1e7,0),curioDay:typeof g.curioDay==='string'?g.curioDay:''};}
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
@@ -1980,7 +2032,7 @@ function wanderStart(c,realm){
   if(state.wander)return;
   const now=Date.now();
   const to=Number.isInteger(realm)&&realm>=0&&realm<=4?realm:-1;
-  state.wander={id:c.id,start:now,ready:now+WANDER_MS,seed:((now^((c.seed|0)*2654435761))>>>0),notified:false,realm:to};
+  state.wander={id:c.id,start:now,ready:now+((state.wstat.sent||0)===0?20*60*1000:WANDER_MS),seed:((now^((c.seed|0)*2654435761))>>>0),notified:false,realm:to};
   state.wstat.sent++;save();hf.msg=to>=0?`${c.nick||c.name} heads off toward ${rName(to)}.`:`${c.nick||c.name} heads off down the path.`;sfx('select');
   renderHearth();renderToday();renderNav();
 }
@@ -2103,7 +2155,7 @@ function renderHearth(){
   if(!cs.length){el.innerHTML='<div class="panel-box"><h2>The Hearth is quiet</h2><p class="muted">The Forge leaves a small fire burning in your corner of the world. Find your first Forgeling and it will come sit by it.</p></div>';return;}
   if(state.hearth.sleep){el.innerHTML=sleepHTML();drawHearth(performance.now());return;}
   hf.sel=Math.min(hf.sel,cs.length-1);
-  if(tab==='hearth'){reqMaybe();const nf=furnNew();if(nf.length){const f=FURN.find(x=>x.id===nf[0]);hf.msg=nf.length===1?`Something new by the fire: ${f.name.toLowerCase()}.`:`${nf.length} new things by the fire. Have a look around.`;state.hearth.fseen=(state.hearth.fseen||[]).concat(nf);save();setTimeout(renderToday,0);}}
+  if(tab==='hearth'){reqMaybe();const nf=furnNew();if(nf.length){const f=FURN.find(x=>x.id===nf[0]);hf.msg=(/small request\.$/.test(hf.msg||'')?hf.msg+' ':'')+(nf.length===1?`Something new by the fire: ${f.name.toLowerCase()}.`:`${nf.length} new things by the fire. Have a look around.`);state.hearth.fseen=(state.hearth.fseen||[]).concat(nf);save();setTimeout(renderToday,0);}}
   const c=cs[hf.sel],lv=bondLevel(c),cur=BOND_AT[lv-1],nx=lv<5?BOND_AT[lv]:null,left=visitsLeft(),n=c.nick||c.name,away=wOut()&&state.wander.id===c.id;
   const pct=nx?Math.round(((c.bond||0)-cur)/(nx-cur)*100):100;
   const keeps=[{id:'',name:'None',lvl:1}].concat(KEEPS).concat(KEEPR.filter(k=>state.keepsR.includes(k.id)).map(k=>({id:k.id,name:k.name,lvl:1}))).map(k=>`<button class="chip" data-keep="${k.id}" ${lv<k.lvl?'disabled style="opacity:.45"':''} aria-pressed="${(c.keep||'')===k.id}">${k.name}${lv<k.lvl?' (level '+k.lvl+')':''}</button>`).join('');
@@ -2121,9 +2173,9 @@ function renderHearth(){
       <div class="actions">
         <button class="act" id="hSnack" ${left&&!away?'':'disabled'}>Snack<small>+1 or +2</small></button>
         <button class="act" id="hStory" ${left&&!away?'':'disabled'}>Story<small>+2</small></button>
-        <button class="act" id="hPlay" ${left&&!away?'':'disabled'}>Play<small>+1 to +3</small></button>
+        <button class="act" id="hPlay" ${!away?'':'disabled'}>Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       </div>
-      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3.`:'The fire is low for today. Your Forgelings will be glad to see you tomorrow.'}</p>
+      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play is ${esc(gameFor(c).t)}${state.games.best[gameFor(c).id]?`, best ${unitOf(gameFor(c),state.games.best[gameFor(c).id])}`:''}.`:`The fire is low for today. You can still play ${esc(gameFor(c).t)} just for fun.`}</p>
       <details class="more"><summary>Keepsakes and backdrops</summary><div class="lbl2">Keepsake</div><div class="chips" role="group" aria-label="Keepsake">${keeps}</div>${state.keepsR.length<KEEPR.length?'<p class="muted small" style="margin-top:4px">More keepsakes come as thank-yous when you answer a request.</p>':''}<div class="lbl2">Backdrop</div><div class="chips" role="group" aria-label="Backdrop">${bds}</div></details>${furnListHTML()}</div>`;
   drawHearth(performance.now());
   bloomCheck();
@@ -2160,20 +2212,6 @@ function openStory(c){
   openSheet(`<h2>Tell ${esc(n)} a story</h2><p class="muted small">${esc(talePrompt(c,k,n))}</p>
     <label class="field" style="margin-top:8px"><span>One line is enough</span><input id="storyIn" maxlength="120" autocomplete="off"></label>
     <div class="stack"><button class="primary" id="storySave">Tell it</button><button class="ghost" data-close>Not now</button></div>`);
-}
-function openPlay(c){
-  const n=c.nick||c.name;
-  if(REDUCE){doVisit(c,'sit',1,lineFor(c,'sit',''));return;}
-  openOverlay(`<p class="rv-title">Spark Catch</p><p class="rv-hint">Tap the sparks for ${esc(n)}. You have 15 seconds.</p>
-    <div class="pg" id="pg" aria-label="Spark catch play area"></div>
-    <div class="row" style="width:100%;max-width:320px"><span class="rv-title" id="pgScore">0</span><span class="rv-hint" id="pgTime">15</span></div>
-    <button class="ghost" id="pgSit" data-cid="${c.id}">Just sit together instead</button>`,false);
-  const area=$('#pg');let score=0,left=15,alive=true;
-  const spawn=()=>{if(!alive)return;const b=document.createElement('button');b.className='spk';b.type='button';b.setAttribute('aria-label','Spark');b.style.left=(4+Math.random()*80)+'%';b.style.animationDuration=(1.9+Math.random()*1.2)+'s';
-    b.addEventListener('pointerdown',ev=>{ev.preventDefault();if(b._c)return;b._c=1;score++;$('#pgScore').textContent=score;b.classList.add('caught');chime(0);setTimeout(()=>b.remove(),160);});
-    b.addEventListener('animationend',()=>b.remove());area.appendChild(b);};
-  const iv=setInterval(spawn,520),tm=setInterval(()=>{left--;const t=$('#pgTime');if(t)t.textContent=left;if(left<=0){pgT.stop();pgT=null;const pts=score>=10?3:score>=5?2:1;doVisit(c,'play',pts,lineFor(c,'play',score));}},1000);
-  pgT={stop:()=>{alive=false;clearInterval(iv);clearInterval(tm);}};
 }
 let pickSel=[];
 function openPick(){
@@ -2229,7 +2267,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=26;
+const SEEN_V=27;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2370,7 +2408,9 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li>
+    <ul class="newlist"><li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
+    <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li>
+    <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li>
     <li><b>Found by the fire.</b> New Forgelings and packs now open at night by a fire, with embers drifting up.</li>
     <li><b>Stamps and rosettes.</b> The Journal marks the days you showed up with a little flame and rest days with a moon. Ribbons are pixel rosettes now.</li>
     <li><b>A tidier binder.</b> Filters live behind one button.</li>
@@ -2802,7 +2842,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspName')openEdit(inspId,'inspect');
   else if(b.dataset.snack!==undefined){const c=slotCards()[hf.sel];if(c){const fav=+b.dataset.snack===c.seed%4;doVisit(c,'snack',fav?2:1,lineFor(c,fav?'snackFav':'snack',''));}}
   else if(b.id==='storySave'){const c=slotCards()[hf.sel],t=(($('#storyIn')||{}).value||'').trim();if(c){if(t){c.fire=(c.fire||[]).concat([{date:todayKey(),text:t}]);}doVisit(c,'story',2,lineFor(c,'story',''));renderChronicle();}}
-  else if(b.id==='pgSit'){const c=cardById(+b.dataset.cid);if(c){if(pgT){pgT.stop();pgT=null;}doVisit(c,'sit',1,lineFor(c,'sit',''));}}
+  else if(b.id==='pgSit'){const c=cardById(+b.dataset.cid);if(c){const fr=game&&game.free;if(pgT){pgT.stop();pgT=null;}game=null;if(fr){closeModal();renderHearth();}else doVisit(c,'sit',1,lineFor(c,'sit',''));}}
   else if(b.dataset.pick){const id=+b.dataset.pick,i=pickSel.indexOf(id);if(i>=0){pickSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}else if(pickSel.length<3){pickSel.push(id);b.classList.add('on');b.setAttribute('aria-pressed','true');}else{sfx('no');toast('Three is plenty for one fire.');}}
   else if(b.id==='pickSave'){state.hearth.slots=pickSel.slice();hf.sel=0;hf.msg='';save();closeModal();renderHearth();toast(pickSel.length?'The fire has new company.':'The fire will pick someone for you.');}
   else if(b.dataset.equip){const c=cardById(+b.dataset.cid);if(c){c.keep=b.dataset.equip;save();closeModal();renderHearth();renderChronicle();}}
@@ -3039,7 +3079,7 @@ document.addEventListener('click',e=>{
 /* ---- The Hearth grows from what you actually do. A few things appear by the fire for every kind of calling you
    keep coming back to. Worked out from your history, so it can never be bought, lost or reset. ---- */
 const FURN=[
- {id:'rug',name:'A woven rug',need:3},{id:'lights',name:'A string of lanterns',need:10},{id:'tree',name:'A little tree',need:30},{id:'flies',name:'Fireflies',need:60},
+ {id:'rug',name:'A woven rug',need:1},{id:'lights',name:'A string of lanterns',need:5},{id:'tree',name:'A little tree',need:15},{id:'flies',name:'Fireflies',need:40},
  {id:'hedge',name:'A trimmed hedge',v:0},{id:'stones',name:'Balanced stones',v:1},{id:'pond',name:'A small pond',v:2},{id:'kite',name:'A paper kite',v:3},
  {id:'mail',name:'A mailbox',v:4},{id:'stump',name:'A chopping stump',v:5},{id:'ball',name:'A bright ball',v:6},{id:'lamp',name:'A lamp post',v:7},
  {id:'menhir',name:'A standing stone',v:8},{id:'bell',name:'A little bell',v:9},{id:'fence',name:'A mended fence',v:10},{id:'fern',name:'A potted fern',v:11}];
@@ -3054,7 +3094,7 @@ function furnListHTML(){
   const t=doneTally(),have=FURN.filter(f=>furnHave(f,t)).length;
   return `<details class="more"><summary>By the fire, ${have} of ${FURN.length}</summary><p class="muted small" style="margin-top:6px">Things appear by the fire as you keep doing your callings. Nothing here can be bought or lost.</p><ul class="furn">${FURN.map(f=>{
     const ok=furnHave(f,t),V=f.v!=null?VECTORS[f.v]:null;
-    const how=V?(ok?`You have ${DID[f.v]} ${t.v[f.v]} times.`:`After ${FURN_V} ${V.name} days. ${t.v[f.v]} so far.`):(ok?`For ${f.need} callings done.`:`After ${f.need} callings done. ${t.all} so far.`);
+    const how=V?(ok?`You have ${DID[f.v]} ${t.v[f.v]} times.`:`After ${FURN_V} ${V.name} days. ${t.v[f.v]} so far.`):(ok?`For ${f.need===1?'your first calling':f.need+' callings done'}.`:`After ${f.need===1?'your first calling':f.need+' callings done'}. ${t.all} so far.`);
     return `<li class="${ok?'on':''}"><span class="fi" aria-hidden="true">${ok?'✓':''}</span><span><b>${f.name}</b><small>${how}</small></span></li>`;}).join('')}</ul></details>`;
 }
 const FCOL={k:'#6B4A2E',w:'#A0703F',g:'#4FA36A',G:'#2F7A4A',l:'#8FD08A',s:'#B4B9C1',S:'#767B85',b:'#4F93C8',B:'#A6D8F2',r:'#D9475A',p:'#F29BB5',W:'#F4F0E8',m:'#4D5262',o:'#C8743E',a:'#E3B341',y:'#FFD36B',Y:'#FFF6CF',P:'#9B7BD8'};
@@ -3102,7 +3142,7 @@ function openWanderTo(c){
   wPickId=c.id;const n=c.nick||c.name,rq=state.request,ra=rq?cardById(rq.cid):null;
   const opts=rKnown().map(ti=>{const all=rCurios(ti),f=all.filter(x=>state.curios[x.id]).length,asked=rq&&rq.realm===ti&&ra;
     return `<button class="moodbtn" data-wgo="${ti}"><div><b>${esc(rName(ti))}</b><span>${f} of ${all.length} curios from here found${asked?`. ${esc(ra.nick||ra.name)} asked for something from here.`:'.'}</span></div></button>`;}).join('');
-  openSheet(`<h2>Where should ${esc(n)} wander?</h2><p class="muted small">Realms on your map. They are back in about three hours.</p>${opts}
+  openSheet(`<h2>Where should ${esc(n)} wander?</h2><p class="muted small">Realms on your map. ${(state.wstat.sent||0)===0?'This first time, they are back in about 20 minutes.':'They are back in about three hours.'}</p>${opts}
     <button class="moodbtn" data-wgo="-1"><div><b>Anywhere</b><span>Wherever the path goes. Good for finding something new.</span></div></button>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
 }
@@ -3113,7 +3153,7 @@ const KEEPR=[{id:'daisies',name:'Flower crown'},{id:'charm',name:'Ember charm'},
 const reqLine=rq=>{const c=cardById(rq.cid);return ((c&&c.dark)?REQ_D:REQ_C)[rq.realm].replace(/\{r\}/g,rName(rq.realm));};
 const reqAsker=()=>state.request?cardById(state.request.cid):null;
 function reqMaybe(){
-  if(state.request||state.hearth.sleep||dayN()<3||(state.wstat.back||0)<1)return;
+  if(state.request||state.hearth.sleep||dayN()<2||(state.wstat.back||0)<1)return;
   if(state.reqLast&&dayDiff(state.reqLast,todayKey())<2)return;
   const out=wOut()?state.wander.id:-1,who=slotCards().filter(c=>bondLevel(c)>=2&&c.id!==out),known=rKnown();
   if(!who.length||!known.length)return;
@@ -3270,6 +3310,122 @@ function termsHTML(){
   <div class="tale"><b>The art and the world</b><p>Forge, the Forgelings and their stories belong to their creator. Please do not copy them into other products.</p></div>
   <div class="stack"><button class="primary" data-close>Done</button></div>`;
 }
+
+
+/* ---- A game for each realm. Played from the Hearth: within your three visits it grows your bond (and, on a great
+   round, might turn up a curio from that realm); after that you can keep playing just for fun. ---- */
+const GAMES=[
+ {id:'meadow',t:'Dandelion Drift',h:'Tap the seeds before they float away.',hi:10,mid:5,u:['seed','seeds']},
+ {id:'ember',t:'Keep the Fire',h:'Tap the embers to feed the fire. Keep it burning.',hi:12,mid:6,u:['ember','embers']},
+ {id:'tide',t:'Skipping Stones',h:'Tap Skip when the stone is over the calm water.',hi:6,mid:3,u:['skip','skips']},
+ {id:'frost',t:'Snowflake Catch',h:'Slide to catch the falling snowflakes.',hi:10,mid:5,u:['snowflake','snowflakes']},
+ {id:'dusk',t:'Lantern Lights',h:'Watch the lanterns, then light them in the same order.',hi:5,mid:3,u:['lantern','lanterns']}];
+const gameFor=c=>GAMES[Math.abs(c.theme|0)%5];
+const unitOf=(G,n)=>n+' '+G.u[n===1?0:1];
+let game=null;
+function openPlay(c){
+  const n=c.nick||c.name,free=visitsLeft()<1,G=gameFor(c);
+  if(REDUCE&&G.id!=='dusk'){if(!free)doVisit(c,'sit',1,lineFor(c,'sit',''));else toast('With reduced motion on, this game rests. Try a Dusk Forgeling’s lantern game.');return;}
+  const best=state.games.best[G.id]||0;
+  openOverlay(`<p class="rv-title">${G.t}</p><p class="rv-hint">${G.h}${best?` Best: ${unitOf(G,best)}.`:''}</p>
+    <div class="pg pg-${G.id}" id="pg" aria-label="${G.t} play area"></div>
+    <div class="row" style="width:100%;max-width:320px"><span class="rv-title" id="pgScore" aria-live="polite">0</span><span class="rv-hint" id="pgTime">${G.id==='dusk'?'':'15s'}</span></div>
+    ${G.id==='tide'?'<div class="pgbtnrow"><button class="primary" id="pgSkip">Skip</button></div>':''}
+    ${G.id==='frost'?'<div class="arrows"><button class="ghost" id="pgL" aria-label="Move left">←</button><button class="ghost" id="pgR" aria-label="Move right">→</button></div>':''}
+    ${free?'<p class="rv-hint small" style="margin:0">Just for fun: your visits are used up for today.</p>':''}
+    <button class="ghost" id="pgSit" data-cid="${c.id}">${free?'Stop playing':'Just sit together instead'}</button>`,false);
+  game={c,G,free,score:0,alive:true,timers:[],raf:0};const pgEl=$('#pg');if(pgEl&&G.id!=='frost')pgEl.insertAdjacentHTML('beforeend',mateHTML(c));
+  pgT={stop:()=>{if(!game)return;game.alive=false;game.timers.forEach(t=>{clearInterval(t);clearTimeout(t);});cancelAnimationFrame(game.raf);}};
+  ({meadow:gMeadow,ember:gEmber,tide:gTide,frost:gFrost,dusk:gDusk})[G.id]();
+}
+const SPR_URL={};
+function spriteURL(c){const k=ckey(c);if(SPR_URL[k])return SPR_URL[k];try{const e=prep(c);if(!e.sp[0])e.sp[0]=buildSprite(e.spec,0,0);const g=e.sp[0],cv=document.createElement('canvas');cv.width=32;cv.height=32;const x=cv.getContext('2d'),im=x.createImageData(32,32);for(let i=0;i<1024;i++){const sl=g[i];if(!sl)continue;const q=e.pal[sl];im.data[i*4]=q[0];im.data[i*4+1]=q[1];im.data[i*4+2]=q[2];im.data[i*4+3]=255;}x.putImageData(im,0,0);return SPR_URL[k]=cv.toDataURL();}catch(err){return '';}}
+const mateHTML=c=>{const u=spriteURL(c);return u?`<img class="pgmate" src="${u}" alt="">`:'';};
+const gScore=v=>{game.score=v;const s=$('#pgScore');if(s)s.textContent=v;const m=document.querySelector('#pg .pgmate');if(m){m.classList.remove('hop');void m.offsetWidth;m.classList.add('hop');}};
+function gClock(sec){let left=sec;game.timers.push(setInterval(()=>{if(!game||!game.alive)return;left--;const t=$('#pgTime');if(t)t.textContent=Math.max(0,left)+'s';if(left<=0)finishGame();},1000));}
+function gMeadow(){
+  const area=$('#pg');
+  const spawn=()=>{if(!game||!game.alive)return;const b=document.createElement('button');b.className='seed';b.type='button';b.setAttribute('aria-label','Seed');b.style.left=(4+Math.random()*78)+'%';b.style.animationDuration=(2.6+Math.random()*1.2)+'s';
+    b.addEventListener('pointerdown',ev=>{ev.preventDefault();if(b._c||!game||!game.alive)return;b._c=1;gScore(game.score+1);b.classList.add('caught');chime(0);setTimeout(()=>b.remove(),160);});
+    b.addEventListener('animationend',()=>b.remove());area.appendChild(b);};
+  spawn();game.timers.push(setInterval(spawn,560));gClock(15);
+}
+function gEmber(){
+  const area=$('#pg');area.innerHTML='<div class="heat" aria-hidden="true"><i></i></div><div class="fire" aria-hidden="true"><i></i><b></b></div><p class="pgmsg" id="pgMsg"></p>'+mateHTML(game.c);
+  let heat=60;const draw=()=>{const f=area.querySelector('.fire i'),h=area.querySelector('.heat i');if(f)f.style.setProperty('--h',Math.max(8,heat)+'%');if(h)h.style.width=heat+'%';};draw();
+  game.timers.push(setInterval(()=>{if(!game||!game.alive)return;heat=Math.max(0,heat-1.1);draw();if(heat<=0){const m=$('#pgMsg');if(m)m.textContent='The fire went out.';finishGame();}},100));
+  const spawn=()=>{if(!game||!game.alive)return;const b=document.createElement('button');b.className='emb';b.type='button';b.setAttribute('aria-label','Ember');
+    let x,y;do{x=6+Math.random()*80;y=14+Math.random()*70;}while(x>32&&x<62&&y>44);b.style.left=x+'%';b.style.top=y+'%';
+    b.addEventListener('pointerdown',ev=>{ev.preventDefault();if(b._c||!game||!game.alive)return;b._c=1;heat=Math.min(100,heat+13);draw();gScore(game.score+1);b.classList.add('caught');chime(0);setTimeout(()=>b.remove(),160);});
+    area.appendChild(b);setTimeout(()=>{if(!b._c)b.remove();},1400);};
+  spawn();game.timers.push(setInterval(spawn,620));gClock(15);
+}
+function gTide(){
+  const area=$('#pg');area.innerHTML='<div class="water" aria-hidden="true"><div class="calm" id="pgCalm"></div><div class="stone" id="pgStone"></div></div><p class="skips" id="pgSkips">Three misses and the stone sinks.</p>'+mateHTML(game.c);
+  let zone=.30,miss=0,speed=1.6,t0=performance.now();const calm=$('#pgCalm'),stone=$('#pgStone');
+  const place=()=>{calm.style.left=((1-zone)/2*100)+'%';calm.style.width=(zone*100)+'%';};place();
+  const pos=()=>(Math.sin((performance.now()-t0)/1000*speed*Math.PI)+1)/2;
+  const loop=()=>{if(!game||!game.alive)return;stone.style.left=(pos()*100)+'%';game.raf=requestAnimationFrame(loop);};loop();
+  game.skip=()=>{if(!game||!game.alive)return;const p=pos(),hit=Math.abs(p-.5)<=zone/2;const r=document.createElement('div');r.className='ripple';r.style.left='calc(12px + '+(p*100)+'% - '+(p*24)+'px)';area.appendChild(r);setTimeout(()=>r.remove(),520);
+    if(hit){gScore(game.score+1);zone=Math.max(.12,zone-.03);speed=Math.min(3.2,speed+.18);place();chime(0);$('#pgSkips').textContent=game.score===1?'One skip!':game.score+' skips!';}
+    else{miss++;sfx('no');$('#pgSkips').textContent=miss>=3?'The stone sank.':(3-miss)+(3-miss===1?' miss left.':' misses left.');if(miss>=3)finishGame();}};
+  area.addEventListener('pointerdown',ev=>{if(ev.target.closest('button'))return;ev.preventDefault();game&&game.skip&&game.skip();});
+  gClock(15);
+}
+function gFrost(){
+  const area=$('#pg');area.innerHTML='<div class="basket" id="pgBasket" aria-hidden="true">'+mateHTML(game.c)+'</div>';
+  const W=()=>area.clientWidth,bk=$('#pgBasket');let bx=.5,flakes=[],last=performance.now();
+  const setX=v=>{bx=Math.max(.08,Math.min(.92,v));bk.style.left=(bx*100)+'%';};setX(.5);
+  const fromEv=ev=>{const r=area.getBoundingClientRect();setX((ev.clientX-r.left)/r.width);};
+  area.addEventListener('pointerdown',ev=>{ev.preventDefault();fromEv(ev);});area.addEventListener('pointermove',ev=>{if(ev.pressure>0||ev.pointerType==='mouse')fromEv(ev);});
+  game.nudge=d=>setX(bx+d);
+  const spawn=()=>{if(!game||!game.alive)return;const f=document.createElement('div');f.className='flake';f.setAttribute('aria-hidden','true');const o={el:f,x:.06+Math.random()*.88,y:-20,v:70+Math.random()*60};f.style.left=(o.x*100)+'%';f.style.top='-20px';area.appendChild(f);flakes.push(o);};
+  const loop=now=>{if(!game||!game.alive)return;const dt=Math.min(.05,(now-last)/1000);last=now;const H=area.clientHeight,bw=72/Math.max(1,W());
+    flakes=flakes.filter(o=>{o.y+=o.v*dt;o.el.style.top=o.y+'px';if(o.y>H-84&&o.y<H-40&&Math.abs(o.x-bx)<bw/2+.03){gScore(game.score+1);chime(0);o.el.remove();return false;}if(o.y>H){o.el.remove();return false;}return true;});
+    game.raf=requestAnimationFrame(loop);};
+  game.raf=requestAnimationFrame(loop);spawn();game.timers.push(setInterval(spawn,480));gClock(15);
+}
+function gDusk(){
+  const area=$('#pg'),cols=['#FFD36B','#F29BB5','#A6D8F2','#B5DDB5'],names=['Gold','Rose','Blue','Green'];
+  area.innerHTML=`<div class="lanterns">${cols.map((c,i)=>`<button class="lant" data-lant="${i}" style="--lc:${c}" aria-label="${names[i]} lantern" disabled></button>`).join('')}</div><p class="pgmsg" id="pgMsg">Watch.</p>`+mateHTML(game.c);
+  const L=[...area.querySelectorAll('.lant')],seq=[],t=$('#pgTime');let step=0,input=false;
+  const flash=(i,ms)=>{L[i].classList.add('on');chime(0);game.timers.push(setTimeout(()=>L[i].classList.remove('on'),ms));};
+  const round=()=>{if(!game||!game.alive)return;input=false;L.forEach(b=>b.disabled=true);seq.push(Math.floor(Math.random()*4));step=0;const m=$('#pgMsg');if(m)m.textContent='Watch.';if(t)t.textContent='Round '+seq.length;
+    seq.forEach((v,k)=>game.timers.push(setTimeout(()=>flash(v,REDUCE?380:420),600+k*640)));
+    game.timers.push(setTimeout(()=>{if(!game||!game.alive)return;input=true;L.forEach(b=>b.disabled=false);if(m)m.textContent='Your turn.';L[0].focus({preventScroll:true});},600+seq.length*640));};
+  L.forEach((b,i)=>b.addEventListener('click',()=>{if(!input||!game||!game.alive)return;flash(i,220);
+    if(i!==seq[step]){input=false;const m=$('#pgMsg');if(m)m.textContent='The lanterns flicker out.';sfx('no');game.timers.push(setTimeout(finishGame,700));return;}
+    step++;if(step===seq.length){gScore(seq.length);if(seq.length>=12){game.timers.push(setTimeout(finishGame,500));return;}input=false;game.timers.push(setTimeout(round,700));}}));
+  round();
+}
+function finishGame(){
+  const g=game;if(!g||!g.alive)return;if(pgT){pgT.stop();}pgT=null;game=null;
+  const G=g.G,score=g.score,best=state.games.best[G.id]||0,nb=score>best&&score>0;if(nb)state.games.best[G.id]=score;state.games.played=(state.games.played||0)+1;save();
+  const n=g.c.nick||g.c.name;
+  if(g.free){
+    openOverlay(`<p class="rv-title">${G.t}</p><p class="rv-title" style="font-size:30px">${unitOf(G,score)}</p><p class="rv-hint">${nb?'A new best!':best?'Best: '+unitOf(G,best)+'.':''} ${esc(n)} ${g.c.dark?'seems quietly pleased.':'had a lovely time.'}</p>
+      <div class="pgbtnrow"><button class="primary" id="pgAgain" data-cid="${g.c.id}">Play again</button><button class="ghost" id="pgDone">Done</button></div>`,false);
+    return;
+  }
+  const pts=score>=G.hi?3:score>=G.mid?2:1;
+  let line=g.c.dark?`${n} rumbles with approval. ${unitOf(G,score)}.`:`${n} cheers. ${unitOf(G,score)}!`;
+  if(pts===3&&state.games.curioDay!==todayKey()&&Math.random()<.4){
+    const ti=Math.abs(g.c.theme|0)%5,all=rCurios(ti),un=all.filter(x=>!state.curios[x.id]),pool=un.length?un:all,cu=pool[Math.floor(Math.random()*pool.length)];
+    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`;}
+  }
+  if(nb)line+=' A new best!';
+  doVisit(g.c,'play',pts,line);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('#modal button');if(!b)return;
+  if(b.id==='pgSkip'&&game&&game.skip)game.skip();
+  else if(b.id==='pgL'&&game&&game.nudge)game.nudge(-.12);
+  else if(b.id==='pgR'&&game&&game.nudge)game.nudge(.12);
+  else if(b.id==='pgAgain'){const c=cardById(+b.dataset.cid);closeModal();if(c)openPlay(c);}
+  else if(b.id==='pgDone'){closeModal();renderHearth();}
+});
+document.addEventListener('keydown',e=>{if(!game||!game.alive)return;if(game.nudge&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();game.nudge(e.key==='ArrowLeft'?-.08:.08);}else if(game.skip&&(e.key===' '||e.key==='Enter')&&document.activeElement&&document.activeElement.id!=='pgSit'){e.preventDefault();game.skip();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&game&&game.alive)finishGame();});
 
 /* ================= Start ================= */
 state=load()||migrate(fresh());
