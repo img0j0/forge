@@ -276,6 +276,15 @@ html.release details.dev{display:none}
 .basket{background:none !important;box-shadow:none !important;clip-path:none !important;width:80px;height:80px;margin-left:-40px;bottom:2px}
 .basket .pgmate{position:static;width:80px;height:80px}
 @media (prefers-reduced-motion: reduce){.pgmate.hop{animation:none}}
+/* ---- 0.24: share picture, backups, your own small thing ---- */
+.shareimg{display:block;width:min(100%,300px);height:auto;margin:4px auto 2px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.filepick{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:44px;cursor:pointer;overflow:hidden}
+.filepick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.filepick:focus-within{outline:3px solid var(--butter);outline-offset:2px}
+.cal .c{position:relative}
+.cal .c.own::after,#view-chronicle .cal span.c.own::after{content:'';position:absolute;right:3px;bottom:3px;width:7px;height:7px;background:#F2B23E;box-shadow:0 0 0 1.5px var(--ink)}
+.calkey i.ownkey{width:8px;height:8px;background:#F2B23E;box-shadow:0 0 0 1.5px var(--ink);vertical-align:1px}
+.rowl.ownrow[aria-pressed="true"] .ri{color:#3E8E4F}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -552,6 +561,21 @@ const VECTORS=[
   {name:'Systems',ability:'Compound',color:'#B5D0DE',blurb:'Improve one process that compounds.',task:`Fix one small annoyance so it never bothers you again.`,question:`What friction am I tolerating that I shouldn't?`},
   {name:'Presence',ability:'Right Here',color:'#BDE5CB',blurb:'Be fully where you are.',task:`Put your phone away for one whole meal or walk.`,question:`What is here right now that I'm missing?`}
 ];
+/* 0.24: more ways to say each calling, so the daily card stays fresh. The original phrasing is one of them. */
+const TASK_ALT=[
+ [`Pick one thing on your plate and decide you won't do it.`,`Clear one small space: a drawer, a desktop or an inbox folder.`,`Say no to one thing that doesn't need a yes.`],
+ [`Do first the one thing that would make today feel done.`,`Find the task that unblocks someone else, and do it.`,`Spend ten minutes setting up tomorrow so it starts easier.`],
+ [`Pick one thing and give it 25 minutes with notifications off.`,`Read something long for 20 minutes without skimming.`,`Stay with one problem until you've made real progress, no switching.`],
+ [`Send the draft you've been sitting on.`,`Make a rough first version of something, start to finish.`,`Make the decision you've been going back and forth on.`],
+ [`Tell someone one specific thing you appreciate about them.`,`Call or voice-message someone instead of texting.`,`Check in on someone you haven't heard from in a while.`],
+ [`Start the task you'd rather avoid. Five minutes is enough.`,`Make the call or send the email you've been dreading.`,`Do the hardest thing on your list before anything else.`],
+ [`Spend ten minutes on something with no purpose but fun.`,`Try one small thing you've never done before.`,`Make something silly, just for you.`],
+ [`Go back to something you made and fix one small thing.`,`Spend ten minutes tidying up a piece of your work.`,`Learn one small trick that makes your work better.`],
+ [`Take a five-minute walk with nothing in your ears.`,`Sit somewhere quiet and let your thoughts wander for five minutes.`,`Write down whatever is on your mind, then put the pen down.`],
+ [`Ask the question you've been holding back.`,`Tell someone honestly how you feel about something.`,`Bring up the small problem you've been ignoring.`],
+ [`Simplify one thing you do every week.`,`Give one thing you keep losing a place where it lives.`,`Write down the steps for something you always have to remember.`],
+ [`Eat one meal without a screen.`,`Notice five things around you that you'd usually walk past.`,`Give your full attention to the next conversation you have.`]];
+function taskFor(v,k){const V=VECTORS[v];if(!V)return '';const all=[V.task].concat(TASK_ALT[v]||[]),n=Math.floor(Date.parse(String(k)+'T00:00:00Z')/864e5);if(!Number.isFinite(n))return V.task;return all[((Math.imul(n,0x9E3779B1)>>>0)+v)%all.length];}
 /* Each theme has a cute palette and a dark twin. New themes = new palettes + a scene. */
 const THEMES=[
   {id:'meadow',name:'Meadow',
@@ -901,7 +925,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.23.0';
+const VERSION='prototype 0.24.0';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -963,7 +987,7 @@ const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00')
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''}};}
+function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1005,6 +1029,8 @@ function sanitize(s){
   const rq=s.request;s.request=(rq&&typeof rq==='object'&&ids.has(rq.cid)&&Number.isInteger(rq.realm)&&rq.realm>=0&&rq.realm<=4)?{cid:rq.cid,realm:rq.realm,made:typeof rq.made==='string'?rq.made:''}:null;
   s.reqLast=typeof s.reqLast==='string'?s.reqLast:'';s.reqDone=int(s.reqDone,0,1e6,0);
   {const g=s.games&&typeof s.games==='object'&&!Array.isArray(s.games)?s.games:{};const b=g.best&&typeof g.best==='object'&&!Array.isArray(g.best)?g.best:{};const ok={};['meadow','ember','tide','frost','dusk'].forEach(k=>{if(Number.isFinite(b[k])&&b[k]>0)ok[k]=Math.min(999,Math.round(b[k]));});s.games={best:ok,played:int(g.played,0,1e7,0),curioDay:typeof g.curioDay==='string'?g.curioDay:''};}
+  {const o=s.own&&typeof s.own==='object'&&!Array.isArray(s.own)?s.own:{};const DK=/^\d{4}-\d{2}-\d{2}$/;s.own={text:typeof o.text==='string'?o.text.trim().slice(0,60):'',days:(Array.isArray(o.days)?o.days:[]).filter((d,i,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===i).sort().slice(-800)};
+   const bk=s.backup&&typeof s.backup==='object'&&!Array.isArray(s.backup)?s.backup:{};s.backup={at:typeof bk.at==='string'&&DK.test(bk.at)?bk.at:'',ask:typeof bk.ask==='string'&&DK.test(bk.ask)?bk.ask:''};}
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
@@ -1123,7 +1149,7 @@ function openVector(){
   openSheet(`<p class="muted center small">Day ${dayN()}, ${dateLabel(todayKey())}</p>
     <div class="flip${isFresh?'':' flipped'}" id="vflip"><div class="flip-in">
       <button class="vface vback" id="vBack"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg><span>Today's card</span><small>Tap to turn it over</small></button>
-      <div class="vface vfront"><div class="vband" style="background:${V.color}"><b>${V.name}</b></div><div class="vbody"><p>${V.blurb}</p><p><strong>Today's small thing</strong>${V.task}</p><p><strong>The Forge asks</strong>${V.question}</p></div></div>
+      <div class="vface vfront"><div class="vband" style="background:${V.color}"><b>${V.name}</b></div><div class="vbody"><p>${V.blurb}</p><p><strong>Today's small thing</strong>${taskFor(state.todayV,state.date)}</p><p><strong>The Forge asks</strong>${V.question}</p></div></div>
     </div></div>
     ${first?`<button class="primary" id="vDoneNow" ${isFresh?'hidden':''}>I did it. Find my Forgeling</button><button class="ghost" id="vOk" ${isFresh?'hidden':''}>I'll do it in a bit</button>`:`<button class="primary" id="vOk" ${isFresh?'hidden':''}>Got it</button>`}
     ${first?'<p class="muted small center" style="margin-top:10px">No account needed. Do the small thing, then tap to find your first Forgeling.</p>':''}`,!isFresh);
@@ -1250,7 +1276,7 @@ function inspect(id){
     <div class="stage lit" id="stage" style="--rc:${R.glow};--gl:${R.gl}">${cardHTML(c,{w:bigW()})}</div>
     <p class="rv-hint" id="inspHint">${inspHint(c)}</p>${keptAge(c)>=KEPT_DAYS?'':keptLine(c)}
     <div class="btnrow"><button class="primary" id="inspFlip">Flip card</button><button class="primary" id="inspName">Name and tale</button></div>
-    <div class="row" style="justify-content:center;gap:22px"><button class="ghost" id="inspFav">${c.fav?'\u2605 Favorited':'\u2606 Favorite'}</button><button class="ghost" data-tale="${c.id}">Story</button>${keptAge(c)>=KEPT_DAYS?keptLine(c):''}<button class="ghost" id="ovClose">Close</button></div>`,true);
+    <div class="row" style="justify-content:center;gap:4px 10px;flex-wrap:wrap"><button class="ghost" id="inspFav">${c.fav?'\u2605 Favorited':'\u2606 Favorite'}</button><button class="ghost" data-tale="${c.id}">Story</button><button class="ghost" id="inspShare">Share</button>${keptAge(c)>=KEPT_DAYS?keptLine(c):''}<button class="ghost" id="ovClose">Close</button></div>`,true);
   attachTilt($('#stage'));hydrate(modal);$('#ovClose').focus({preventScroll:true});
 }
 function talk(){
@@ -1287,10 +1313,13 @@ function renderToday(){
   const EMB='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg>';
   const IC={hearth:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2 0 2 1 3 2 3 0-3-1-5 1-8.8z"/></svg>',
     map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>',
-    pack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 7h16M12 11l2.5 2-2.5 4-2.5-4z"/></svg>'};
+    pack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 7h16M12 11l2.5 2-2.5 4-2.5-4z"/></svg>',
+    tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M7.5 12.5l3 3 6-7"/></svg>',
+    ring:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/></svg>',
+    save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>'};
   let hero='';
   if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
-  else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${V.name}</div><p>${V.task}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
+  else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${V.name}</div><p>${taskFor(state.todayV,state.date)}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
   else if(s==='done'){const c=cardById(state.todayCard);hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else hero=`<h2>Resting today</h2><p class="muted">Your progress is safe and nothing is lost. A new card arrives tomorrow.</p><button class="ghost" id="btnUnrest">Actually, show me today's card</button><div style="width:100%;text-align:left">${echoHTML()}</div>`;
   const row=(id,ic,title,sub,extra,ready)=>`<button class="rowl${ready?' ready':''}" ${id?`id="${id}"`:'disabled'}><span class="ri">${ic}</span><span class="rt"><b>${title}</b><span class="rs">${sub}</span>${extra||''}</span>${id?'<span class="chev" aria-hidden="true">›</span>':''}</button>`;
@@ -1300,6 +1329,8 @@ function renderToday(){
   else if(state.packs===0)rows.push(row('',IC.pack,'Next pack',`${5-state.progress} more ${5-state.progress===1?'day':'days'} to go. Rest days and missed days never reset this.`,`<div class="pips" role="img" aria-label="${state.progress} of 5 days toward your next pack">${pips}</div>`));
   if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();rows.push(row('btnHearth',IC.hearth,'The Hearth',(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'The fire is low for today.'))+(wl?' '+wl:''),'',nf.length>0));}
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
+  if(state.own&&state.own.text){const on=state.own.days.includes(todayKey());rows.unshift(`<button class="rowl ownrow${on?' ready':''}" id="btnOwn" aria-pressed="${on}"><span class="ri">${on?IC.tick:IC.ring}</span><span class="rt"><b>${esc(state.own.text)}</b><span class="rs">${on?'Done today. Tap again if you didn’t mean to.':'Your own small thing. Tap when it’s done.'}</span></span></button>`);}
+  if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
   const jr=state.journal[state.date],reflect=s!=='fresh'?`<div class="panel-box"><h2>In the margin</h2><p class="muted"><i>The Forge asks:</i> ${esc(V.question)}</p>${jr&&!ui.editJ?`<p class="mine">“${esc(jr.text)}”</p><button class="ghost" id="jEdit" style="padding-left:0">Edit</button>`:`<label class="field" style="margin-top:8px"><span>Write one line in the margin. It stays on this device.</span><input id="jIn" maxlength="200" value="${esc(jr?jr.text:'')}" placeholder="Whatever comes to mind" autocomplete="off"></label><div class="row"><button class="pill" id="jSave">Save</button></div>`}</div>`:'';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}<div class="group">${rows.join('')}</div>
@@ -1360,6 +1391,9 @@ function renderSettings(){
       ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}</div>
     <div class="setblock"><b>Comfort</b><p class="muted small">Motion, lore, and appearance.</p>
       <div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and Chronicle ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app can follow your day, from dawn to night.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div></div>
+    <div class="setblock"><b>Your own small thing</b><p class="muted small">Optional. One habit of your own to tick off on Today, beside the daily card. It never earns packs, and missing it never counts against you.</p>
+      <label class="field"><span>Your small thing</span><input id="ownIn" maxlength="60" value="${esc(state.own.text)}" placeholder="For example: drink a glass of water" autocomplete="off"></label>
+      <div class="chips"><button class="pill" id="ownSave">${state.own.text?'Save changes':'Add it to Today'}</button>${state.own.text?'<button class="pill" id="ownClear">Remove it</button>':''}</div></div>
     <div class="setblock"><b>Morning nudge</b><p class="muted small">Prototype only. Nothing is sent yet.</p>
       <div class="chips" role="group" aria-label="Nudge time">${[[null,'Off'],['8:00 am','8:00 am'],['12:00 pm','12:00 pm'],['6:00 pm','6:00 pm']].map(a=>`<button class="chip" data-setnudge="${a[0]||''}" aria-pressed="${(S.nudge||null)===a[0]}">${a[1]}</button>`).join('')}</div></div>
     ${installTipHTML()}
@@ -2267,7 +2301,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=27;
+const SEEN_V=28;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2299,16 +2333,17 @@ function recapHTML(){
 function calendarHTML(){
   const days=lastDays(35),today=todayKey();
   const head=days.slice(0,7).map(k=>`<span class="wd">${new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'narrow'})}</span>`).join('');
-  let n=0;
+  let n=0,no=0;const ownSet=new Set((state.own&&state.own.days)||[]);
   const cells=days.map(k=>{
     const h=state.history.find(x=>x.date===k);let cls='c',label='before you started';
     if(k<state.startDate){cls+=' future';}
     else if(h){cls+=' '+h.status;if(h.status==='done')n++;label=h.status==='done'?'showed up':h.status==='rest'?'rested':'missed, no penalty';}
     else if(k===today){label='today';}
     if(k===today)cls+=' now';
+    if(ownSet.has(k)&&k>=state.startDate){cls+=' own';label+=', your own small thing done';no++;}
     return `<span class="${cls}" role="img" aria-label="${dateLabel(k)}: ${label}">${+k.slice(8)}</span>`;
   }).join('');
-  return `<div class="panel-box"><h2>The last five weeks</h2><p class="muted small">Showed up on ${n} of these days. Gaps are just gaps.</p><div class="cal">${head}${cells}</div><div class="calkey" aria-hidden="true"><span><i style="background-image:var(--stF)"></i>showed up</span><span><i style="background-image:var(--stM)"></i>rested</span></div>${didHTML(days.filter(k=>k>=state.startDate))}</div>`;
+  return `<div class="panel-box"><h2>The last five weeks</h2><p class="muted small">Showed up on ${n} of these days. Gaps are just gaps.</p><div class="cal">${head}${cells}</div><div class="calkey" aria-hidden="true"><span><i style="background-image:var(--stF)"></i>showed up</span><span><i style="background-image:var(--stM)"></i>rested</span>${ownSet.size?'<span><i class="ownkey"></i>your own small thing</span>':''}</div>${didHTML(days.filter(k=>k>=state.startDate))}${no?`<p class="small" style="margin-top:10px">You did your own small thing on ${no} of these days${state.own.text?': '+esc(state.own.text).replace(/[.!?]+$/,''):''}.</p>`:''}</div>`;
 }
 
 /* ---- Echoes and the mirror (0.17.0): resurfacing what you already did. Nothing new to keep up with. ---- */
@@ -2408,40 +2443,16 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
+    <ul class="newlist"><li><b>Share a Forgeling.</b> Open any Forgeling and tap Share for a picture card you can send a friend. It's made on your phone, and nothing is uploaded.</li>
+    <li><b>Keep your collection safe.</b> Once a month, Today offers to save a copy as a file. Restore it from Settings on this phone or a new one.</li>
+    <li><b>Fresh callings.</b> Each calling now has several ways of asking, so the daily card keeps surprising you.</li>
+    <li><b>Your own small thing.</b> In Settings you can add one habit of your own to tick off on Today. It shows in your Journal, never earns packs and never counts against you.</li>
+    <li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
     <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li>
     <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li>
     <li><b>Found by the fire.</b> New Forgelings and packs now open at night by a fire, with embers drifting up.</li>
     <li><b>Stamps and rosettes.</b> The Journal marks the days you showed up with a little flame and rest days with a moon. Ribbons are pixel rosettes now.</li>
-    <li><b>A tidier binder.</b> Filters live behind one button.</li>
-    <li><b>A warmer welcome.</b> Forge now opens gently, with a greeting for the time of day. New players start by a small fire under your own sky.</li>
-    <li><b>An icon for your home screen.</b> Add Forge to your home screen and it gets its own little campfire.</li>
-    <li><b>Wander somewhere.</b> Send a Forgeling to a realm on your map, from the Hearth or from the realm's page. Each realm has its own curios.</li>
-    <li><b>Requests.</b> Now and then a Forgeling by the fire asks for something from a realm. Send anyone there. Requests never run out, and each realm has a thank-you keepsake any Forgeling can wear.</li>
-    <li><b>Every Forgeling has a story.</b> Each one has its own, five chapters long. A new chapter opens every time your bond grows. Read it from the Hearth or from the card.</li>
-    <li><b>The Hearth grows with you.</b> Things appear by the fire as you keep doing your callings: a rug, a kite, a pond, a mailbox. Each kind of calling brings something of its own, so your Hearth ends up looking like your days.</li>
-    <li><b>A living sky.</b> The sky behind the app follows your day, from dawn to night, with a pixel horizon along the bottom. You can keep it always day, always night or plain in Settings.</li>
-    <li><b>A clearer Today.</b> Today's card is front and centre, with one button for the one thing to do. The pack, the Hearth and the map sit in a short list below it.</li>
-    <li><b>A calmer Hearth.</b> Keepsakes, backdrops and the curio shelf fold away until you want them.</li>
-    <li><b>Easier to tap.</b> Chips and small buttons are a little bigger.</li>
-    <li><b>On this day.</b> When a Forgeling's anniversary comes round (two weeks, a month, a year), it may now and then appear under today's card so you can read that day again. Never more than once a week.</li>
-    <li><b>A mirror.</b> After today's card, the Forge notes how often this month you have done that kind of thing. The Journal shows the last five weeks the same way. No scores, just what you did.</li>
-    <li><b>One world.</b> The world's events are the same in every Forge. If something happens today, it happened for everyone.</li>
-    <li><b>A map, mostly blank.</b> It has its own tab now. Each realm sharpens as you find Forgelings there, and small marks show where the world has been busy. Tap a corner to open that realm\u2019s page.</li>
-    <li><b>The world keeps its own calendar.</b> It has eras and small events, whether or not you are looking. After time away, your next Forgeling may know something you missed. Turn a card over to read it.</li>
-    <li><b>Something in the corner.</b> A small thing by the fire grows only while you are away. Opening the app does not hurry it.</li>
-    <li><b>Company.</b> Forgelings who share the fire choose how close to sit, and one on its own does something of its own.</li>
-    <li><b>Welcome home.</b> If you are away for a few days, your Forgelings curl up asleep by the embers. Light the fire and hear what they dreamed.</li>
-    <li><b>Wanderers.</b> Send a Forgeling out from the Hearth. A few hours later it comes back with a curio.</li>
-    <li><b>Margin notes.</b> Once a Forgeling is close to you, it may scrawl a correction in the margin of its realm's page. And the pages revise themselves, slowly, the longer you have known a place.</li>
-    <li><b>A fuller world.</b> Twice as many small events from here on, and every Forgeling now has something of its own to do when it sits by the fire alone.</li>
-    <li><b>Second reading.</b> Each card now keeps the hour and day it was found. After two weeks you can read it again, with what the world was doing and what you wrote.</li>
-    <li><b>Callings in the binder.</b> Pick a type in the binder to read its note. Tales, Journal and the map share the Map tab.</li>
-    <li><b>Journal.</b> Answer today's question in one private line.</li>
-    <li><b>Journey.</b> A weekly recap and a five-week calendar, under Journal on the Map tab.</li>
-    <li><b>Ribbons.</b> Gentle goals that unlock new Hearth backdrops.</li>
-    <li><b>Favorites.</b> Star your best Forgelings and filter the binder.</li>
-    <li><b>Appearance.</b> Light or dark, in Settings.</li></ul>
+    <li><b>A tidier binder.</b> Filters live behind one button.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -2802,18 +2813,76 @@ function openOdds(){
 }
 function openExport(){
   const txt=JSON.stringify(state);
-  openSheet(`<h2>Save a copy</h2><p class="muted small">Copy this text and keep it somewhere safe. Paste it into Restore on any device.</p>
-    <textarea class="box" id="expText" readonly>${esc(txt)}</textarea>
-    <div class="stack"><button class="primary" id="copyExp">Copy</button><button class="ghost" data-close>Close</button></div>`);
-  const t=$('#expText');if(t){t.focus();t.select();}
+  openSheet(`<h2>Save a copy</h2><p class="muted small">Save your whole collection as a small file. Keep it in Files, a notes app or your email, and restore it on this phone or a new one.</p>
+    <button class="primary" id="saveFile" style="width:100%">Save as a file</button>
+    <p class="muted small" style="margin:14px 0 4px">Or copy it as text:</p>
+    <textarea class="box" id="expText" readonly aria-label="Your saved copy as text">${esc(txt)}</textarea>
+    <div class="stack"><button class="ghost" id="copyExp">Copy the text</button><button class="ghost" data-close>Close</button></div>`);
 }
 function openRestore(){
-  openSheet(`<h2>Restore a copy</h2><p class="muted small">Paste a saved copy here. This replaces what is on this device.</p>
-    <textarea class="box" id="resText" placeholder="Paste your saved copy"></textarea>
+  openSheet(`<h2>Restore a copy</h2><p class="muted small">Choose a saved file, or paste the text of a saved copy. This replaces what is on this device.</p>
+    <label class="pill filepick">Choose a saved file<input type="file" id="resFile" accept=".json,application/json,text/plain"></label>
+    <textarea class="box" id="resText" placeholder="Or paste your saved copy" aria-label="Saved copy text"></textarea>
     <div class="stack"><button class="primary" id="doRestore">Restore</button><button class="ghost" data-close>Cancel</button></div>`);
 }
 function copyText(txt,done){
   try{navigator.clipboard.writeText(txt).then(()=>toast(done),()=>toast('Select the text and copy it.'));}catch(e){toast('Select the text and copy it.');}
+}
+
+/* ---- 0.24: your own small thing, backups, and the share picture ---- */
+function toggleOwn(){const k=todayKey(),d=state.own.days,i=d.indexOf(k);if(i>=0)d.splice(i,1);else{d.push(k);d.sort();if(d.length>800)d.splice(0,d.length-800);chime(0);}save();renderToday();const b=$('#btnOwn');if(b)b.focus({preventScroll:true});}
+function backupDue(){const b=state.backup||{};if(state.cards.length<5||dayN()<7)return false;const last=[b.at,b.ask].filter(Boolean).sort().pop();return !last||daysBetween(last,todayKey())>=30;}
+function openBackupNudge(){openSheet(`<h2>Keep your Forgelings safe</h2><p class="muted">Your collection lives only on this phone. If the browser ever clears its storage, a saved copy brings everything back.</p><p class="muted small">Save it to Files, a notes app or your own email. You can restore it any time from Settings, on this phone or a new one.</p><div class="stack"><button class="primary" id="saveFile">Save a copy</button><button class="ghost" id="backupLater">Remind me next month</button></div>`);}
+function canShareFiles(){try{return !!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'x.png',{type:'image/png'})]}));}catch(e){return false;}}
+function downloadBlob(blob,name){try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true;}catch(e){toast('Saving did not work here. Try copying the text instead.');return false;}}
+function backupFile(){
+  const k=todayKey(),name=`forge-backup-${k}.json`,blob=new Blob([JSON.stringify(state)],{type:'application/json'});
+  const done=msg=>{state.backup.at=k;save();closeModal();if(tab==='today')renderToday();toast(msg);};
+  let f=null;try{f=new File([blob],name,{type:'application/json'});}catch(e){}
+  try{if(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Forge backup'}).then(()=>done('Saved. Keep it somewhere safe.')).catch(err=>{if(err&&err.name==='AbortError')return;if(downloadBlob(blob,name))done('Saved to your downloads. Keep it somewhere safe.');});return;}}catch(e){}
+  if(downloadBlob(blob,name))done('Saved to your downloads. Keep it somewhere safe.');
+}
+let shareCv=null;
+async function shareFonts(){try{await Promise.race([Promise.all(['600 52px Fredoka','400 28px "Nunito Sans"','22px "Press Start 2P"'].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,1500))]);}catch(e){}}
+function shareCanvas(c){
+  const W=720,H=960,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),R=RAR[c.rarity],nm=c.nick||c.name;
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1B1430');g.addColorStop(1,'#35223C');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle=R.edge;x.fillRect(0,0,W,14);x.fillRect(0,H-14,W,14);x.fillRect(0,0,14,H);x.fillRect(W-14,0,14,H);
+  x.fillStyle=R.glow;x.fillRect(14,14,W-28,4);x.fillRect(14,14,4,H-28);
+  x.fillStyle='#E2B04A';[[22,22],[W-38,22],[22,H-38],[W-38,H-38]].forEach(p=>x.fillRect(p[0],p[1],16,16));
+  const src=document.createElement('canvas');src.width=48;src.height=37;drawFrame(prep(c),src,300-(Math.abs(c.seed|0)%2000),null);
+  x.fillStyle=R.edge;x.fillRect(64,74,592,460);x.fillStyle=R.glow;x.fillRect(68,78,584,452);
+  x.imageSmoothingEnabled=false;x.drawImage(src,72,82,576,444);
+  const fit=(t,max,size,w,fam)=>{let s=size;do{x.font=`${w} ${s}px ${fam}`;s-=2;}while(x.measureText(t).width>max&&s>14);};
+  const wrap=(t,max)=>{const words=t.split(' '),out=[];let line='';words.forEach(wd=>{const tr=line?line+' '+wd:wd;if(x.measureText(tr).width>max&&line){out.push(line);line=wd;}else line=tr;});if(line)out.push(line);return out;};
+  x.textAlign='center';x.textBaseline='alphabetic';let y=604;
+  x.fillStyle='#FFF3D6';fit(nm,600,54,600,'Fredoka, sans-serif');x.fillText(nm,W/2,y);
+  if(c.nick&&c.nick!==c.name){y+=40;x.fillStyle='#CDBFDB';fit(c.name,600,26,400,'"Nunito Sans", sans-serif');x.fillText(c.name,W/2,y);}
+  y+=46;x.fillStyle=R.glow;fit(`${R.name} · ${realmName(c)}`,600,28,600,'"Nunito Sans", sans-serif');x.fillText(`${R.name} · ${realmName(c)}`,W/2,y);
+  const found=c.source==='pack'?'Found in a pack, earned by showing up.':(DID[c.v]?`Found the day I'd ${DID[c.v]}.`:'Found by showing up.');
+  x.fillStyle='#EDE3F2';x.font='400 27px "Nunito Sans", sans-serif';wrap(found,600).slice(0,3).forEach(l=>{y+=40;x.fillText(l,W/2,y);});
+  let when='';try{when=new Date(c.date+'T00:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});}catch(e){}
+  if(when){y+=38;x.fillStyle='#B9A9C9';x.font='400 22px "Nunito Sans", sans-serif';x.fillText(when,W/2,y);}
+  x.fillStyle='#FFD36B';x.font='22px "Press Start 2P", monospace';x.fillText('FORGE',W/2,H-72);
+  x.fillStyle='#B9A9C9';x.font='400 20px "Nunito Sans", sans-serif';x.fillText('Every Forgeling is one of a kind',W/2,H-40);
+  return cv;
+}
+async function openShare(id){
+  const c=cardById(id);if(!c)return;await shareFonts();
+  const cv=shareCanvas(c),url=cv.toDataURL('image/png'),blob=await new Promise(r=>{try{cv.toBlob(r,'image/png');}catch(e){r(null);}});
+  shareCv={c,cv,blob};const can=canShareFiles(),nm=c.nick||c.name;
+  ovMode='share';
+  openOverlay(`<p class="rv-title">Share ${esc(nm)}</p><img class="shareimg" id="shareImg" src="${url}" alt="A picture card of ${esc(nm)}, ${RAR[c.rarity].name}, from ${esc(realmName(c))}">
+    <p class="rv-hint">${can?'Send it to a friend, or save it to your photos.':'Save the picture, then send it however you like.'} It's made on this phone, and nothing is uploaded.</p>
+    <div class="btnrow"><button class="primary" id="shDo">${can?'Share':'Save picture'}</button><button class="ghost" id="shBack" data-cid="${c.id}">Back</button></div>`,true);
+  ovMode='share';const d=$('#shDo');if(d)d.focus({preventScroll:true});
+}
+function doShare(){
+  const s=shareCv;if(!s)return;if(!s.blob){toast('That picture could not be made here.');return;}
+  const nm=s.c.nick||s.c.name,name=(nm.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'forgeling')+'.png';
+  let f=null;try{f=new File([s.blob],name,{type:'image/png'});}catch(e){}
+  if(f&&canShareFiles()){navigator.share({files:[f],title:nm}).then(()=>toast('Shared.')).catch(err=>{if(err&&err.name==='AbortError')return;if(downloadBlob(s.blob,name))toast('Picture saved.');});return;}
+  if(downloadBlob(s.blob,name))toast('Picture saved.');
 }
 
 /* ================= Events ================= */
@@ -2852,7 +2921,12 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspFlip')flipCard();
   else if(b.dataset.time){state.settings.nudge=b.dataset.time;save();modal.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b?'true':'false'));}
   else if(b.id==='nudgeOk'){closeModal();renderSettings();toast(state.settings.nudge?`Nudge set for ${state.settings.nudge}. Nothing is sent in this prototype.`:'No nudge. You can change this in Settings.');}
-  else if(b.id==='copyExp')copyText($('#expText').value,'Copied. Keep it somewhere safe.');
+  else if(b.id==='copyExp'){copyText($('#expText').value,'Copied. Keep it somewhere safe.');state.backup.at=todayKey();save();}
+  else if(b.id==='saveFile')backupFile();
+  else if(b.id==='backupLater'){state.backup.ask=todayKey();save();closeModal();renderToday();toast('No problem. I’ll ask again next month.');}
+  else if(b.id==='inspShare')openShare(inspId);
+  else if(b.id==='shDo')doShare();
+  else if(b.id==='shBack'){const id=+b.dataset.cid;closeModal();inspect(id);}
   else if(b.id==='doRestore'){
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to replace this device';return;}
     const prevState=state;try{const s=JSON.parse($('#resText').value.trim());if(!(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object'))throw 0;s.ageBand=s.ageBand||state.ageBand;state=migrate(s);rollover();save();applySettings();closeModal();tab='today';render();toast('Restored.');}
@@ -2860,6 +2934,13 @@ modal.addEventListener('click',e=>{
   }
 });
 modal.addEventListener('input',e=>{if(e.target.id==='nickIn')syncNick();});
+modal.addEventListener('change',e=>{
+  if(e.target.id!=='resFile')return;const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(f.size>20e6){sfx('no');toast('That file is too big to be a Forge copy.');return;}
+  const r=new FileReader();
+  r.onload=()=>{const t=$('#resText');if(t)t.value=String(r.result||'');const d=$('#doRestore');if(d){d.dataset.armed='0';d.textContent='Restore';d.focus({preventScroll:true});}toast('File loaded. Tap Restore to use it.');};
+  r.onerror=()=>toast('That file could not be read.');r.readAsText(f);
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden){const s=modal.querySelector('.scrim');if(s&&s.dataset.dismiss==='true')closeModal();}});
 document.addEventListener('keydown',e=>{
   if(e.key!=='Tab'||modal.hidden)return;
@@ -2874,6 +2955,8 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{tab
 $('#view-today').addEventListener('click',e=>{
   const ins=e.target.closest('[data-insp]');if(ins){inspect(+ins.dataset.insp);return;}
   const b=e.target.closest('button');if(!b)return;
+  if(b.id==='btnOwn'){toggleOwn();return;}
+  if(b.id==='btnBackup'){openBackupNudge();return;}
   if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard')openVector();
   else if(b.id==='btnDone')startDone(false);
   else if(b.id==='btnAll')startDone(true);
@@ -2923,6 +3006,8 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='setLore'){state.settings.lore=state.settings.lore===false;save();render();}
   else if(b.dataset.setnudge!==undefined){state.settings.nudge=b.dataset.setnudge||null;save();renderSettings();}
   else if(b.id==='btnOdds')openOdds();
+  else if(b.id==='ownSave'){const v=(($('#ownIn')||{}).value||'').trim().slice(0,60);if(!v){sfx('no');toast('Write a few words first.');return;}state.own.text=v;save();renderSettings();renderToday();toast('Saved. It is on Today, ready to tick.');}
+  else if(b.id==='ownClear'){state.own.text='';save();renderSettings();renderToday();toast('Removed. Your past ticks stay in the Journal.');}
   else if(b.id==='btnExport')openExport();
   else if(b.id==='btnRestore')openRestore();
   else if(b.id==='fbSave')saveFeedback();
