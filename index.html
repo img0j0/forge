@@ -727,7 +727,7 @@ function buildSprite(S,bob,blink){
       const tm=mask();fillPoly(tm,[[17,sy+1],[20,sy+1],[20,sy+6],[17,sy+6]]);commit(g,tm,{b:6,s:13,h:null});}
     else if(S.keep==='flower'){const fx=16+Math.round(half*.62),fy=top+3;stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
     else if(S.keep==='daisies'){[11,15,19].forEach(x=>stamp(g,x,top,['.c.','cyc','.c.'],false));}
-    else if(S.keep==='charm'){const cy=mouthY+(dk?3:2);stamp(g,15,cy,['o..o','.oo.','.ya.','.aa.'],false);}
+    else if(S.keep==='charm'){const cy=mouthY+(dk?3:2);stamp(g,14,cy,['.o..o.','..oo..','.oyyo.','.oyao.','..oo..'],false);}
     else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=0;x<N;x++){const i=sy*N+x;if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
     else if(S.keep==='cap'){const cm=mask();fillEll(cm,16,top+1.2,6.4,3.4);for(let y=Math.ceil(top+1.2);y<N;y++)for(let x=0;x<N;x++)cm[y*N+x]=0;commit(g,cm,{b:6,s:13,h:null});const bm=mask();fillEll(bm,16,top-2.6,1.6,1.4);commit(g,bm,{b:7,s:7,h:null});}
     else if(S.keep==='lantern'){const lx=16+half+2,ly=mouthY+1;stamp(g,Math.min(N-3,lx),ly,['.o.','ooo','yyy','yyy','yyy','ooo'],false);}
@@ -838,7 +838,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.22.1';
+const VERSION='prototype 0.22.2';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -890,7 +890,7 @@ const SPEAK_DARK=['{n} regards you. Slowly nods.','{n} rumbles softly. That is a
 
 
 /* ================= State ================= */
-const KEY='forge-app-v1',BLOCK='forge-age-block';
+const KEY='forge-app-v1',BLOCK='forge-age-block',MIN_AGE=18;
 const p2=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
 let state=null,tab='today',bf={type:'all',mood:'all',sort:'new',page:0},rv=null,pk=null,pendingAllIn=false,pgT=null;
@@ -1300,7 +1300,9 @@ function renderSettings(){
       <div class="chips" role="group" aria-label="Nudge time">${[[null,'Off'],['8:00 am','8:00 am'],['12:00 pm','12:00 pm'],['6:00 pm','6:00 pm']].map(a=>`<button class="chip" data-setnudge="${a[0]||''}" aria-pressed="${(S.nudge||null)===a[0]}">${a[1]}</button>`).join('')}</div></div>
     ${installTipHTML()}
     <div class="setblock"><b>Fair odds</b><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button></div>
-    <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forge stays on this device. Forge has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only whether you are a teen or an adult.</p><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p></div>
+    <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forge stays on this device. Forge has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p>
+      <div class="chips"><button class="pill" id="btnPrivacy">How Forge handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div>
+      <button class="pill" id="btnErase" style="margin-top:8px">Erase everything on this device</button><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p></div>
     <div class="setblock"><b>Your numbers</b>
       <div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div></div>
     <div class="setblock"><b>Backup</b><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p>
@@ -2202,13 +2204,13 @@ function openAgeGate(){openTitle();}
 function showAgeForm(){const b=$('#titleBottom');if(!b)return;const sc=modal.querySelector('.scrim');if(sc)sc.classList.add('asking');b.innerHTML=ageFormHTML();const m=$('#ageM');if(m)m.focus({preventScroll:true});}
 function showBlocked(){
   document.querySelector('.app').hidden=true;document.querySelector('.tabs').hidden=true;$('#toast').classList.remove('show');
-  openOverlay(`<p class="rv-title">Forge is not available for you just yet</p><p class="rv-hint">Thanks for being honest with us. We did not save any details about you. Come back when you are older.</p>`,false);
+  openOverlay(`<p class="rv-title">Forge is not available for you just yet</p><p class="rv-hint">While Forge is being tested, it is for adults only. Thanks for being honest with us. We did not save any details about you.</p>`,false);
 }
 function submitAge(){
   const m=+(($('#ageM')||{}).value||0),y=+(($('#ageY')||{}).value||0);
   if(!m||!y){sfx('no');toast('Please choose a month and a year.');return;}
   const a=ageFrom(m,y);
-  if(a<13){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}showBlocked();return;}
+  if(a<MIN_AGE){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}showBlocked();return;}
   state.ageBand=a<18?'teen':'adult';save();closeModal();
   if(!state.onboarded)openVector();else{render();if(state.seen<SEEN_V){state.seen=SEEN_V;save();openWhatsNew();}}
 }
@@ -2872,6 +2874,13 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='btnExport')openExport();
   else if(b.id==='btnRestore')openRestore();
   else if(b.id==='fbSave')saveFeedback();
+  else if(b.id==='btnPrivacy')openSheet(privacyHTML());
+  else if(b.id==='btnTerms')openSheet(termsHTML());
+  else if(b.id==='btnErase'){
+    if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to erase everything. This cannot be undone.';return;}
+    try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(QSEEN);}catch(e){}
+    state=migrate(fresh());bf={type:'all',mood:'all',sort:'new',page:0};tab='today';applySettings();render();openAgeGate();
+  }
   else if(b.id==='btnReport')shareOrCopy(pilotReport(),'Report copied.','My Forge report');
   else if(b.dataset.tool)runTool(b.dataset.tool,b);
 });
@@ -3152,7 +3161,7 @@ function titleLoop(ts){if(!document.getElementById('titleCv')){titleRAF=0;return
 function openTitle(){
   openOverlay(`<canvas id="titleCv" aria-hidden="true"></canvas>
     <div class="title-top"><h1 class="wordmark" id="dlgTitle">Forge</h1><p class="tagline">One small thing a day.<br>A small creature to keep it.</p></div>
-    <div class="title-bottom" id="titleBottom"><button class="primary" id="titleGo">Begin</button><p class="tsmall">No account. Everything stays on this phone.</p></div>`,false);
+    <div class="title-bottom" id="titleBottom"><button class="primary" id="titleGo">Begin</button><p class="tsmall">No account. Everything stays on this phone. For adults 18 and up.</p></div>`,false);
   const sc=modal.querySelector('.scrim');sc.classList.add('titlemode');sc.classList.toggle('lite',!titleDark());
   drawTitle(performance.now());if(!REDUCE&&!titleRAF)titleRAF=requestAnimationFrame(titleLoop);
 }
@@ -3220,6 +3229,34 @@ function installTipHTML(){
 function shareOrCopy(txt,done,title){
   if(navigator.share&&(RELEASE||STANDALONE())){navigator.share({title,text:txt}).catch(err=>{if(!err||err.name!=='AbortError')copyText(txt,done);});return;}
   copyText(txt,done);
+}
+
+
+/* ---- Privacy note and terms of use: plain English, kept short, matching exactly what Forge does. ---- */
+const DOCS_DATE='October 16, 2026';
+function privacyHTML(){
+  return `<h2>How Forge handles your data</h2><p class="muted small">Last updated ${DOCS_DATE}</p>
+  <div class="tale"><b>What Forge keeps</b><p>Your Forgelings, the days you showed up or rested, anything you write (names, tales, margin notes and feedback answers), your settings, and the fact that you are an adult. Your birth date is never kept.</p></div>
+  <div class="tale"><b>Where it is kept</b><p>Only on this device, in this browser. Forge has no accounts and no server of its own, so nobody else can see it, including the people who make Forge.</p></div>
+  <div class="tale"><b>What Forge never does</b><p>No tracking, no analytics, no ads, no selling or sharing of anything. Nothing about you leaves this device unless you choose to send it.</p></div>
+  <div class="tale"><b>When you choose to share</b><p>"Save a copy" and "Send my report" create text that goes only where you put it, for example a message to the person testing Forge with you.</p></div>
+  <div class="tale"><b>Where Forge is hosted</b><p>The app is delivered by GitHub Pages. Like any website, GitHub receives basic technical details such as your IP address when it delivers the app, under GitHub's own privacy statement. Forge itself never receives them.</p></div>
+  <div class="tale"><b>Deleting everything</b><p>Use "Erase everything on this device" in Settings, or remove Forge and clear this site's data in your browser. There is no other copy anywhere.</p></div>
+  <div class="tale"><b>Age</b><p>While Forge is being tested, it is for adults 18 and up.</p></div>
+  <div class="tale"><b>Changes</b><p>If this ever changes, for example if Forge adds accounts, this note will be updated first, and you will see it in the app before anything new happens.</p></div>
+  <p class="muted small">Questions? Ask the person who shared Forge with you.</p>
+  <div class="stack"><button class="primary" data-close>Done</button></div>`;
+}
+function termsHTML(){
+  return `<h2>Terms of use</h2><p class="muted small">Last updated ${DOCS_DATE}</p>
+  <div class="tale"><b>A test version</b><p>Forge is an early version shared for testing. It is free, it may change, and things may occasionally break. Save a copy from Settings now and then so you never lose your Forgelings.</p></div>
+  <div class="tale"><b>For adults</b><p>You need to be 18 or older to use Forge while it is being tested.</p></div>
+  <div class="tale"><b>Nothing to buy</b><p>Forgelings, packs, curios and keepsakes cannot be bought or sold and have no value outside the app.</p></div>
+  <div class="tale"><b>Small things, your judgment</b><p>Daily callings are gentle suggestions, not medical, mental health or professional advice. Only do what is safe and right for you, and skip anything that is not. Rest days are always fine.</p></div>
+  <div class="tale"><b>Your words are yours</b><p>Anything you write stays yours. If you send feedback, it may be used to improve Forge.</p></div>
+  <div class="tale"><b>As it is</b><p>Forge is provided as it is, without promises that it will always work or keep your data. To the extent the law allows, the people who make Forge are not responsible for losses from using it.</p></div>
+  <div class="tale"><b>The art and the world</b><p>Forge, the Forgelings and their stories belong to their creator. Please do not copy them into other products.</p></div>
+  <div class="stack"><button class="primary" data-close>Done</button></div>`;
 }
 
 /* ================= Start ================= */
