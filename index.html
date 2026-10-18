@@ -925,7 +925,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.24.0';
+const VERSION='prototype 0.24.1';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1383,7 +1383,7 @@ function renderSettings(){
     <div class="setblock"><b>Forgeling mood</b><p class="muted small">Which Forgelings you find from now on. The ones you already have stay.</p>
       <div class="chips" role="group" aria-label="Forgeling mood">${[['cute','Cute only'],['mix','A mix'],['dark','Dark only']].map(a=>`<button class="chip" data-setmood="${a[0]}" aria-pressed="${S.mood===a[0]}">${a[1]}</button>`).join('')}</div></div>
     <div class="setblock"><b>Sound</b><p class="muted small">Soft pixel-style sounds, all made on your device.</p>
-      <div class="chips"><button class="chip" id="setSound" aria-pressed="${S.sound!==false}">Sound ${S.sound!==false?'on':'off'}</button><button class="chip" id="setSfx" aria-pressed="${S.sfx!==false}">Sound effects ${S.sfx!==false?'on':'off'}</button><button class="chip" id="setAmb" aria-pressed="${S.amb!==false}">Fire crackle ${S.amb!==false?'on':'off'}</button><button class="chip" id="setNature" aria-pressed="${S.nature!==false}">Nature sounds ${S.nature!==false?'on':'off'}</button><button class="chip" id="setMusic" aria-pressed="${S.music===true}">Soft music ${S.music===true?'on':'off'}</button></div>
+      <div class="chips"><button class="chip" id="setSound" aria-pressed="${S.sound!==false}">Sound ${S.sound!==false?'on':'off'}</button><button class="chip" id="setSfx" aria-pressed="${S.sfx!==false}">Sound effects ${S.sfx!==false?'on':'off'}</button><button class="chip" id="setAmb" aria-pressed="${S.amb!==false}">Fire crackle ${S.amb!==false?'on':'off'}</button><button class="chip" id="setNature" aria-pressed="${S.nature!==false}">Nature sounds ${S.nature!==false?'on':'off'}</button><button class="chip" id="setMusic" aria-pressed="${S.music!==false}">Soft music ${S.music!==false?'on':'off'}</button></div>
       <div class="lbl2">Volume</div><div class="chips" role="group" aria-label="Volume">${[['quiet','Quiet'],['normal','Normal'],['loud','Loud']].map(a=>`<button class="chip" data-vol="${a[0]}" aria-pressed="${(S.vol||'normal')===a[0]}">${a[1]}</button>`).join('')}</div>
       <div class="lbl2">Sound method</div><div class="chips" role="group" aria-label="Sound method">${[['std','Standard'],['media','Compatibility']].map(a=>`<button class="chip" data-eng="${a[0]}" aria-pressed="${(S.engine==='media'?'media':'std')===a[0]}">${a[1]}</button>`).join('')}</div>
       <p class="muted small" id="auStatus" style="margin-top:6px">${auStatusText()}</p>
@@ -2501,7 +2501,7 @@ function auVolumes(){
   AU.sfx.gain.setTargetAtTime(S.sfx!==false?1:0,t,.05);
   AU.amb.gain.setTargetAtTime(S.amb!==false&&tab==='hearth'?.8:0,t,.4);
   const duck=(tab==='hearth'?.4:1)*((modal&&!modal.hidden)?.6:1);
-  AU.mus.gain.setTargetAtTime(S.music===true?duck*.45:0,t,.6);
+  AU.mus.gain.setTargetAtTime(S.music!==false?duck*.45:0,t,.6);
 }
 function tone(o){
   const c=auInit();if(!c||c.state!=='running'||!sOn())return;
@@ -2779,7 +2779,7 @@ function audioSync(){
   auVolumes();if(c.state!=='running')return;
   const wantAmb=sOn()&&state.settings.amb!==false&&tab==='hearth';
   if(wantAmb){if(AU.ambRun&&AU.ambRun.key!==ambKey())ambStop();if(!AU.ambRun)ambStart();}else if(AU.ambRun)ambStop();
-  const wantMus=sOn()&&state.settings.music===true;
+  const wantMus=sOn()&&state.settings.music!==false;
   if(wantMus&&!AU.musRun)musStart();else if(!wantMus&&AU.musRun)musStop();
 }
 /* Only real "activation" gestures can unlock audio on phones, so listen for those. */
@@ -2996,7 +2996,7 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='setSfx'){state.settings.sfx=state.settings.sfx===false;save();renderSettings();audioSync();}
   else if(b.id==='setNature'){state.settings.nature=state.settings.nature===false;save();renderSettings();audioSync();}
   else if(b.id==='setAmb'){state.settings.amb=state.settings.amb===false;save();renderSettings();audioSync();}
-  else if(b.id==='setMusic'){state.settings.music=!state.settings.music;save();renderSettings();audioSync();}
+  else if(b.id==='setMusic'){state.settings.music=state.settings.music===false;save();renderSettings();audioSync();}
   else if(b.dataset.eng){setEngine(b.dataset.eng);}
   else if(b.id==='soundCheck'){soundCheck();}
   else if(b.dataset.vol){state.settings.vol=b.dataset.vol;save();renderSettings();audioSync();}
