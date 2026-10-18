@@ -229,11 +229,10 @@ html.release details.dev{display:none}
 .pg{border-radius:0;border:3px solid rgba(255,255,255,.28)}
 .pgbtnrow{display:flex;gap:10px;justify-content:center;width:100%;max-width:320px}
 .pgbtnrow .ghost,.pgbtnrow .primary{flex:1}
-.seed{position:absolute;bottom:-44px;width:48px;height:48px;border:0;background:none;padding:0;animation:drift linear forwards}
+.seed{position:absolute;bottom:-44px;width:48px;height:48px;border:0;background:none;padding:0;will-change:transform}
 .seed::before{content:'';position:absolute;left:14px;top:8px;width:20px;height:20px;background:radial-gradient(circle,#FFFFFF 0 3px,transparent 3.5px),conic-gradient(from 0deg,#F4F0E8 0 10%,transparent 10% 25%,#F4F0E8 25% 35%,transparent 35% 50%,#F4F0E8 50% 60%,transparent 60% 75%,#F4F0E8 75% 85%,transparent 85%);border-radius:50%;opacity:.95}
 .seed::after{content:'';position:absolute;left:23px;top:27px;width:2px;height:12px;background:#CFE8C0}
-.seed.caught,.emb.caught,.flake.caught{animation:none;opacity:0;transform:scale(1.8);transition:.15s}
-@keyframes drift{0%{transform:translate(0,0)}25%{transform:translate(14px,-110px)}50%{transform:translate(-10px,-220px)}75%{transform:translate(12px,-320px)}100%{transform:translate(0,-420px)}}
+.seed.caught,.emb.caught,.flake.caught{animation:none;opacity:0;transition:opacity .15s}
 .fire{position:absolute;left:50%;bottom:40px;width:64px;height:120px;transform:translateX(-50%);transform-origin:50% 100%;pointer-events:none}
 .fire i{position:absolute;left:0;right:0;bottom:0;height:var(--h,60%);background:linear-gradient(#FFF3B0,#FFD36B 30%,#FF8A2E 65%,#E5441E);clip-path:polygon(50% 0,64% 22%,78% 14%,82% 46%,100% 62%,92% 100%,8% 100%,0 62%,18% 46%,22% 14%,36% 22%);transition:height .15s}
 .fire b{position:absolute;left:-16px;right:-16px;bottom:-12px;height:14px;background:repeating-linear-gradient(90deg,#6B4A2E 0 10px,#4B331F 10px 12px)}
@@ -427,7 +426,7 @@ html.reduce .mk-ring{animation:none}
 .pickgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;justify-items:center;margin:12px 0;max-height:46dvh;overflow:auto}
 .pickbtn{background:none;border:3px solid transparent;border-radius:10px;padding:2px}
 .pickbtn.on{border-color:var(--plum);background:var(--chip)}
-.pg{position:relative;width:100%;max-width:320px;height:340px;border:3px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);overflow:hidden;touch-action:manipulation}
+.pg{position:relative;width:100%;max-width:320px;height:340px;border:3px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .spk{position:absolute;top:-44px;width:48px;height:48px;border:0;background:none;padding:0;animation:fall linear forwards}
 .spk::before{content:'';position:absolute;inset:8px;background:#FFD36B;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .spk.caught{animation:none;opacity:0;transform:scale(1.8);transition:.15s}
@@ -925,7 +924,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.24.1';
+const VERSION='prototype 0.24.2';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -3410,7 +3409,6 @@ const unitOf=(G,n)=>n+' '+G.u[n===1?0:1];
 let game=null;
 function openPlay(c){
   const n=c.nick||c.name,free=visitsLeft()<1,G=gameFor(c);
-  if(REDUCE&&G.id!=='dusk'){if(!free)doVisit(c,'sit',1,lineFor(c,'sit',''));else toast('With reduced motion on, this game rests. Try a Dusk Forgeling’s lantern game.');return;}
   const best=state.games.best[G.id]||0;
   openOverlay(`<p class="rv-title">${G.t}</p><p class="rv-hint">${G.h}${best?` Best: ${unitOf(G,best)}.`:''}</p>
     <div class="pg pg-${G.id}" id="pg" aria-label="${G.t} play area"></div>
@@ -3430,10 +3428,15 @@ const gScore=v=>{game.score=v;const s=$('#pgScore');if(s)s.textContent=v;const m
 function gClock(sec){let left=sec;game.timers.push(setInterval(()=>{if(!game||!game.alive)return;left--;const t=$('#pgTime');if(t)t.textContent=Math.max(0,left)+'s';if(left<=0)finishGame();},1000));}
 function gMeadow(){
   const area=$('#pg');
-  const spawn=()=>{if(!game||!game.alive)return;const b=document.createElement('button');b.className='seed';b.type='button';b.setAttribute('aria-label','Seed');b.style.left=(4+Math.random()*78)+'%';b.style.animationDuration=(2.6+Math.random()*1.2)+'s';
+  let seeds=[],last=performance.now();
+  const spawn=()=>{if(!game||!game.alive)return;const b=document.createElement('button');b.className='seed';b.type='button';b.setAttribute('aria-label','Seed');b.style.left=(4+Math.random()*78)+'%';
+    const o={el:b,y:0,v:(area.clientHeight+48)/(2.6+Math.random()*1.2),ph:Math.random()*6.28};
     b.addEventListener('pointerdown',ev=>{ev.preventDefault();if(b._c||!game||!game.alive)return;b._c=1;gScore(game.score+1);b.classList.add('caught');chime(0);setTimeout(()=>b.remove(),160);});
-    b.addEventListener('animationend',()=>b.remove());area.appendChild(b);};
-  spawn();game.timers.push(setInterval(spawn,560));gClock(15);
+    area.appendChild(b);seeds.push(o);};
+  const loop=now=>{if(!game||!game.alive)return;const dt=Math.min(.05,(now-last)/1000),H=area.clientHeight;last=now;
+    seeds=seeds.filter(o=>{if(o.el._c)return false;o.y+=o.v*dt;if(o.y>H+52){o.el.remove();return false;}o.el.style.transform=`translate(${Math.round(Math.sin(o.ph+o.y/60)*12)}px,${-Math.round(o.y)}px)`;return true;});
+    game.raf=requestAnimationFrame(loop);};
+  game.raf=requestAnimationFrame(loop);spawn();game.timers.push(setInterval(spawn,560));gClock(15);
 }
 function gEmber(){
   const area=$('#pg');area.innerHTML='<div class="heat" aria-hidden="true"><i></i></div><div class="fire" aria-hidden="true"><i></i><b></b></div><p class="pgmsg" id="pgMsg"></p>'+mateHTML(game.c);
@@ -3462,7 +3465,7 @@ function gFrost(){
   const W=()=>area.clientWidth,bk=$('#pgBasket');let bx=.5,flakes=[],last=performance.now();
   const setX=v=>{bx=Math.max(.08,Math.min(.92,v));bk.style.left=(bx*100)+'%';};setX(.5);
   const fromEv=ev=>{const r=area.getBoundingClientRect();setX((ev.clientX-r.left)/r.width);};
-  area.addEventListener('pointerdown',ev=>{ev.preventDefault();fromEv(ev);});area.addEventListener('pointermove',ev=>{if(ev.pressure>0||ev.pointerType==='mouse')fromEv(ev);});
+  let drag=false;area.addEventListener('pointerdown',ev=>{ev.preventDefault();drag=true;try{area.setPointerCapture(ev.pointerId);}catch(e){}fromEv(ev);});area.addEventListener('pointermove',ev=>{if(drag||ev.pointerType==='mouse')fromEv(ev);});['pointerup','pointercancel','lostpointercapture'].forEach(t=>area.addEventListener(t,()=>{drag=false;}));
   game.nudge=d=>setX(bx+d);
   const spawn=()=>{if(!game||!game.alive)return;const f=document.createElement('div');f.className='flake';f.setAttribute('aria-hidden','true');const o={el:f,x:.06+Math.random()*.88,y:-20,v:70+Math.random()*60};f.style.left=(o.x*100)+'%';f.style.top='-20px';area.appendChild(f);flakes.push(o);};
   const loop=now=>{if(!game||!game.alive)return;const dt=Math.min(.05,(now-last)/1000);last=now;const H=area.clientHeight,bw=72/Math.max(1,W());
