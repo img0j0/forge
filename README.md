@@ -2,6 +2,6 @@
 
 One small thing a day. A small creature to keep it.
 
-A cozy pixel-creature habit app. Prototype 0.25.1. Everything stays on your device.
+A cozy pixel-creature habit app. Prototype 0.25.2. Everything stays on your device.
 
 Open it on your phone, then add it to your home screen.

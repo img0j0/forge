@@ -314,6 +314,11 @@ html.release details.dev{display:none}
 @media (prefers-reduced-motion: reduce){.pgend{animation:none}}
 .moodbtn img.gpick{width:44px;height:44px;image-rendering:pixelated;flex:none}
 .moodbtn.gwait{opacity:1;border-style:dashed}
+.gwho{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.gwho button{display:flex;align-items:center;gap:6px;min-height:44px;padding:4px 12px 4px 6px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:600 15px var(--display)}
+.gwho button[aria-pressed="true"]{border-color:var(--plum);background:var(--chip)}
+.gwho img{width:32px;height:32px;image-rendering:pixelated}
+.moodbtn .home{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--butter);color:#2E2A47;font:600 12px var(--body);vertical-align:2px}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -954,7 +959,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.25.1';
+const VERSION='prototype 0.25.2';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -2238,7 +2243,7 @@ function renderHearth(){
         <button class="act" id="hStory" ${left&&!away?'':'disabled'}>Story<small>+2</small></button>
         <button class="act" id="hPlay" ${!away?'':'disabled'}>Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       </div>
-      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play opens all five games.`:`The fire is low for today. You can still play the games just for fun.`}</p>
+      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`The fire is low for today. You can still play the games just for fun.`}</p>
       <details class="more"><summary>Keepsakes and backdrops</summary><div class="lbl2">Keepsake</div><div class="chips" role="group" aria-label="Keepsake">${keeps}</div>${state.keepsR.length<KEEPR.length?'<p class="muted small" style="margin-top:4px">More keepsakes come as thank-yous when you answer a request.</p>':''}<div class="lbl2">Backdrop</div><div class="chips" role="group" aria-label="Backdrop">${bds}</div></details>${furnListHTML()}</div>`;
   drawHearth(performance.now());
   bloomCheck();
@@ -2472,7 +2477,7 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Deeper games.</b> Play in the Hearth opens all five games, each played by a Forgeling from its realm. Your Forgeling now shapes its game. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
+    <ul class="newlist"><li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
     <li><b>Share a Forgeling.</b> Open any Forgeling and tap Share for a picture card you can send a friend. It's made on your phone, and nothing is uploaded.</li>
     <li><b>Keep your collection safe.</b> Once a month, Today offers to save a copy as a file. Restore it from Settings on this phone or a new one.</li>
     <li><b>Fresh callings.</b> Each calling now has several ways of asking, so the daily card keeps surprising you.</li>
@@ -3446,12 +3451,12 @@ const statName=(c,i)=>(c.dark?['Might','Dread','Guile']:['Grit','Spark','Calm'])
 const gTrait=(c,G)=>{const v=Array.isArray(c.stats)?+c.stats[G.si]:0;return Math.max(0,Math.min(1,((Number.isFinite(v)?v:15)-15)/84));};
 const GIFT_LV=3;
 let game=null;
-function openPlay(c){
-  const free=visitsLeft()<1,G=gameFor(c),best=state.games.best[G.id]||0,gift=bondLevel(c)>=GIFT_LV,twist=!!c.dark,si=G.si,sv=Array.isArray(c.stats)?c.stats[si]:'';
+function openPlay(c,gi){
+  const free=visitsLeft()<1,G=Number.isInteger(gi)&&GAMES[gi]?GAMES[gi]:gameFor(c),best=state.games.best[G.id]||0,gift=bondLevel(c)>=GIFT_LV,twist=!!c.dark,si=G.si,sv=Array.isArray(c.stats)?c.stats[si]:'';
   const ready=`<div class="pgready" id="pgReady"><img src="${spriteURL(c)}" alt="">
       <p><b>${statName(c,si)} ${esc(String(sv))}</b>: ${G.trait}.</p>
       ${gift?`<p><b>Bond gift</b>: ${G.gift}</p>`:`<p class="lock">At ${BOND_NAMES[GIFT_LV-1]} bond: ${G.gift}</p>`}
-      ${twist?`<p class="tw"><b>${esc(realmName(c))} twist</b>: ${G.twist}</p>`:''}
+      ${twist?`<p class="tw"><b>${esc(THEMES[GAMES.indexOf(G)].dark.name)} twist</b>: ${G.twist}</p>`:''}
       <button class="primary" id="pgGo">Start</button></div>`;
   openOverlay(`<p class="rv-title">${G.t}</p><p class="rv-hint">${G.h}${best?` Best: ${unitOf(G,best)}.`:''}</p>
     <div class="pg pg-${G.id}" id="pg" aria-label="${G.t} play area"><span class="pgstreak" id="pgStreak" aria-hidden="true"></span><p class="pgmsg" id="pgMsg"></p>${G.id!=='frost'?mateHTML(c):''}${ready}</div>
@@ -3464,18 +3469,17 @@ function openPlay(c){
   pgT={stop:()=>{if(!game)return;game.alive=false;game.started=false;game.timers.forEach(t=>{clearInterval(t);clearTimeout(t);});clearTimeout(game.ct);cancelAnimationFrame(game.raf);}};
   const go=$('#pgGo');if(go)go.focus({preventScroll:true});
 }
-/* 0.25.1: choose any game. A realm's game is played by its Forgeling: the one by the fire if it belongs to that realm,
-   otherwise your closest-bonded one there (never one who is out wandering). */
+/* 0.25.2: any Forgeling plays any game. Pick who plays from the Forgelings by the fire (never one out wandering), then
+   any of the five games. A Forgeling's own realm game is its Home game and comes first. */
 const realmOf=c=>Math.abs(c.theme|0)%5;
-function playerFor(ti,c){const away=state.wander&&state.wander.id;
-  if(c&&realmOf(c)===ti&&c.id!==away)return c;
-  return state.cards.filter(x=>realmOf(x)===ti&&x.id!==away).sort((a,b)=>(b.bond||0)-(a.bond||0)||b.rarity-a.rarity||a.id-b.id)[0]||null;}
+function gPlayers(){const away=state.wander&&state.wander.id;return slotCards().filter(x=>x&&x.id!==away);}
 function openGames(c){
-  const left=visitsLeft(),mine=c?realmOf(c):0,order=[mine].concat([0,1,2,3,4].filter(i=>i!==mine));
+  const ps=gPlayers();if(!c||!ps.some(x=>x.id===c.id))c=ps[0];if(!c){toast('Bring a Forgeling to the fire to play.');return;}
+  const left=visitsLeft(),home=realmOf(c),order=[home].concat([0,1,2,3,4].filter(i=>i!==home)),n=c.nick||c.name;
   openSheet(`<h2>Play a game</h2><p class="muted small">${left?`Visits left today: ${left} of 3. A round grows the bond of the Forgeling who plays.`:'Your visits are used up for today, so these are just for fun.'}</p>
-    ${order.map(ti=>{const G=GAMES[ti],p=playerFor(ti,c),best=state.games.best[G.id]||0;
-      return p?`<button class="moodbtn" data-game="${ti}" data-cid="${p.id}"><img class="gpick" src="${spriteURL(p)}" alt=""><div><b>${G.t}</b><span>${esc(p.nick||p.name)} plays${best?`. Best: ${unitOf(G,best)}`:''}</span></div></button>`
-        :`<div class="moodbtn gwait" role="note"><div><b>${G.t}</b><span>Find ${/^[AEIOU]/.test(THEMES[ti].name)?'an':'a'} ${THEMES[ti].name} Forgeling to play this one.</span></div></div>`;}).join('')}
+    ${ps.length>1?`<div class="gwho" role="group" aria-label="Who plays">${ps.map(p=>`<button data-gwho="${p.id}" aria-pressed="${p.id===c.id}"><img src="${spriteURL(p)}" alt="">${esc(p.nick||p.name)}</button>`).join('')}</div>`:''}
+    ${order.map(ti=>{const G=GAMES[ti],best=state.games.best[G.id]||0;
+      return `<button class="moodbtn" data-game="${ti}" data-cid="${c.id}"><img class="gpick" src="${spriteURL(c)}" alt=""><div><b>${G.t}${ti===home?'<span class="home">Home</span>':''}</b><span>${esc(n)} plays${best?`. Best: ${unitOf(G,best)}`:''}</span></div></button>`;}).join('')}
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
   const f=$('#modal [data-game]');if(f)f.focus({preventScroll:true});
 }
@@ -3616,7 +3620,7 @@ function finishGame(){
   const n=g.c.nick||g.c.name;
   if(g.free){
     openOverlay(`<p class="rv-title">${G.t}</p><p class="rv-title" style="font-size:30px">${unitOf(G,score)}</p><p class="rv-hint">${nb?'A new best!':best?'Best: '+unitOf(G,best)+'.':''} ${esc(n)} ${g.c.dark?'seems quietly pleased.':'had a lovely time.'}</p>
-      <div class="pgbtnrow"><button class="primary" id="pgAgain" data-cid="${g.c.id}">Play again</button><button class="ghost" id="pgDone">Done</button></div>`,false);
+      <div class="pgbtnrow"><button class="primary" id="pgAgain" data-cid="${g.c.id}" data-gi="${GAMES.indexOf(G)}">Play again</button><button class="ghost" id="pgDone">Done</button></div>`,false);
     return;
   }
   const m=g.twist?.8:1,pts=score>=Math.ceil(G.hi*m)?3:score>=Math.ceil(G.mid*m)?2:1;
@@ -3631,11 +3635,12 @@ function finishGame(){
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('#modal button');if(!b)return;
   if(b.id==='pgGo')gStart();
-  else if(b.dataset.game!==undefined){const p=cardById(+b.dataset.cid);if(p)openPlay(p);}
+  else if(b.dataset.game!==undefined){const p=cardById(+b.dataset.cid);if(p)openPlay(p,+b.dataset.game);}
+  else if(b.dataset.gwho!==undefined){const p=cardById(+b.dataset.gwho);if(p){const i=slotCards().findIndex(x=>x&&x.id===p.id);if(i>=0)hf.sel=i;openGames(p);const w=$(`#modal [data-gwho="${p.id}"]`);if(w)w.focus({preventScroll:true});}}
   else if(b.id==='pgSkip'&&game&&game.skip)game.skip();
   else if(b.id==='pgL'&&game&&game.nudge)game.nudge(-.12);
   else if(b.id==='pgR'&&game&&game.nudge)game.nudge(.12);
-  else if(b.id==='pgAgain'){const c=cardById(+b.dataset.cid);closeModal();if(c)openPlay(c);}
+  else if(b.id==='pgAgain'){const c=cardById(+b.dataset.cid);closeModal();if(c)openPlay(c,+b.dataset.gi);}
   else if(b.id==='pgDone'){closeModal();renderHearth();}
 });
 document.addEventListener('keydown',e=>{if(!gOn())return;if(game.nudge&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();game.nudge(e.key==='ArrowLeft'?-.08:.08);}else if(game.skip&&(e.key===' '||e.key==='Enter')&&document.activeElement&&document.activeElement.id!=='pgSit'){e.preventDefault();game.skip();}});
