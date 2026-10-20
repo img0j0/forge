@@ -975,7 +975,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.27.0';
+const VERSION='prototype 0.27.1';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1281,12 +1281,12 @@ function openFeedbackAsk(){
 }
 
 function openNudge(){
-  const first=doneDays()<=1,c=state.cards[state.cards.length-1];
-  openSheet(`${first?`<h2>That\u2019s your first day</h2><p class="muted">${c?esc(c.nick||c.name)+' is in your binder, and t':'T'}he Hearth is ready whenever you are. A new card arrives tomorrow.</p><h3 style="margin:14px 0 0">Want a gentle nudge?</h3><p class="muted small">Pick a time and you\u2019ll hear when your next card is ready. Change it anytime in Settings.</p>`:`<h2>Want a gentle nudge?</h2><p class="muted">Pick a time and you'll hear when your next card is ready. Change it anytime in Settings.</p>`}
-    <div class="chips" role="group" aria-label="Nudge time" style="margin:12px 0">${['8:00 am','12:00 pm','6:00 pm'].map(t=>`<button class="chip" data-time="${t}" aria-pressed="${state.settings.nudge===t}">${t}</button>`).join('')}</div>
-    <button class="primary" id="nudgeOk">Save</button>
-    <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>
-    <p class="muted small center" style="margin-top:6px">Prototype only. Nothing is sent yet.</p>`);
+  const c=state.cards[state.cards.length-1],n=c?esc(c.nick||c.name):'';
+  openSheet(`<h2>That’s your first day</h2><p class="muted">${c?n+' is in your binder, and t':'T'}he Hearth is ready whenever you are. A new card arrives tomorrow.</p>
+    ${c?`<h3 style="margin:14px 0 0">Something to try now</h3><p class="muted small">At the Hearth, send ${n} out to wander. This first time they are back in about 20 minutes, with something small for your shelf.</p>`:''}
+    ${installTipHTML().replace('class="setblock"','class="setblock" style="margin-top:12px"')}
+    <div class="stack" style="margin-top:12px">${c?'<button class="primary" id="fdHearth">Go to the Hearth</button>':''}</div>
+    <div class="row" style="justify-content:center"><button class="ghost" data-close>${c?'Maybe later':'Got it'}</button></div>`);
 }
 
 /* Weekly pack */
@@ -1441,12 +1441,10 @@ function renderSettings(){
       <button class="pill" id="soundCheck" style="margin-top:8px">Run a sound check</button>
       ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}</div>
     <div class="setblock"><b>Comfort</b><p class="muted small">Motion, lore, and appearance.</p>
-      <div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and Chronicle ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app can follow your day, from dawn to night.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div></div>
+      <div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and tales ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app can follow your day, from dawn to night.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div></div>
     <div class="setblock"><b>Your own small thing</b><p class="muted small">Optional. One habit of your own to tick off on Today, beside the daily card. It never earns packs, and missing it never counts against you.</p>
       <label class="field"><span>Your small thing</span><input id="ownIn" maxlength="60" value="${esc(state.own.text)}" placeholder="For example: drink a glass of water" autocomplete="off"></label>
       <div class="chips"><button class="pill" id="ownSave">${state.own.text?'Save changes':'Add it to Today'}</button>${state.own.text?'<button class="pill" id="ownClear">Remove it</button>':''}</div></div>
-    <div class="setblock"><b>Morning nudge</b><p class="muted small">Prototype only. Nothing is sent yet.</p>
-      <div class="chips" role="group" aria-label="Nudge time">${[[null,'Off'],['8:00 am','8:00 am'],['12:00 pm','12:00 pm'],['6:00 pm','6:00 pm']].map(a=>`<button class="chip" data-setnudge="${a[0]||''}" aria-pressed="${(S.nudge||null)===a[0]}">${a[1]}</button>`).join('')}</div></div>
     ${installTipHTML()}
     <div class="setblock"><b>Fair odds</b><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button></div>
     <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forge stays on this device. Forge has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p>
@@ -1530,21 +1528,21 @@ const talesDone=()=>[0,1,2,3,4].filter(ti=>talePages(ti)===4).length;
 const loreOn=()=>state.settings.lore!==false;
 /* The page a new curio remembers, shown where you find it. */
 function talePageHTML(id){
-  if(!loreOn())return '';const q=taleOf(id);if(!q)return '';const T=TALES[q.ti],n=talePages(q.ti),R=THEMES[q.ti].name;
+  if(!loreOn())return '';const q=taleOf(id);if(!q)return '';const T=TALES[q.ti],n=talePages(q.ti),R=mapName(q.ti);
   return `<div class="tale new"><b>A page of an old ${R} tale: ${T.t}</b><p class="world">${esc(T.p[q.k][1])}</p>
     <p class="small">${n===4?`<b>The tale is whole.</b> ${esc(T.end)}`:`Pages found: ${n} of 4. The rest are with other ${R} curios.`} Read the whole tale on the Map tab, under Tales.</p></div>`;
 }
 function oldTalesHTML(){
   if(!loreOn())return '';
   const any=Object.keys(state.curios).length;
-  return `<h2 style="margin-top:4px">Old tales of the realms</h2><p class="muted small">Every realm forgot a tale. Each of its four curios remembers one page. Wander a realm to bring its pages home.</p>`+
-   TALES.map((T,ti)=>{const n=talePages(ti),R=THEMES[ti].name;
+  return `<h2 style="margin-top:4px">Old tales of the realms</h2><p class="muted small">Every realm forgot a tale. Each of its four curios remembers one page. Wander a realm to bring its pages home.${any?'':' Your first wander starts at the Hearth.'}</p>`+
+   TALES.map((T,ti)=>{const n=talePages(ti),R=mapName(ti);
     return `<div class="otale${n===4?' whole':''}"><h3>${n?T.t:R+': an untold tale'}</h3><p class="meta">${R}. ${n} of 4 pages${n===4?'. The tale is whole.':''}</p>
-      ${n?`<ol>${T.p.map(([id,txt])=>{const cu=CURIOS.find(x=>x.id===id);return state.curios[id]?`<li><span class="g" aria-hidden="true">${cu.g}</span><span class="world">${esc(txt)}</span></li>`:`<li class="gone">A page is missing. Another ${R} curio remembers it.</li>`;}).join('')}</ol>${n===4?`<p class="done world">${esc(T.end)}</p>`:''}`:`<p class="muted small" style="margin:0">${any?`No pages yet. Send a Forgeling to wander in ${R}.`:'Send a Forgeling wandering to find your first curio.'}</p>`}</div>`;}).join('');
+      ${n?`<ol>${T.p.map(([id,txt])=>{const cu=CURIOS.find(x=>x.id===id);return state.curios[id]?`<li><span class="g" aria-hidden="true">${cu.g}</span><span class="world">${esc(txt)}</span></li>`:`<li class="gone">A page is missing. Another ${R} curio remembers it.</li>`;}).join('')}</ol>${n===4?`<p class="done world">${esc(T.end)}</p>`:''}`:`<p class="muted small" style="margin:0">${any?`No pages yet. Send a Forgeling to wander in ${R}.`:'No pages yet.'}</p>`}</div>`;}).join('');
 }
 function talesHTML(){
   const cards=state.cards.slice().reverse(),ot=oldTalesHTML();
-  if(!cards.length)return ot+'<p class="muted">Your Chronicle begins with your first Forgeling.</p>';
+  if(!cards.length)return ot+'<p class="muted">Your Forgelings and their tales appear here once you find your first one.</p>';
   const shown=cards.slice(0,ch.more*12);
   return ot+(ot?'<h2 style="margin-top:18px">Your Forgelings</h2>':'')+shown.map(c=>`<div class="chron"><button class="minibtn" data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:64,mini:true})}</button><div class="cbody">
     <b>${esc(c.nick||c.name)}</b><div class="muted small">${c.nick?'Born as '+esc(c.name)+', ':''}${realmName(c)}, ${esc(c.dateLabel)}</div>
@@ -1857,7 +1855,7 @@ function worldSheet(){
   for(let x=d;x>=Math.max(0,d-30)&&ev.length<6;x--){const e=worldEvent(x);if(e)ev.push([d-x,e]);}
   openSheet(`<h2>The world right now</h2><p class="muted small">Day ${d} of the world. Era ${E.k+1}, ${E.len-(d-E.start)} days left. Every Forge shares this calendar.</p>
     <h3 style="margin:6px 0 2px">${esc(era.n)}</h3><p>${esc(dk?era.d:era.c)}</p>
-    <div class="lbl2">Recent events</div>${ev.length?ev.map(([ago,e])=>`<p class="small"><b>${ago===0?'Today':ago+(ago===1?' day ago':' days ago')}, ${esc(THEMES[e.realm].name)}.</b> ${esc(cap(EVENTS[e.realm][e.kind][dk?1:0]))}.</p>`).join(''):'<p class="muted small">Nothing in the last month.</p>'}
+    <div class="lbl2">Recent events</div>${ev.length?ev.map(([ago,e])=>`<p class="small"><b>${ago===0?'Today':ago+(ago===1?' day ago':' days ago')}, ${esc(mapName(e.realm))}.</b> ${esc(cap(EVENTS[e.realm][e.kind][dk?1:0]))}.</p>`).join(''):'<p class="muted small">Nothing in the last month.</p>'}
     <div class="stack"><button class="primary" data-close>Close</button></div>`);
 }
 
@@ -2022,6 +2020,8 @@ function placesListHTML(ti){
   const n=placesFound(ti);if(!n)return '';
   return `<p class="muted small" style="margin:8px 0 0">Places on the map${n===5?'. Fully charted.':''}</p><ul class="places">${PLACES[ti].slice(0,n).map(p=>`<li><b>${esc(p.n)}.</b> <span class="world">${esc(p.x)}</span></li>`).join('')}${n<5?'<li class="gone">There is more to find here. Wander here to uncover it.</li>':''}</ul>`;
 }
+/* 0.27.1: one name per realm everywhere, the one the Map shows. */
+function mapName(ti){if(!(ti>=0&&ti<=4))return 'somewhere';const m=mapState()[ti],mood=state.settings.mood,dk=mood==='dark'||(mood==='mix'&&whash(m.ti*7+m.tier)%2===0);return dk?THEMES[ti].dark.name:THEMES[ti].name;}
 function mapState(){
   return THEMES.map((T,ti)=>{const cs=state.cards.filter(c=>c.theme===ti);return{ti,n:cs.length,tier:mapPreview!=null?mapPreview:mapTier(cs.length),shade:cs.some(c=>c.dark)};});
 }
@@ -2267,7 +2267,7 @@ function wanderCollect(){
   state.wstat.back++;state.wander=null;
   let place='';{const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&placesFound(t)<5),dto=to>=0?(open.includes(to)?to:-1):(open.length?open[Math.floor(r()*open.length)]:-1);
     if(dto>=0){if(!state.explore)state.explore={};state.explore[dto]=(state.explore[dto]||0)+1;const pf=placesFound(dto),pl=PLACES[dto][pf-1];
-      place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(THEMES[dto].name)}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(THEMES[dto].name)}.`} See it on the Map tab.</p></div>`;}}
+      place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(mapName(dto))}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(mapName(dto))}.`} See it on the Map tab.</p></div>`;}}
   let done='';const rq=state.request,ra=rq?cardById(rq.cid):null;
   if(rq&&ra&&to===rq.realm){
     const before=bondLevel(ra);ra.bond=(ra.bond||0)+3;const K=KEEPR[rq.realm],nk=!state.keepsR.includes(K.id);if(nk)state.keepsR.push(K.id);
@@ -2291,7 +2291,7 @@ function wanderTick(){
   const c=cardById(w.id);
   if(!c){state.wander=null;save();render();return;}
   if(Date.now()>=w.ready){
-    if(!w.notified){w.notified=true;save();toast((c.nick||c.name)+' is back from wandering.');chime(1);render();}
+    if(!w.notified){w.notified=true;save();if(modal.hidden)toast((c.nick||c.name)+' is back from wandering.');chime(1);render();}
   }else{const el=$('#wLeft');if(el)el.textContent=wLeftText();}
 }
 
@@ -2516,7 +2516,7 @@ function recapHTML(){
   const lines=days.map(k=>state.journal[k]&&{t:state.journal[k].text}).filter(Boolean).concat(cards.filter(c=>c.tale).map(c=>({t:c.tale})));
   const line=lines.length?lines[lines.length-1].t:'';
   return `<div class="panel-box"><h2>This week</h2>
-    <p>You showed up on <b>${done}</b> of the last ${days.length} ${days.length===1?'day':'days'}${rest?`, and rested on ${rest}`:''}.</p>
+    <p>${days.length===1?(done?'You showed up today.':'This week starts today.'):`You showed up on <b>${done}</b> of the last ${days.length} days${rest?`, and rested on ${rest}`:''}.`}</p>
     ${vecs.length?`<div class="chips" style="margin-top:8px">${vecs.map(v=>`<span class="stat-chip" style="background:${VECTORS[v].color};color:#2E2A47">${VECTORS[v].name}</span>`).join('')}</div>`:''}
     ${best?`<div class="chron" style="margin:10px 0 0;padding:8px"><button class="minibtn" data-insp="${best.id}" aria-label="Look at ${esc(best.nick||best.name)}">${cardHTML(best,{w:56,mini:true})}</button><div class="cbody"><b>Best find: ${esc(best.nick||best.name)}</b><div class="muted small">${RAR[best.rarity].name}, ${realmName(best)}</div></div></div>`:''}
     ${line?`<p class="mine" style="margin-top:10px">\u201C${esc(line)}\u201D</p>`:''}
@@ -3116,6 +3116,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='packDone'){closeModal();tab='binder';bf={type:'all',mood:'all',sort:'new',page:0};render();window.scrollTo(0,0);}
   else if(b.id==='inspFlip')flipCard();
   else if(b.dataset.time){state.settings.nudge=b.dataset.time;save();modal.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b?'true':'false'));}
+  else if(b.id==='fdHearth'){closeModal();tab='hearth';render();window.scrollTo(0,0);}
   else if(b.id==='nudgeOk'){closeModal();renderSettings();toast(state.settings.nudge?`Nudge set for ${state.settings.nudge}. Nothing is sent in this prototype.`:'No nudge. You can change this in Settings.');}
   else if(b.id==='copyExp'){copyText($('#expText').value,'Copied. Keep it somewhere safe.');state.backup.at=todayKey();save();}
   else if(b.id==='saveFile')backupFile();
@@ -3416,7 +3417,7 @@ function furnDraw(put,fs,dim){
 /* ---- Wandering somewhere: each curio belongs to a realm, and a wander can head for one realm on your map. ---- */
 const CREALM={acorn:0,flower:0,feather:0,mushroom:0,leaf:1,spark:1,bone:1,crystal:1,shell:2,pebble:2,rain:2,coin:2,snow:3,moon:3,bell:3,glimmer:3,key:4,candle:4,thread:4,map:4};
 const rKnown=()=>[0,1,2,3,4].filter(ti=>state.cards.some(c=>c.theme===ti));
-function rName(ti){if(!(ti>=0&&ti<=4))return 'somewhere';const cs=state.cards.filter(c=>c.theme===ti);return REALM_PAGES[ti+'-'+(cs.length&&cs.every(c=>c.dark)?1:0)].t;}
+function rName(ti){return mapName(ti);}
 const rCurios=ti=>CURIOS.filter(x=>CREALM[x.id]===ti);
 let wPickId=null;
 function openWanderTo(c){
@@ -3789,7 +3790,7 @@ function finishGame(){
   let line=g.c.dark?`${n} rumbles with approval. ${unitOf(G,score)}.`:`${n} cheers. ${unitOf(G,score)}!`;
   if(pts===3&&state.games.curioDay!==todayKey()&&Math.random()<.4){
     const ti=Math.abs(g.c.theme|0)%5,all=rCurios(ti),un=all.filter(x=>!state.curios[x.id]),pool=un.length?un:all,cu=pool[Math.floor(Math.random()*pool.length)];
-    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();const nw=cur.n===1,q=taleOf(cu.id);line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`+(nw&&q&&loreOn()?(talePages(q.ti)===4?` It holds the last page of an old ${THEMES[q.ti].name} tale. The tale is whole. Read it on the Map tab, under Tales.`:` It remembers a page of an old ${THEMES[q.ti].name} tale. Read it on the Map tab, under Tales.`):'');}
+    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();const nw=cur.n===1,q=taleOf(cu.id);line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`+(nw&&q&&loreOn()?(talePages(q.ti)===4?` It holds the last page of an old ${mapName(q.ti)} tale. The tale is whole. Read it on the Map tab, under Tales.`:` It remembers a page of an old ${mapName(q.ti)} tale. Read it on the Map tab, under Tales.`):'');}
   }
   if(nb)line+=' A new best!';
   doVisit(g.c,'play',pts,line);
