@@ -328,6 +328,13 @@ html.release details.dev{display:none}
 .otale li .world{border:0;padding:0;margin:0;display:inline}
 .otale.whole{border-color:#E2B04A;box-shadow:inset 0 0 0 1px #E2B04A}
 .otale .done{margin:8px 0 0;font-size:14px}
+.mp-gold{stroke:#C9962E}
+:root[data-theme="dark"] .mp-gold{stroke:#E2B04A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .mp-gold{stroke:#E2B04A}}
+ul.places{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+ul.places li{font-size:14px;line-height:1.35}
+ul.places li.gone{color:var(--muted)}
+ul.places li b{font-weight:700}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -968,7 +975,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.26.0';
+const VERSION='prototype 0.27.0';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1030,7 +1037,7 @@ const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00')
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''}};}
+function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1074,6 +1081,7 @@ function sanitize(s){
   {const g=s.games&&typeof s.games==='object'&&!Array.isArray(s.games)?s.games:{};const b=g.best&&typeof g.best==='object'&&!Array.isArray(g.best)?g.best:{};const ok={};['meadow','ember','tide','frost','dusk'].forEach(k=>{if(Number.isFinite(b[k])&&b[k]>0)ok[k]=Math.min(999,Math.round(b[k]));});s.games={best:ok,played:int(g.played,0,1e7,0),curioDay:typeof g.curioDay==='string'?g.curioDay:''};}
   {const o=s.own&&typeof s.own==='object'&&!Array.isArray(s.own)?s.own:{};const DK=/^\d{4}-\d{2}-\d{2}$/;s.own={text:typeof o.text==='string'?o.text.trim().slice(0,60):'',days:(Array.isArray(o.days)?o.days:[]).filter((d,i,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===i).sort().slice(-800)};
    const bk=s.backup&&typeof s.backup==='object'&&!Array.isArray(s.backup)?s.backup:{};s.backup={at:typeof bk.at==='string'&&DK.test(bk.at)?bk.at:'',ask:typeof bk.ask==='string'&&DK.test(bk.ask)?bk.ask:''};}
+  {const e=s.explore&&typeof s.explore==='object'&&!Array.isArray(s.explore)?s.explore:{};const ok={};[0,1,2,3,4].forEach(t=>{const v=e[t];if(Number.isFinite(v)&&v>0)ok[t]=Math.min(4,Math.round(v));});s.explore=ok;}
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
@@ -1605,6 +1613,7 @@ function realmPageHTML(ti){
   const hc=slotCards(),hw=hc[Math.min(hf.sel,hc.length-1)],wc0=wCard(),rq=state.request,ra=rq&&rq.realm===ti?reqAsker():null;
   out+=hw?(state.wander&&wc0?`<p class="muted small" style="margin:8px 0 0">${esc(wc0.nick||wc0.name)} is out wandering${state.wander.realm>=0?' in '+esc(rName(state.wander.realm)):''}.</p>`:state.hearth.sleep?'':`<button class="outline" data-wto="${ti}" style="margin-top:10px">Send ${esc(hw.nick||hw.name)} to wander here</button>`):'';
   if(ra)out+=`<p class="muted small" style="margin:6px 0 0">${esc(ra.nick||ra.name)} asked for something from here.</p>`;
+  out+=placesListHTML(ti);
   if(loreOn()){const tp=talePages(ti);out+=`<p class="muted small" style="margin:6px 0 0">Old tale: ${TALES[ti].t}. ${tp===4?'The tale is whole.':tp+' of 4 pages found.'}</p>`;}
   return out+`<div class="latest" style="margin-top:6px">${mini.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:62,mini:true})}</button>`).join('')}</div>`;
 }
@@ -1931,6 +1940,88 @@ function markPos(ti,seed){
   }
   return[L[0],L[1]+24];
 }
+/* ---- 0.27: places on the map. The first place in a realm appears with your first Forgeling there; each wander there
+   uncovers the next. They are drawn as small landmarks joined by a dotted trail. ---- */
+const PLACES=[
+ [{n:'The Slow Hill',k:'hill',x:'The first hill in Meadow. Someone is always sitting on it, admiring the view.'},
+  {n:'Birdwait Oak',k:'tree',x:'Birds leave feathers in its branches as promises. The oak keeps every one.'},
+  {n:'The Crooked Garden',k:'star',x:'Nothing here grows straight, and nothing here minds.'},
+  {n:'Bramble Edge',k:'zig',x:'Where Meadow goes wild. The thorns keep untended things safe until you come back for them.'},
+  {n:'Fernlow\'s Seat',k:'stone',x:'A flat stone where Fernlow sits. Time slows down a little near it.'}],
+ [{n:'Leaprock',k:'star',x:'Where the Forge\'s first spark landed. The ground is still warm.'},
+  {n:'Warmleaf Grove',k:'tree',x:'Red leaves that stay warm, and naps that last longer than planned.'},
+  {n:'Skitter\'s Run',k:'zig',x:'A trail worn smooth by someone who never waits to be finished.'},
+  {n:'The Holding Stone',k:'cave',x:'Down in Inferno. Heavy things rest here until someone is ready to lift them.'},
+  {n:'Crystal Hollow',k:'gem',x:'Every crystal here was once a hard thing, finally done.'}],
+ [{n:'First Wave Cove',k:'pool',x:'Where the water laughed for the first time. It still does, now and then.'},
+  {n:'Pebble Shallows',k:'dots',x:'Round pebbles, warm water, and no hurry at all.'},
+  {n:'Jollop\'s Point',k:'tower',x:'A rock where nobody keeps score. Jumping off is encouraged.'},
+  {n:'The Questions Deep',k:'cave',x:'Down in the Abyss. Unasked questions drift here, glowing softly.'},
+  {n:'Rainrise Bay',k:'arch',x:'Where answers rise as rain. Bring a pocket.'}],
+ [{n:'The Unmelting Field',k:'star',x:'Snow that decided to stay. The air here makes thinking easy.'},
+  {n:'Bell Peak',k:'bell',x:'A bell rings here once a year. Everyone comes. Nobody speaks.'},
+  {n:'Quillen\'s Clearing',k:'pool',x:'A quiet clearing, trimmed of everything extra.'},
+  {n:'Hollow Log Light',k:'cave',x:'In the Wraith whiteout, a small light kept burning so nobody feels alone.'},
+  {n:'Moonrest',k:'arch',x:'Where the moon once rested. A sliver still glows on the snow.'}],
+ [{n:'The First Workshop',k:'house',x:'Benches, half-made things, and a lamp that is always lit.'},
+  {n:'Candle Row',k:'star',x:'Candles that light themselves when you want to see your work clearly.'},
+  {n:'Tikka\'s Clocktower',k:'tower',x:'Every gear in it was fixed once, and has worked ever since.'},
+  {n:'The Keyhole',k:'key',x:'Down in the Void. One small key, and one door that opens when you are ready.'},
+  {n:'Red Thread Stair',k:'zig',x:'The way home from the Void, marked by a red thread and a small light.'}]];
+const rKnownTi=ti=>state.cards.some(c=>c.theme===ti);
+const placesFound=ti=>rKnownTi(ti)?Math.min(5,1+((state.explore&&state.explore[ti])||0)):0;
+const chartedCount=()=>[0,1,2,3,4].filter(ti=>placesFound(ti)===5).length;
+const PLACE_PTS={};
+function placePts(ti){
+  if(PLACE_PTS[ti])return PLACE_PTS[ti];
+  const P=MAPP[ti],L=mapMid(P),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),gl=glyphPts(ti,MAXG[ti]);
+  let out=[];
+  for(const [edge,gd,pd,lw] of [[7,10,17,34],[6,8,14,30],[5,6,12,26],[4,4,10,20]]){
+    out=[];
+    for(let k=0;k<1500&&out.length<5;k++){
+      const x=x0+whash(ti*4099+k*11+3)%1000/1000*(x1-x0),y=y0+whash(ti*7919+k*13+5)%1000/1000*(y1-y0);
+      if(!inPoly(x,y,P)||![[edge,0],[-edge,0],[0,edge],[0,-edge]].every(o=>inPoly(x+o[0],y+o[1],P)))continue;
+      if(Math.abs(x-L[0])<lw&&y>L[1]-13&&y<L[1]+17)continue;
+      if(gl.some(q=>Math.hypot(q[0]-x,q[1]-y)<gd))continue;
+      if(out.some(q=>Math.hypot(q[0]-x,q[1]-y)<pd))continue;
+      out.push([Math.round(x),Math.round(y)]);
+    }
+    if(out.length===5)break;
+  }
+  while(out.length<5)out.push([Math.round(L[0]),Math.round(L[1]+22+out.length*4)]);
+  out.sort((a,b)=>Math.atan2(a[1]-L[1],a[0]-L[0])-Math.atan2(b[1]-L[1],b[0]-L[0]));
+  return PLACE_PTS[ti]=out;
+}
+function iconD(k,x,y){
+  switch(k){
+    case 'hill':return `M${x-5} ${y+3}Q${x} ${y-5} ${x+5} ${y+3}Z`;
+    case 'tree':return `M${x} ${y-5}L${x+4} ${y+1}L${x-4} ${y+1}ZM${x} ${y+1}L${x} ${y+4}`;
+    case 'star':return `M${x} ${y-5}L${x+1.3} ${y-1.3}L${x+5} ${y}L${x+1.3} ${y+1.3}L${x} ${y+5}L${x-1.3} ${y+1.3}L${x-5} ${y}L${x-1.3} ${y-1.3}Z`;
+    case 'zig':return `M${x-5} ${y+2}L${x-2.5} ${y-3}L${x} ${y+2}L${x+2.5} ${y-3}L${x+5} ${y+2}`;
+    case 'stone':return `M${x-4} ${y+2}Q${x-4} ${y-3} ${x} ${y-3}Q${x+4} ${y-3} ${x+4} ${y+2}Z`;
+    case 'cave':return `M${x-5} ${y+3}Q${x-5} ${y-4} ${x} ${y-4}Q${x+5} ${y-4} ${x+5} ${y+3}M${x-2} ${y+3}Q${x-2} ${y-1} ${x} ${y-1}Q${x+2} ${y-1} ${x+2} ${y+3}`;
+    case 'gem':return `M${x} ${y-5}L${x+4} ${y-1}L${x} ${y+5}L${x-4} ${y-1}ZM${x-4} ${y-1}L${x+4} ${y-1}`;
+    case 'pool':return `M${x-5} ${y}Q${x-5} ${y-3} ${x} ${y-3}Q${x+5} ${y-3} ${x+5} ${y}Q${x+5} ${y+3} ${x} ${y+3}Q${x-5} ${y+3} ${x-5} ${y}Z`;
+    case 'dots':return `M${x-4} ${y}h1M${x} ${y-2}h1M${x+3} ${y+1}h1M${x-1} ${y+3}h1`;
+    case 'tower':return `M${x-2} ${y+4}L${x-2} ${y-3}L${x+2} ${y-3}L${x+2} ${y+4}ZM${x} ${y-3}L${x} ${y-6}L${x+3} ${y-5}L${x} ${y-4}`;
+    case 'arch':return `M${x-5} ${y+3}L${x-5} ${y}Q${x-5} ${y-5} ${x} ${y-5}Q${x+5} ${y-5} ${x+5} ${y}L${x+5} ${y+3}`;
+    case 'bell':return `M${x-4} ${y+3}Q${x-3} ${y-4} ${x} ${y-4}Q${x+3} ${y-4} ${x+4} ${y+3}ZM${x} ${y+3}L${x} ${y+5}`;
+    case 'house':return `M${x-4} ${y+4}L${x-4} ${y-1}L${x} ${y-5}L${x+4} ${y-1}L${x+4} ${y+4}Z`;
+    case 'key':return `M${x-1} ${y-4}Q${x-4} ${y-4} ${x-4} ${y-1.5}Q${x-4} ${y+1} ${x-1} ${y+1}Q${x+2} ${y+1} ${x+2} ${y-1.5}Q${x+2} ${y-4} ${x-1} ${y-4}ZM${x-1} ${y+1}L${x-1} ${y+5}L${x+1} ${y+5}`;
+  }
+  return '';
+}
+function placesSVG(ti){
+  const n=placesFound(ti);if(!n)return '';const pts=placePts(ti),found=PLACES[ti].slice(0,n).map((p,i)=>[p,pts[i]]);
+  let s='';
+  if(n>1)s+=`<path class="mp-st" fill="none" stroke-width="1" stroke-dasharray="1.5 3" stroke-opacity=".7" d="M${found.map(f=>f[1][0]+' '+f[1][1]).join('L')}"/>`;
+  s+=found.map(f=>`<path class="mp-st mp-place" fill="none" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" transform="translate(${f[1][0]} ${f[1][1]}) scale(1.3)" d="${iconD(f[0].k,0,0)}"/>`).join('');
+  return s;
+}
+function placesListHTML(ti){
+  const n=placesFound(ti);if(!n)return '';
+  return `<p class="muted small" style="margin:8px 0 0">Places on the map${n===5?'. Fully charted.':''}</p><ul class="places">${PLACES[ti].slice(0,n).map(p=>`<li><b>${esc(p.n)}.</b> <span class="world">${esc(p.x)}</span></li>`).join('')}${n<5?'<li class="gone">There is more to find here. Wander here to uncover it.</li>':''}</ul>`;
+}
 function mapState(){
   return THEMES.map((T,ti)=>{const cs=state.cards.filter(c=>c.theme===ti);return{ti,n:cs.length,tier:mapPreview!=null?mapPreview:mapTier(cs.length),shade:cs.some(c=>c.dark)};});
 }
@@ -1945,8 +2036,12 @@ function mapHTML(){
     g+=`<path d="${d}" fill="${acc}" fill-opacity="${[0,.12,.22,.32][m.tier]}" class="mp-st" stroke-width="${[0,1.1,1.5,1.9][m.tier]}" stroke-dasharray="${m.tier===1?'5 4':'none'}" stroke-opacity="${[0,.55,.8,1][m.tier]}"/>`;
     const gl=glyphPts(ti,Math.min([0,2,5,9][m.tier],MAXG[ti]));
     if(gl.length)g+=`<path class="mp-st" fill="none" stroke-width="1.1" stroke-opacity="${m.tier===1?.5:.75}" d="${gl.map(p=>glyphD(ti,p[0],p[1])).join('')}"/>`;
+    g+=placesSVG(ti);
+
     g+=`<text x="${r1(L[0])}" y="${r1(L[1]+4)}" text-anchor="middle" class="${m.tier===1?'mp-mut':'mp-txt'}" font-size="13" letter-spacing="1"${m.tier===3?' font-weight="700"':''}>${esc(nameOf(m))}</text>`;
-    if(m.tier===3)g+=`<path class="mp-st" fill="none" stroke-width="1" d="M${r1(L[0]-15)} ${r1(L[1]+10)}Q${r1(L[0])} ${r1(L[1]+14)} ${r1(L[0]+15)} ${r1(L[1]+10)}"/>`;
+    const chd=placesFound(ti)===5;
+    if(m.tier===3||chd)g+=`<path class="${chd?'mp-gold':'mp-st'}" fill="none" stroke-width="${chd?1.6:1}" d="M${r1(L[0]-15)} ${r1(L[1]+10)}Q${r1(L[0])} ${r1(L[1]+14)} ${r1(L[0]+15)} ${r1(L[1]+10)}"/>`;
+    if(chd)g+=`<path class="mp-gold" fill="#E2B04A" stroke-width="1" d="M${r1(L[0])} ${r1(L[1]+9)}l3 3l-3 3l-3 -3z"/>`;
   });
   ms.forEach(m=>{
     const P=MAPP[m.ti],d=blobPath(P,m.ti+1,[3.4,2.3,1.3,.5][m.tier]),sel=ch.realm===m.ti;
@@ -1973,7 +2068,7 @@ function mapHTML(){
   const ago=n=>n===0?'Today':n===1?'Yesterday':n+' days ago';
   const names=['Sketched in pencil. The edges are guesses.','Drawn, mostly. A few hills are still rumor.','Inked. You could draw it from memory.'];
   const dnames=['Scratched in. The edges are guesses, and something keeps correcting them.','Drawn, mostly. The lines are darker than you remember making them.','Inked. You are no longer sure the ink is yours.'];
-  let notes=ms.filter(m=>m.tier>0).map(m=>`<p class="small"><b>${esc(nameOf(m))}.</b> ${(dkOf(m)?dnames:names)[m.tier-1]}</p>`).join('');
+  let notes=ms.filter(m=>m.tier>0).map(m=>{const pf=placesFound(m.ti);return `<p class="small"><b>${esc(nameOf(m))}.</b> ${(dkOf(m)?dnames:names)[m.tier-1]} ${['','One place drawn in so far.','A few places drawn in.','A few places drawn in.','Most of it drawn in.','Fully charted.'][pf]}</p>`;}).join('');
   if(ms.some(m=>m.tier===0))notes+='<p class="muted small">The rest is blank paper, for now.</p>';
   const ev=evs.map(([a,e])=>{const m=ms[e.realm],dk=mood==='dark';return `<p class="small"><b>${ago(a)}, ${m.tier>0?esc(nameOf(m)):'somewhere not yet drawn'}.</b> ${esc(cap(EVENTS[e.realm][e.kind][dk?1:0]))}.</p>`;}).join('');
   const sp=ch.realm!=null&&ms[ch.realm]?`<div class="realmpage" aria-live="polite">${realmPageHTML(ch.realm)}</div>`:'';
@@ -2170,6 +2265,9 @@ function wanderCollect(){
   const to=Number.isInteger(w.realm)&&w.realm>=0?w.realm:-1,base=to>=0?rCurios(to):CURIOS,unfound=base.filter(x=>!state.curios[x.id]),pool=unfound.length?unfound:base,cu=pool[Math.floor(r()*pool.length)];
   const isNew=!state.curios[cu.id],cur=state.curios[cu.id]||{n:0,cid:w.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;
   state.wstat.back++;state.wander=null;
+  let place='';{const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&placesFound(t)<5),dto=to>=0?(open.includes(to)?to:-1):(open.length?open[Math.floor(r()*open.length)]:-1);
+    if(dto>=0){if(!state.explore)state.explore={};state.explore[dto]=(state.explore[dto]||0)+1;const pf=placesFound(dto),pl=PLACES[dto][pf-1];
+      place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(THEMES[dto].name)}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(THEMES[dto].name)}.`} See it on the Map tab.</p></div>`;}}
   let done='';const rq=state.request,ra=rq?cardById(rq.cid):null;
   if(rq&&ra&&to===rq.realm){
     const before=bondLevel(ra);ra.bond=(ra.bond||0)+3;const K=KEEPR[rq.realm],nk=!state.keepsR.includes(K.id);if(nk)state.keepsR.push(K.id);
@@ -2184,7 +2282,7 @@ function wanderCollect(){
   openSheet(`<p class="muted center small">${esc(head)}</p>
     <div style="font-size:64px;text-align:center;line-height:1.25" aria-hidden="true">${cu.g}</div>
     <h2 style="text-align:center">${cu.name}</h2><p class="center">${esc(line)}</p>
-    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${isNew?talePageHTML(cu.id):''}${done}
+    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${place}${isNew?talePageHTML(cu.id):''}${done}
     <div class="stack"><button class="primary" id="wcOk" data-close>Lovely</button></div>`);
 }
 function wanderTick(){
@@ -2395,7 +2493,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=30;
+const SEEN_V=31;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2504,6 +2602,8 @@ const RIBBONS=[
   {id:'inked1',name:'Inked In',desc:'Fill in a realm on the map.',g:1,f:()=>THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length},
   {id:'bloom1',name:'Quiet Bloom',desc:'Something blooms by the fire while you are away.',g:1,f:()=>(state.hearth.quiet&&state.hearth.quiet.b)||0},
   {id:'curios',name:'Curio Shelf',desc:'Find 10 different curios.',g:10,f:()=>Object.keys(state.curios).length},
+  {id:'chart1',name:'Cartographer',desc:'Find all five places in a realm.',g:1,f:()=>chartedCount()},
+  {id:'chart5',name:'Every Corner',desc:'Fully chart all five realms.',g:5,f:()=>chartedCount()},
   {id:'tale1',name:'Tale Keeper',desc:'Make a realm\'s old tale whole.',g:1,f:()=>talesDone()},
   {id:'tales5',name:'Keeper of Old Tales',desc:'Make all five old tales whole.',g:5,f:()=>talesDone()},
   {id:'journal',name:'Thoughtful',desc:'Answer 7 daily questions.',g:7,f:()=>Object.keys(state.journal).length},
@@ -2539,7 +2639,8 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li>
+    <ul class="newlist"><li><b>Places on the map.</b> Each realm has five places to find. Your first Forgeling there reveals one, and every wander there uncovers another. Watch the Map fill in, one landmark at a time.</li>
+    <li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li>
     <li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
     <li><b>Share a Forgeling.</b> Open any Forgeling and tap Share for a picture card you can send a friend. It's made on your phone, and nothing is uploaded.</li>
     <li><b>Keep your collection safe.</b> Once a month, Today offers to save a copy as a file. Restore it from Settings on this phone or a new one.</li>
@@ -2547,8 +2648,7 @@ function openWhatsNew(){
     <li><b>Your own small thing.</b> In Settings you can add one habit of your own to tick off on Today. It shows in your Journal, never earns packs and never counts against you.</li>
     <li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
     <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li>
-    <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li>
-    <li><b>Found by the fire.</b> New Forgelings and packs now open at night by a fire, with embers drifting up.</li></ul>
+    <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
