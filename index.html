@@ -319,6 +319,15 @@ html.release details.dev{display:none}
 .gwho button[aria-pressed="true"]{border-color:var(--plum);background:var(--chip)}
 .gwho img{width:32px;height:32px;image-rendering:pixelated}
 .moodbtn .home{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--butter);color:#2E2A47;font:600 12px var(--body);vertical-align:2px}
+.otale{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;background:var(--surface)}
+.otale h3{margin:0 0 2px;font:600 17px var(--display)}
+.otale .meta{margin:0 0 8px;color:var(--muted);font-size:13px}
+.otale ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.otale li.gone{color:var(--muted);font-size:14px}
+.otale li .g{display:inline-block;width:1.5em}
+.otale li .world{border:0;padding:0;margin:0;display:inline}
+.otale.whole{border-color:#E2B04A;box-shadow:inset 0 0 0 1px #E2B04A}
+.otale .done{margin:8px 0 0;font-size:14px}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -959,7 +968,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.25.2';
+const VERSION='prototype 0.26.0';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1475,11 +1484,61 @@ function renderNav(){
 function render(){worldFreeze();renderToday();renderBinder();renderChronicle();renderSettings();renderNav();renderHearth();checkRibbons();}
 /* ================= Chronicle: a book in two inks ================= */
 let ch={sub:'map',more:1,realm:null};
+/* ---- 0.26: the old tales. Every realm forgot a tale, and each of its four curios remembers one page. ---- */
+const TALES=[
+ {t:'The Slow Hill',p:[
+  ['acorn','Before Meadow had a name, it was one bare hill. A Forgeling planted an acorn there and sat down to wait. Everyone said nothing would come of it. The Forgeling said that was fine. It liked the view.'],
+  ['flower','The first spring, one flower came up crooked. The Forgeling did not straighten it. It watered it and said good morning. The next spring there were two, both crooked, both fine.'],
+  ['feather','Birds came for the flowers and stayed for the company. One left a feather behind, which is how birds say they will be back. The hill began, very slowly, to hum.'],
+  ['mushroom','Part of the hill grew wild while nobody looked. That edge became Bramble, and it kept the untended things safe until someone came back for them. Its mushrooms glow only when you look away. They are shy, not secret.']],
+  end:'The hill is Meadow now. It still grows at its own speed, and it still likes the view.'},
+ {t:'The Spark That Leapt',p:[
+  ['spark','The Forge struck its first spark, and the spark did not wait to be finished. It leapt. Where it landed, the ground stayed warm, and the warm ground became Ember.'],
+  ['leaf','The first tree in Ember grew red leaves that stay a little warm. They were never on fire. They just remember being near one.'],
+  ['bone','Under Ember, pressure gathered into black stone. The Inferno guardians took the heavy things people kept putting off and held them there, safe and warm. They set a bone beside the first fire as a promise: we will hold it until you are ready.'],
+  ['crystal','When someone finally picks the hard thing back up, the stone where it lay cools into crystal. Inferno is full of crystals now. Each one hums with something that got done.']],
+  end:'Ember still burns on effort, and Inferno still holds what waits. Neither one is in a hurry for you.'},
+ {t:'Where the Tide Goes',p:[
+  ['shell','Tide was once still water that did not know what it wanted. A Forgeling dropped a shell in it to see what would happen. The water laughed, and that was the first wave.'],
+  ['pebble','The waves carried one pebble back and forth for a hundred years, until it was perfectly round. They were never in a hurry. They just liked the company.'],
+  ['coin','Deeper down, the Abyss keeps the questions nobody has asked yet. One was stamped onto a coin: a crown on one side, a warning on the other. It asks which matters more. The Abyss waits with you for the answer.'],
+  ['rain','When the Abyss has held a question long enough, it lets the answer rise as rain. That is why Tide rain feels like a thought you almost had. Catch some. Keep it in your pocket.']],
+  end:'Tide still goes wherever you bring it, and the Abyss still waits beside you, not ahead of you.'},
+ {t:'The Quiet Mountain',p:[
+  ['snow','Frost began as one snowflake that would not melt, because it had decided something. Every flake after it decided something too. That is why the air there is so clear.'],
+  ['bell','A Frost Forgeling hung a bell on the highest peak to tell the others when to listen. It rang once a year. Everyone came, nobody spoke, and that was the point.'],
+  ['glimmer','In the whiteout, Wraith grew so quiet the quiet took a shape. Its guardians found a glimmer in a hollow log and kept it lit, so nobody lost in the snow would think they were alone.'],
+  ['moon','On the longest night, the moon came down to rest on the peak. When it left, a sliver stayed behind, as thanks for the quiet. Frost still keeps it, and has never once spent it.']],
+  end:'The mountain is still quiet. It is the kind of quiet that keeps you company.'},
+ {t:'The Workshop Between',p:[
+  ['map','Dusk was the first workshop. Its makers drew a map of everywhere they had not been yet, and marked one small hill with care, in case anyone needed a place to start.'],
+  ['candle','The first candle in Dusk lit itself the moment a maker asked to see their work more clearly. The workshops have never been fully dark since.'],
+  ['key','Below the workshops lies the Void, where people leave the things they are afraid to say. Its guardians made one small iron key for all of it. It opens nothing until you are ready. Then it opens anything.'],
+  ['thread','A red thread runs from the Void up to the workshop door, so whatever is said in the dark can find its way home. Orrun walked it first, carrying a small light. Others have followed since.']],
+  end:'Dusk is still the hour between. Whatever you make there, and whatever you finally say, has a way home.'}];
+const taleOf=id=>{for(let ti=0;ti<5;ti++){const k=TALES[ti].p.findIndex(x=>x[0]===id);if(k>=0)return {ti,k};}return null;};
+const talePages=ti=>TALES[ti].p.filter(x=>state.curios[x[0]]).length;
+const talesDone=()=>[0,1,2,3,4].filter(ti=>talePages(ti)===4).length;
+const loreOn=()=>state.settings.lore!==false;
+/* The page a new curio remembers, shown where you find it. */
+function talePageHTML(id){
+  if(!loreOn())return '';const q=taleOf(id);if(!q)return '';const T=TALES[q.ti],n=talePages(q.ti),R=THEMES[q.ti].name;
+  return `<div class="tale new"><b>A page of an old ${R} tale: ${T.t}</b><p class="world">${esc(T.p[q.k][1])}</p>
+    <p class="small">${n===4?`<b>The tale is whole.</b> ${esc(T.end)}`:`Pages found: ${n} of 4. The rest are with other ${R} curios.`} Read the whole tale on the Map tab, under Tales.</p></div>`;
+}
+function oldTalesHTML(){
+  if(!loreOn())return '';
+  const any=Object.keys(state.curios).length;
+  return `<h2 style="margin-top:4px">Old tales of the realms</h2><p class="muted small">Every realm forgot a tale. Each of its four curios remembers one page. Wander a realm to bring its pages home.</p>`+
+   TALES.map((T,ti)=>{const n=talePages(ti),R=THEMES[ti].name;
+    return `<div class="otale${n===4?' whole':''}"><h3>${n?T.t:R+': an untold tale'}</h3><p class="meta">${R}. ${n} of 4 pages${n===4?'. The tale is whole.':''}</p>
+      ${n?`<ol>${T.p.map(([id,txt])=>{const cu=CURIOS.find(x=>x.id===id);return state.curios[id]?`<li><span class="g" aria-hidden="true">${cu.g}</span><span class="world">${esc(txt)}</span></li>`:`<li class="gone">A page is missing. Another ${R} curio remembers it.</li>`;}).join('')}</ol>${n===4?`<p class="done world">${esc(T.end)}</p>`:''}`:`<p class="muted small" style="margin:0">${any?`No pages yet. Send a Forgeling to wander in ${R}.`:'Send a Forgeling wandering to find your first curio.'}</p>`}</div>`;}).join('');
+}
 function talesHTML(){
-  const cards=state.cards.slice().reverse();
-  if(!cards.length)return '<p class="muted">Your Chronicle begins with your first Forgeling.</p>';
+  const cards=state.cards.slice().reverse(),ot=oldTalesHTML();
+  if(!cards.length)return ot+'<p class="muted">Your Chronicle begins with your first Forgeling.</p>';
   const shown=cards.slice(0,ch.more*12);
-  return shown.map(c=>`<div class="chron"><button class="minibtn" data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:64,mini:true})}</button><div class="cbody">
+  return ot+(ot?'<h2 style="margin-top:18px">Your Forgelings</h2>':'')+shown.map(c=>`<div class="chron"><button class="minibtn" data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:64,mini:true})}</button><div class="cbody">
     <b>${esc(c.nick||c.name)}</b><div class="muted small">${c.nick?'Born as '+esc(c.name)+', ':''}${realmName(c)}, ${esc(c.dateLabel)}</div>
     <p class="world">${esc(whisperFor(c))}</p>
     ${c.tale?`<p class="mine">\u201C${esc(c.tale)}\u201D</p>`:`<button class="ghost" data-edit="${c.id}" style="padding-left:0">Add a name or tale</button>`}${(c.fire||[]).slice(-2).map(f=>`<p class="mine">By the fire: \u201C${esc(f.text)}\u201D</p>`).join('')}${keptAge(c)>=KEPT_DAYS?'<div>'+keptLine(c).replace('class="ghost"','class="ghost" style="padding-left:0"')+'</div>':''}</div></div>`).join('')
@@ -1546,6 +1605,7 @@ function realmPageHTML(ti){
   const hc=slotCards(),hw=hc[Math.min(hf.sel,hc.length-1)],wc0=wCard(),rq=state.request,ra=rq&&rq.realm===ti?reqAsker():null;
   out+=hw?(state.wander&&wc0?`<p class="muted small" style="margin:8px 0 0">${esc(wc0.nick||wc0.name)} is out wandering${state.wander.realm>=0?' in '+esc(rName(state.wander.realm)):''}.</p>`:state.hearth.sleep?'':`<button class="outline" data-wto="${ti}" style="margin-top:10px">Send ${esc(hw.nick||hw.name)} to wander here</button>`):'';
   if(ra)out+=`<p class="muted small" style="margin:6px 0 0">${esc(ra.nick||ra.name)} asked for something from here.</p>`;
+  if(loreOn()){const tp=talePages(ti);out+=`<p class="muted small" style="margin:6px 0 0">Old tale: ${TALES[ti].t}. ${tp===4?'The tale is whole.':tp+' of 4 pages found.'}</p>`;}
   return out+`<div class="latest" style="margin-top:6px">${mini.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:62,mini:true})}</button>`).join('')}</div>`;
 }
 function realmsHTML(){
@@ -2124,7 +2184,7 @@ function wanderCollect(){
   openSheet(`<p class="muted center small">${esc(head)}</p>
     <div style="font-size:64px;text-align:center;line-height:1.25" aria-hidden="true">${cu.g}</div>
     <h2 style="text-align:center">${cu.name}</h2><p class="center">${esc(line)}</p>
-    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${done}
+    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${isNew?talePageHTML(cu.id):''}${done}
     <div class="stack"><button class="primary" id="wcOk" data-close>Lovely</button></div>`);
 }
 function wanderTick(){
@@ -2335,7 +2395,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=29;
+const SEEN_V=30;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2444,6 +2504,8 @@ const RIBBONS=[
   {id:'inked1',name:'Inked In',desc:'Fill in a realm on the map.',g:1,f:()=>THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length},
   {id:'bloom1',name:'Quiet Bloom',desc:'Something blooms by the fire while you are away.',g:1,f:()=>(state.hearth.quiet&&state.hearth.quiet.b)||0},
   {id:'curios',name:'Curio Shelf',desc:'Find 10 different curios.',g:10,f:()=>Object.keys(state.curios).length},
+  {id:'tale1',name:'Tale Keeper',desc:'Make a realm\'s old tale whole.',g:1,f:()=>talesDone()},
+  {id:'tales5',name:'Keeper of Old Tales',desc:'Make all five old tales whole.',g:5,f:()=>talesDone()},
   {id:'journal',name:'Thoughtful',desc:'Answer 7 daily questions.',g:7,f:()=>Object.keys(state.journal).length},
   {id:'bond3',name:'Close Friends',desc:'Reach bond level 3 with a Forgeling. Unlocks the Snowfall backdrop.',g:3,f:()=>Math.max(1,...state.cards.map(bondLevel))},
   {id:'forgebound',name:'Forgebound',desc:'Reach bond level 5 with a Forgeling.',g:5,f:()=>Math.max(1,...state.cards.map(bondLevel))},
@@ -2477,7 +2539,8 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
+    <ul class="newlist"><li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li>
+    <li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
     <li><b>Share a Forgeling.</b> Open any Forgeling and tap Share for a picture card you can send a friend. It's made on your phone, and nothing is uploaded.</li>
     <li><b>Keep your collection safe.</b> Once a month, Today offers to save a copy as a file. Restore it from Settings on this phone or a new one.</li>
     <li><b>Fresh callings.</b> Each calling now has several ways of asking, so the daily card keeps surprising you.</li>
@@ -2485,8 +2548,7 @@ function openWhatsNew(){
     <li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
     <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li>
     <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li>
-    <li><b>Found by the fire.</b> New Forgelings and packs now open at night by a fire, with embers drifting up.</li>
-    <li><b>Stamps and rosettes.</b> The Journal marks the days you showed up with a little flame and rest days with a moon. Ribbons are pixel rosettes now.</li></ul>
+    <li><b>Found by the fire.</b> New Forgelings and packs now open at night by a fire, with embers drifting up.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3627,7 +3689,7 @@ function finishGame(){
   let line=g.c.dark?`${n} rumbles with approval. ${unitOf(G,score)}.`:`${n} cheers. ${unitOf(G,score)}!`;
   if(pts===3&&state.games.curioDay!==todayKey()&&Math.random()<.4){
     const ti=Math.abs(g.c.theme|0)%5,all=rCurios(ti),un=all.filter(x=>!state.curios[x.id]),pool=un.length?un:all,cu=pool[Math.floor(Math.random()*pool.length)];
-    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`;}
+    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();const nw=cur.n===1,q=taleOf(cu.id);line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`+(nw&&q&&loreOn()?(talePages(q.ti)===4?` It holds the last page of an old ${THEMES[q.ti].name} tale. The tale is whole. Read it on the Map tab, under Tales.`:` It remembers a page of an old ${THEMES[q.ti].name} tale. Read it on the Map tab, under Tales.`):'');}
   }
   if(nb)line+=' A new best!';
   doVisit(g.c,'play',pts,line);
