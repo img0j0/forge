@@ -335,6 +335,13 @@ ul.places{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
 ul.places li{font-size:14px;line-height:1.35}
 ul.places li.gone{color:var(--muted)}
 ul.places li b{font-weight:700}
+.mecho{border:1.5px dashed #E0A82E;border-radius:14px;padding:12px 14px;margin:8px 0;background:var(--surface)}
+.mecho h2{margin:0 0 4px;font:600 16px var(--display)}
+.mecho .q{margin:6px 0 0;color:var(--muted);font-size:13px}
+.mecho .chips{margin-top:10px}
+.mecho .chips button{min-height:44px}
+.comp{margin:6px 0 0;font-size:14px}
+.later{margin:2px 0 0;color:var(--muted);font-size:13px}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -975,7 +982,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.27.1';
+const VERSION='prototype 0.28.0';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1071,7 +1078,11 @@ function sanitize(s){
   s.opens=[...new Set((Array.isArray(s.opens)?s.opens:[]).filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort();
   s.history=(Array.isArray(s.history)?s.history:[]).filter(x=>x&&typeof x==='object'&&typeof x.date==='string');
   if(!s.journal||typeof s.journal!=='object'||Array.isArray(s.journal))s.journal={};
-  Object.keys(s.journal).forEach(k=>{const j=s.journal[k];if(!j||typeof j!=='object'||typeof j.text!=='string')delete s.journal[k];});
+  Object.keys(s.journal).forEach(k=>{const j=s.journal[k];if(!j||typeof j!=='object'||typeof j.text!=='string')delete s.journal[k];else if(j.reply!==undefined&&!['did','still','let'].includes(j.reply))delete j.reply;});
+  if(s.comp!==undefined&&s.comp!==null&&(typeof s.comp!=='object'||typeof s.comp.date!=='string'||!Number.isFinite(s.comp.cid)||typeof s.comp.line!=='string'))s.comp=null;
+  if(s.mEcho!==undefined&&s.mEcho!==null&&(typeof s.mEcho!=='object'||typeof s.mEcho.date!=='string'||typeof s.mEcho.k!=='string'))s.mEcho=null;
+  if(s.mEchoed!==undefined&&!Array.isArray(s.mEchoed))s.mEchoed=[];
+  if(Array.isArray(s.mEchoed))s.mEchoed=s.mEchoed.filter(x=>typeof x==='string');
   if(s.curios&&typeof s.curios==='object'&&!Array.isArray(s.curios)){const ok=new Set(CURIOS.map(x=>x.id));Object.keys(s.curios).forEach(k=>{if(!ok.has(k)||!s.curios[k]||typeof s.curios[k]!=='object')delete s.curios[k];});}else s.curios={};
   if(s.echo!==undefined&&s.echo!==null&&(typeof s.echo!=='object'||typeof s.echo.date!=='string'||!Number.isFinite(s.echo.id)||typeof s.echo.lab!=='string'))s.echo=null;
   if(s.wander&&(typeof s.wander!=='object'||!Number.isFinite(s.wander.id)||!Number.isFinite(s.wander.ready)))s.wander=null;
@@ -1163,13 +1174,60 @@ const vw=()=>Math.min(window.innerWidth,460);
 const bigW=()=>Math.max(200,Math.min(290,window.innerWidth*.74,(window.innerHeight-240)/1.4));
 
 /* ================= Daily loop ================= */
+/* ---- 0.28: a Forgeling that notices your days ---- */
+const COMP_L=[['{n} sat a little closer.','{n} did a small happy hop by the fire.','{n} saved you the warm spot.','{n} hums something that sounds like well done.'],
+  ['{n} nodded once. From {n}, that is a lot.','{n} moved over to make room for you.','{n} kept the fire high for you.','{n} watched you come in, and looked quietly proud.']];
+function companion(){
+  return slotCards().filter(c=>c.id!==state.todayCard&&!(wOut()&&state.wander.id===c.id))[0]||null;
+}
+function compNotice(){
+  const c=companion();if(!c){state.comp=null;return;}
+  const before=bondLevel(c),L=COMP_L[c.dark?1:0],n=c.nick||c.name;
+  c.bond=(c.bond||0)+1;
+  const line=L[whash(dnum(state.date)*31+c.id)%L.length].replace(/\{n\}/g,n),after=bondLevel(c);
+  state.comp={date:state.date,cid:c.id,line,up:after>before?after:0};
+  hf.msg=line;
+}
+function compHTML(){
+  const p=state.comp;if(!p||p.date!==state.date)return '';const c=cardById(p.cid);if(!c)return '';const n=c.nick||c.name;
+  return `<p class="comp"><b>${esc(p.line)}</b> Showing up grew ${esc(n)}’s bond by 1.${p.up?` ${esc(n)} is now ${BOND_NAMES[p.up-1]}.`:''}</p>`;
+}
+/* ---- 0.28: it remembers what you wrote ---- */
+const MECHO_GAP=5,SPOTS=['tucked under the rug','in the woodpile','between two warm stones','folded in its pocket','caught in the grass by the fire'];
+function mEchoPick(){
+  const k=todayKey();if(dayN()<8)return null;
+  if(state.mEcho&&state.mEcho.date===k)return state.mEcho;
+  if(state.mEcho&&dayDiff(state.mEcho.date,k)<MECHO_GAP)return null;
+  const done=state.mEchoed||[];
+  const ks=Object.keys(state.journal).filter(j=>{const d=dayDiff(j,k);return d>=7&&d<=60&&!done.includes(j)&&!state.journal[j].reply;}).sort();
+  if(!ks.length)return null;
+  const cp=companion();state.mEcho={date:k,k:ks[0],ans:null,cid:cp?cp.id:0};save();return state.mEcho;
+}
+function mEchoHTML(c0){
+  const e=mEchoPick();if(!e)return '';const c=(e.cid&&slotCards().find(x=>x.id===e.cid))||c0;const j=state.journal[e.k];if(!j){state.mEcho=null;return '';}
+  const n=esc(c.nick||c.name),V=VECTORS[j.v]||VECTORS[0],spot=SPOTS[whash(dnum(e.k))%SPOTS.length];
+  if(e.ans)return `<div class="mecho" aria-live="polite"><h2>${n} found something ${spot}</h2><p class="mine">“${esc(j.text)}”</p><p class="small" style="margin:6px 0 0">${esc(e.line||'')}</p></div>`;
+  return `<div class="mecho" aria-live="polite"><h2>${n} found something ${spot}</h2><p class="mine">“${esc(j.text)}”</p>
+    <p class="q">You wrote this on ${esc(dateLabel(e.k))}, when the Forge asked: ${esc(V.question)}</p>
+    <div class="chips" role="group" aria-label="How did it go?"><button class="chip" data-mecho="did">I did it</button><button class="chip" data-mecho="still">Still on it</button><button class="chip" data-mecho="let">Let it go</button></div></div>`;
+}
+const MECHO_L={did:['{n} looks very pleased for you, and puts it somewhere safe.','{n} gives a short, approving rumble and keeps it.'],
+  still:['{n} tucks it back where it found it. No rush.','{n} puts it back carefully. It will keep.'],
+  let:['{n} folds it into a paper boat and lets the fire take it.','{n} drops it in the fire. It crackles once, and is gone.']};
+function mEchoAnswer(c,a){
+  const e=state.mEcho;if(!e||e.ans||!state.journal[e.k])return;
+  const L=MECHO_L[a];e.ans=a;e.line=L[c.dark?1:0].replace(/\{n\}/g,c.nick||c.name);
+  state.journal[e.k].reply=a;state.mEchoed=(state.mEchoed||[]).concat(e.k);save();sfx('save');
+  renderHearth();renderChronicle();
+}
+const LATER={did:'Later: you did it.',still:'Later: still on it.',let:'Later: you let it go.'};
 function earnDaily(allIn){
   const c=makeCard({allIn,v:state.todayV,source:'daily',weights:allIn?ODDS.allIn:ODDS.daily});
   state.cards.push(c);state.todayCard=c.id;state.status='done';
   state.history=state.history.filter(h=>h.date!==state.date);
   state.history.push({date:state.date,status:'done',v:state.todayV,card:c.id,note:'',allIn:!!allIn});
   state.progress++;let packGained=false;if(state.progress>=5){state.progress=0;state.packs++;packGained=true;}
-  save();return {c,packGained};
+  compNotice();save();return {c,packGained};
 }
 function startDone(allIn){
   if(!state.moodAsked&&doneDays()>=1){pendingAllIn=allIn;openMood();return;}
@@ -1371,7 +1429,7 @@ function renderToday(){
   let hero='';
   if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
   else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${V.name}</div><p>${taskFor(state.todayV,state.date)}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
-  else if(s==='done'){const c=cardById(state.todayCard);hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
+  else if(s==='done'){const c=cardById(state.todayCard);hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else hero=`<h2>Resting today</h2><p class="muted">Your progress is safe and nothing is lost. A new card arrives tomorrow.</p><button class="ghost" id="btnUnrest">Actually, show me today's card</button><div style="width:100%;text-align:left">${echoHTML()}</div>`;
   const row=(id,ic,title,sub,extra,ready)=>`<button class="rowl${ready?' ready':''}" ${id?`id="${id}"`:'disabled'}><span class="ri">${ic}</span><span class="rt"><b>${title}</b><span class="rs">${sub}</span>${extra||''}</span>${id?'<span class="chev" aria-hidden="true">›</span>':''}</button>`;
   const pips=[0,1,2,3,4].map(i=>`<span class="pip${i<state.progress?' on':''}"></span>`).join('');
@@ -2382,6 +2440,7 @@ function renderHearth(){
   if(state.hearth.sleep){el.innerHTML=sleepHTML();drawHearth(performance.now());return;}
   hf.sel=Math.min(hf.sel,cs.length-1);
   if(tab==='hearth'){reqMaybe();const nf=furnNew();if(nf.length){const f=FURN.find(x=>x.id===nf[0]);hf.msg=(/small request\.$/.test(hf.msg||'')?hf.msg+' ':'')+(nf.length===1?`Something new by the fire: ${f.name.toLowerCase()}.`:`${nf.length} new things by the fire. Have a look around.`);state.hearth.fseen=(state.hearth.fseen||[]).concat(nf);save();setTimeout(renderToday,0);}}
+  if(tab==='hearth'&&state.comp&&state.comp.date===state.date&&!state.comp.seen){state.comp.seen=1;save();hf.msg=state.comp.line+(/new by the fire|new things by the fire/.test(hf.msg||'')?' '+hf.msg:'');}
   const c=cs[hf.sel],lv=bondLevel(c),cur=BOND_AT[lv-1],nx=lv<5?BOND_AT[lv]:null,left=visitsLeft(),n=c.nick||c.name,away=wOut()&&state.wander.id===c.id;
   const pct=nx?Math.round(((c.bond||0)-cur)/(nx-cur)*100):100;
   const keeps=[{id:'',name:'None',lvl:1}].concat(KEEPS).concat(KEEPR.filter(k=>state.keepsR.includes(k.id)).map(k=>({id:k.id,name:k.name,lvl:1}))).map(k=>`<button class="chip" data-keep="${k.id}" ${lv<k.lvl?'disabled style="opacity:.45"':''} aria-pressed="${(c.keep||'')===k.id}">${k.name}${lv<k.lvl?' (level '+k.lvl+')':''}</button>`).join('');
@@ -2390,7 +2449,7 @@ function renderHearth(){
     <div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
     <p class="hmsg" id="hmsg">${esc(hf.msg||'The fire crackles. Everyone is settling in.')}</p>
     <div class="chips" role="group" aria-label="Companions">${cs.map((x,i)=>`<button class="chip" data-hslot="${i}" aria-pressed="${i===hf.sel}">${esc(x.nick||x.name)}</button>`).join('')}<button class="chip" id="hChange">Change who is here</button></div>
-    ${wPanelHTML(c,n)}
+    ${away?'':mEchoHTML(c)}${wPanelHTML(c,n)}
     <div class="panel-box" style="margin-top:8px">
       <div class="row" style="margin:0"><h2 style="margin:0">${esc(n)}</h2><span class="muted small">${BOND_NAMES[lv-1]}, bond ${lv} of 5</span></div>
       <div class="bondbar" role="img" aria-label="Bond progress"><i style="width:${pct}%"></i></div>
@@ -2451,6 +2510,7 @@ $('#view-hearth').addEventListener('click',e=>{
   if(e.target.id==='hearthCv'){hearthPoke();if(state.hearth.sleep&&!sleepRun)startWake();return;}
   const b=e.target.closest('button');if(!b)return;
   const cs=slotCards(),c=cs[hf.sel];
+  if(b.dataset.mecho&&c){const e=state.mEcho;mEchoAnswer((e&&e.cid&&cs.find(x=>x.id===e.cid))||c,b.dataset.mecho);return;}
   if(b.dataset.hslot!==undefined){hf.sel=+b.dataset.hslot;hf.msg='';renderHearth();}
   else if(b.id==='hChange')openPick();
   else if(b.dataset.bd!==undefined){state.hearth.bd=b.dataset.bd;save();hbg=null;renderHearth();audioSync();}
@@ -2493,7 +2553,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=31;
+const SEEN_V=32;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2504,7 +2564,7 @@ function journalHTML(){
   const ks=Object.keys(state.journal).sort().reverse();
   if(!ks.length)return '<p class="muted">Your journal starts with the first question you answer on the Today screen. It stays on this device.</p>';
   return '<p class="muted small" style="margin-bottom:8px">Private. Only on this device.</p>'+ks.slice(0,40).map(k=>{const e=state.journal[k],V=VECTORS[e.v];
-    return `<div class="calling" style="--rc:${V.color}"><div class="row" style="margin:0"><b>${V.name}</b><span class="muted small">${esc(dateLabel(k))}</span></div><p class="muted small" style="margin:4px 0">${esc(V.question)}</p><p class="mine">\u201C${esc(e.text)}\u201D</p></div>`;}).join('');
+    return `<div class="calling" style="--rc:${V.color}"><div class="row" style="margin:0"><b>${V.name}</b><span class="muted small">${esc(dateLabel(k))}</span></div><p class="muted small" style="margin:4px 0">${esc(V.question)}</p><p class="mine">\u201C${esc(e.text)}\u201D</p>${e.reply?`<p class="later">${LATER[e.reply]}</p>`:''}</div>`;}).join('');
 }
 function lastDays(n){const out=[];for(let i=n-1;i>=0;i--){const d=nowDate();d.setDate(d.getDate()-i);out.push(dkey(d));}return out;}
 function recapHTML(){
@@ -2639,7 +2699,8 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Places on the map.</b> Each realm has five places to find. Your first Forgeling there reveals one, and every wander there uncovers another. Watch the Map fill in, one landmark at a time.</li>
+    <ul class="newlist"><li><b>A Forgeling that notices.</b> When you do your small thing, the Forgeling by the fire notices, and your bond grows. Every so often it also brings back something you wrote in the margin a while ago, so you can say how it went.</li>
+    <li><b>Places on the map.</b> Each realm has five places to find. Your first Forgeling there reveals one, and every wander there uncovers another. Watch the Map fill in, one landmark at a time.</li>
     <li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li>
     <li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li>
     <li><b>Share a Forgeling.</b> Open any Forgeling and tap Share for a picture card you can send a friend. It's made on your phone, and nothing is uploaded.</li>
@@ -2647,8 +2708,7 @@ function openWhatsNew(){
     <li><b>Fresh callings.</b> Each calling now has several ways of asking, so the daily card keeps surprising you.</li>
     <li><b>Your own small thing.</b> In Settings you can add one habit of your own to tick off on Today. It shows in your Journal, never earns packs and never counts against you.</li>
     <li><b>Play together.</b> Every realm has its own little game: Dandelion Drift, Keep the Fire, Skipping Stones, Snowflake Catch and Lantern Lights. Play from the Hearth to grow your bond. A great round might turn up a curio. Once your visits are used, you can keep playing just for fun.</li>
-    <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li>
-    <li><b>A new daily card.</b> Today’s card has a pixel back with the campfire on it, and its face is printed on paper.</li></ul>
+    <li><b>A fuller first week.</b> Your first wander comes back in about 20 minutes, the rug appears after your first calling, and requests can start on day two.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
