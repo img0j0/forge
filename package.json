@@ -1,0 +1,23 @@
+{
+  "name": "forgelings-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Forgelings for iPhone: the Forgelings web app wrapped with Capacitor.",
+  "scripts": {
+    "www": "python3 build-www.py",
+    "sync": "npm run www && npx cap sync ios",
+    "open": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "^8.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3"
+  }
+}

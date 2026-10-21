@@ -1,0 +1,15 @@
+{
+  "appId": "com.forgelings.app",
+  "appName": "Forgelings",
+  "webDir": "www",
+  "backgroundColor": "#16132E",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#16132E",
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "LocalNotifications": { "iconColor": "#FFD36B" }
+  }
+}
