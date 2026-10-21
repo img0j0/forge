@@ -1014,7 +1014,10 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.31.0';
+const VERSION='prototype 0.32.0',APPVER='1.0.0';
+/* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
+const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
+const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
 /* ================= Lore (from the Forge Lore Bible) ================= */
 /* Whispers: five per realm and temper, keyed "themeIndex-isDark". {name} becomes the nickname, or the true name. */
 const WHISPERS={
@@ -1067,6 +1070,21 @@ const SPEAK_DARK=['{n} regards you. Slowly nods.','{n} rumbles softly. That is a
 
 /* ================= State ================= */
 const KEY='forge-app-v1',BLOCK='forge-age-block',MIN_AGE=18;
+const NQ={q:{},t:null};
+function nset(k,v){if(!NATIVE||!PL.Preferences)return;NQ.q[k]=v;clearTimeout(NQ.t);NQ.t=setTimeout(nflush,250);}
+function nflush(){const q=NQ.q;NQ.q={};clearTimeout(NQ.t);Object.keys(q).forEach(k=>{try{const p=q[k]===null?PL.Preferences.remove({key:k}):PL.Preferences.set({key:k,value:q[k]});if(p&&p.catch)p.catch(()=>{});}catch(e){}});}
+async function nrestore(){
+  if(!NATIVE||!PL.Preferences)return;
+  const sv=t=>{try{return (JSON.parse(t)||{})._sv||0;}catch(e){return -1;}};
+  for(const k of [KEY,BLOCK]){
+    let nv=null,lv=null;try{nv=(await PL.Preferences.get({key:k})).value||null;}catch(e){}try{lv=localStorage.getItem(k);}catch(e){}
+    if(k===KEY&&nv&&lv){if(sv(nv)>sv(lv)){try{localStorage.setItem(k,nv);}catch(e){}}else if(sv(lv)>sv(nv))nset(k,lv);}
+    else if(nv&&!lv){try{localStorage.setItem(k,nv);}catch(e){}}
+    else if(lv&&!nv)nset(k,lv);
+  }
+  nflush();
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)nflush();});
 const p2=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
 let state=null,tab='today',bf={type:'all',mood:'all',sort:'new',page:0},rv=null,pk=null,pendingAllIn=false,pgT=null;
@@ -1140,7 +1158,7 @@ function load(){
   try{localStorage.setItem(KEY+'-recovery',raw);}catch(e){}
   return null;
 }
-function save(){try{let s=state;if(sleepRun&&s&&s.hearth&&s.hearth.sleep)s=Object.assign({},s,{hearth:Object.assign({},s.hearth,{sleep:null})});localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+function save(){try{let s=state;if(!s)return;s._sv=(s._sv||0)+1;if(sleepRun&&s.hearth&&s.hearth.sleep)s=Object.assign({},s,{hearth:Object.assign({},s.hearth,{sleep:null})});const j=JSON.stringify(s);try{localStorage.setItem(KEY,j);}catch(e){}nset(KEY,j);remindSoon();}catch(e){}}
 function rollover(){
   const k=todayKey();if(state.date===k)return;
   if(!['done','rest'].includes(state.status))state.history.push({date:state.date,status:'skipped',v:state.todayV});
@@ -1180,12 +1198,12 @@ function cardHTML(c,o){
       <div class="sub"><span class="th">${dk?T.dark.name:T.name}, ${dk?'dark':'cute'}</span><span class="stars" role="img" aria-label="${R.name}">${stars}</span></div>
       <div class="stats">${SN.map((n,i)=>`<div class="stat"><span>${n}</span><div class="bar"><i style="width:${c.stats[i]}%"></i></div><span>${c.stats[i]}</span></div>`).join('')}</div>
       <div class="ability"><b>${V.ability}.</b> ${V.blurb}</div>
-      <div class="foot"><span>Pilot Edition</span><span>No. ${pad(c.serial)}</span></div>
+      <div class="foot"><span>${EDITION}</span><span>No. ${pad(c.serial)}</span></div>
     </div><div class="shine"></div><div class="glare"></div></div>
     <div class="face cbk${(c.tale||c.gossip)?' dense':''}"><svg class="emb" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg>
       <div class="wm">FORGE</div><div class="rule"></div>
       <div class="m1">${c.source==='pack'?'Pulled from a pack':'Earned'} on day ${c.dayN}</div><div class="m2">${esc(c.dateLabel)}</div><div class="m2">${V.name}${c.allIn?', went all in':''}</div>${worldBack(c)}
-      ${c.nick?`<div class="m2">Born as ${esc(c.name)}</div>`:''}${c.tale?`<div class="m3">\u201C${esc(c.tale)}\u201D</div>`:''}<div class="m4">Pilot Edition, No. ${pad(c.serial)}</div></div>
+      ${c.nick?`<div class="m2">Born as ${esc(c.name)}</div>`:''}${c.tale?`<div class="m3">\u201C${esc(c.tale)}\u201D</div>`:''}<div class="m4">${EDITION}, No. ${pad(c.serial)}</div></div>
     ${o.cover?'<div class="cover" id="cover" role="button" tabindex="0" aria-label="Turn the card over"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg></div>':''}
     </div></div>`;
 }
@@ -1359,7 +1377,7 @@ function finishReveal(){
   const gained=rv&&rv.packGained;
   closeModal();tab='today';render();window.scrollTo(0,0);
   if(!state.nudgeAsked){state.nudgeAsked=true;save();setTimeout(openNudge,500);}
-  else if(!state.feedbackAsked&&doneDays()>=5){state.feedbackAsked=true;save();setTimeout(openFeedbackAsk,1200);}
+  else if(!STORE&&!state.feedbackAsked&&doneDays()>=5){state.feedbackAsked=true;save();setTimeout(openFeedbackAsk,1200);}
   else if(gained)toast('A pack is ready to open.');
 }
 function openEdit(id,back){
@@ -1539,7 +1557,7 @@ function renderSettings(){
     <div class="setblock"><b>Your own small thing</b><p class="muted small">Optional. One habit of your own to tick off on Today, beside the daily card. It never earns packs, and missing it never counts against you.</p>
       <label class="field"><span>Your small thing</span><input id="ownIn" maxlength="60" value="${esc(state.own.text)}" placeholder="For example: drink a glass of water" autocomplete="off"></label>
       <div class="chips"><button class="pill" id="ownSave">${state.own.text?'Save changes':'Add it to Today'}</button>${state.own.text?'<button class="pill" id="ownClear">Remove it</button>':''}</div></div>
-    ${installTipHTML()}
+    ${remindHTML()}${installTipHTML()}
     <div class="setblock"><b>Fair odds</b><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button></div>
     <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forgelings stays on this device. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p>
       <div class="chips"><button class="pill" id="btnPrivacy">How Forgelings handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div>
@@ -1548,7 +1566,7 @@ function renderSettings(){
       <div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div></div>
     <div class="setblock"><b>Backup</b><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p>
       <div class="chips"><button class="pill" id="btnExport">Save a copy</button><button class="pill" id="btnRestore">Restore a copy</button></div></div>
-    <div class="setblock"><b>Share your thoughts</b><p class="muted small">A few quick questions. Answer as many as you like, whenever you like.</p>${feedbackHTML()}</div>
+    ${STORE?'':`<div class="setblock"><b>Share your thoughts</b><p class="muted small">A few quick questions. Answer as many as you like, whenever you like.</p>${feedbackHTML()}</div>
     <div class="setblock"><b>My report</b><p class="muted small">A short summary, plus anything you wrote above, that you can send to whoever is gathering feedback.</p><button class="pill" id="btnReport">${navigator.share&&(RELEASE||STANDALONE())?'Send my report':'Copy my report'}</button></div>
     <details class="dev"><summary>Prototype tools</summary><div class="stack">
       <button class="tool" data-tool="next"><b>Skip to tomorrow</b><span>Skipping a day never breaks anything.</span></button>
@@ -1565,8 +1583,8 @@ function renderSettings(){
       <button class="tool" data-tool="sleep"><b>Put the Hearth to sleep</b><span>Plays the return scene. Tap again for a longer absence.</span></button>
       <button class="tool" data-tool="holo"><b>Give me a Holo Forgeling</b><span>See the rainbow foil.</span></button>
       <button class="tool" data-tool="legend"><b>Give me a Legend Forgeling</b><span>The gold top tier.</span></button>
-      <button class="tool" data-tool="reset"><b>Start over</b><span>Erases this prototype's progress.</span></button></div></details>
-    <p class="muted small center" style="margin:14px 0 0">${VERSION}</p>`;
+      <button class="tool" data-tool="reset"><b>Start over</b><span>Erases this prototype's progress.</span></button></div></details>`}
+    <p class="muted small center" style="margin:14px 0 0">${STORE?'Forgelings '+APPVER:VERSION}</p>`;
 }
 function renderNav(){
   const lore=state.settings.lore!==false;
@@ -2501,7 +2519,7 @@ function wanderStart(c,realm){
   const now=Date.now();
   const to=Number.isInteger(realm)&&realm>=0&&realm<=4?realm:-1;
   state.wander={id:c.id,start:now,ready:now+((state.wstat.sent||0)===0?20*60*1000:WANDER_MS),seed:((now^((c.seed|0)*2654435761))>>>0),notified:false,realm:to};
-  state.wstat.sent++;save();hf.msg=to>=0?`${c.nick||c.name} heads off toward ${rName(to)}.`:`${c.nick||c.name} heads off down the path.`;sfx('select');
+  state.wstat.sent++;save();if(NATIVE&&!state.settings.wAsked){state.settings.wAsked=true;save();remindSync(true);}hf.msg=to>=0?`${c.nick||c.name} heads off toward ${rName(to)}.`:`${c.nick||c.name} heads off down the path.`;sfx('select');
   renderHearth();renderToday();renderNav();
 }
 function wanderCollect(){
@@ -2737,7 +2755,7 @@ function submitAge(){
   const m=+(($('#ageM')||{}).value||0),y=+(($('#ageY')||{}).value||0);
   if(!m||!y){sfx('no');toast('Please choose a month and a year.');return;}
   const a=ageFrom(m,y);
-  if(a<MIN_AGE){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}showBlocked();return;}
+  if(a<MIN_AGE){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}nset(BLOCK,String(Date.now()));nset(KEY,null);nflush();showBlocked();return;}
   state.ageBand=a<18?'teen':'adult';save();closeModal();
   if(!state.onboarded)openVector();else{render();if(state.seen<SEEN_V){state.seen=SEEN_V;save();openWhatsNew();}}
 }
@@ -3114,8 +3132,8 @@ function mediaSync(){
 
 /* ----- Playing sounds on whichever engine is chosen ----- */
 function playNotes(notes,key,peak){if(eng()==='media')mediaPlayNotes(notes,key,peak);else notes.forEach(n=>tone(n));}
-function sfx(n){if(!state||state.settings.sfx===false||!sOn())return;try{playNotes(SFXD[n],n,.5);}catch(e){}}
-function chime(n){if(!state||state.settings.sfx===false||!sOn())return;try{playNotes(chimeNotes(n),'chime'+Math.min(n,4),.55);}catch(e){}}
+function sfx(n){if(n==='tap'||n==='select'||n==='tab')buzz('LIGHT');else if(n==='save'||n==='no')buzz('MEDIUM');if(!state||state.settings.sfx===false||!sOn())return;try{playNotes(SFXD[n],n,.5);}catch(e){}}
+function chime(n){if(n>=2)buzz('success');if(!state||state.settings.sfx===false||!sOn())return;try{playNotes(chimeNotes(n),'chime'+Math.min(n,4),.55);}catch(e){}}
 
 /* ----- Making sure phones let the standard engine play ----- */
 function silentWav(){
@@ -3285,6 +3303,7 @@ function downloadBlob(blob,name){try{const u=URL.createObjectURL(blob),a=documen
 function backupFile(){
   const k=todayKey(),name=`forgelings-backup-${k}.json`,blob=new Blob([JSON.stringify(state)],{type:'application/json'});
   const done=msg=>{state.backup.at=k;save();closeModal();if(tab==='today')renderToday();toast(msg);};
+  if(NATIVE&&PL.Share&&PL.Filesystem){nshareFile(blob,name,'Forgelings backup').then(()=>done('Saved. Keep it somewhere safe.')).catch(err=>{if(!/cancel/i.test(String(err&&err.message||err)))toast('That copy could not be saved here.');});return;}
   let f=null;try{f=new File([blob],name,{type:'application/json'});}catch(e){}
   try{if(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Forgelings backup'}).then(()=>done('Saved. Keep it somewhere safe.')).catch(err=>{if(err&&err.name==='AbortError')return;if(downloadBlob(blob,name))done('Saved to your downloads. Keep it somewhere safe.');});return;}}catch(e){}
   if(downloadBlob(blob,name))done('Saved to your downloads. Keep it somewhere safe.');
@@ -3327,6 +3346,7 @@ async function openShare(id){
 function doShare(){
   const s=shareCv;if(!s)return;if(!s.blob){toast('That picture could not be made here.');return;}
   const nm=s.c.nick||s.c.name,name=(nm.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'forgeling')+'.png';
+  if(NATIVE&&PL.Share&&PL.Filesystem){nshareFile(s.blob,name,nm).then(()=>toast('Shared.')).catch(err=>{if(!/cancel/i.test(String(err&&err.message||err)))toast('That picture could not be shared here.');});return;}
   let f=null;try{f=new File([s.blob],name,{type:'image/png'});}catch(e){}
   if(f&&canShareFiles()){navigator.share({files:[f],title:nm}).then(()=>toast('Shared.')).catch(err=>{if(err&&err.name==='AbortError')return;if(downloadBlob(s.blob,name))toast('Picture saved.');});return;}
   if(downloadBlob(s.blob,name))toast('Picture saved.');
@@ -3457,7 +3477,9 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.dataset.settheme){state.settings.theme=b.dataset.settheme;save();applySettings();renderSettings();}
   else if(b.dataset.setsky){state.settings.sky=b.dataset.setsky;save();drawSky(true);renderSettings();}
   else if(b.id==='setLore'){state.settings.lore=state.settings.lore===false;save();render();}
-  else if(b.dataset.setnudge!==undefined){state.settings.nudge=b.dataset.setnudge||null;save();renderSettings();}
+  else if(b.dataset.setnudge!==undefined){state.settings.nudge=b.dataset.setnudge||null;save();renderSettings();if(state.settings.nudge)remindSync(true).then(ok=>{if(ok)toast(`A gentle nudge at ${state.settings.nudge}, only on days your card is still waiting.`);});else remindSync(false);}
+  else if(b.id==='setWnote'){state.settings.wnote=state.settings.wnote===false;save();renderSettings();if(state.settings.wnote!==false)remindSync(true);}
+  else if(b.id==='setHaptic'){state.settings.haptics=state.settings.haptics===false;save();renderSettings();buzz('MEDIUM');}
   else if(b.id==='btnOdds')openOdds();
   else if(b.id==='ownSave'){const v=(($('#ownIn')||{}).value||'').trim().slice(0,60);if(!v){sfx('no');toast('Write a few words first.');return;}state.own.text=v;save();renderSettings();renderToday();toast('Saved. It is on Today, ready to tick.');}
   else if(b.id==='ownClear'){state.own.text='';save();renderSettings();renderToday();toast('Removed. Your past ticks stay in the Journal.');}
@@ -3469,6 +3491,7 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='btnErase'){
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to erase everything. This cannot be undone.';return;}
     try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(QSEEN);}catch(e){}
+    nset(KEY,null);nflush();if(NATIVE&&PL.LocalNotifications){try{PL.LocalNotifications.cancel({notifications:[{id:1},{id:2}]}).catch(()=>{});}catch(e){}}
     state=migrate(fresh());bf={type:'all',mood:'all',sort:'new',page:0};tab='today';applySettings();render();openAgeGate();
   }
   else if(b.id==='btnReport')shareOrCopy(pilotReport(),'Report copied.','My Forgelings report');
@@ -3812,11 +3835,12 @@ if(RELEASE){document.documentElement.classList.add('release');
   if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}}
 function installTipHTML(){
-  if(!RELEASE||STANDALONE())return '';
+  if(!RELEASE||STANDALONE()||NATIVE)return '';
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   return `<div class="setblock"><b>Put Forgelings on your home screen</b><p class="muted small">It opens like an app, full screen, and works offline.</p><p class="installtip small">${ios?'In Safari, tap the Share button, then <b>Add to Home Screen</b>.':'In Chrome, open the menu and tap <b>Install app</b> or <b>Add to Home screen</b>.'}</p></div>`;
 }
 function shareOrCopy(txt,done,title){
+  if(NATIVE&&PL.Share){PL.Share.share({title,text:txt,dialogTitle:title}).catch(err=>{if(!/cancel/i.test(String(err&&err.message||err)))copyText(txt,done);});return;}
   if(navigator.share&&(RELEASE||STANDALONE())){navigator.share({title,text:txt}).catch(err=>{if(!err||err.name!=='AbortError')copyText(txt,done);});return;}
   copyText(txt,done);
 }
@@ -3918,7 +3942,7 @@ function gStreak(){const e=$('#pgStreak');if(e&&game)e.textContent=game.combo>=3
 function gFloat(x,y,t){if(REDUCE)return;const a=$('#pg');if(!a)return;const e=document.createElement('span');e.className='ptx';e.setAttribute('aria-hidden','true');e.textContent=t;e.style.left=x+'px';e.style.top=y+'px';a.appendChild(e);setTimeout(()=>e.remove(),720);}
 function gBurst(x,y,col){if(REDUCE)return;const a=$('#pg');if(!a)return;for(let i=0;i<7;i++){const e=document.createElement('i'),an=i/7*6.28+Math.random()*.5,d=16+Math.random()*16;e.className='pt';e.setAttribute('aria-hidden','true');e.style.cssText=`left:${Math.round(x)}px;top:${Math.round(y)}px;background:${col};--dx:${Math.round(Math.cos(an)*d)}px;--dy:${Math.round(Math.sin(an)*d)}px`;a.appendChild(e);setTimeout(()=>e.remove(),520);}}
 function gMsg(t){const m=$('#pgMsg');if(m)m.textContent=t;}
-function gHit(pts,x,y,col,tone){const g=game;g.combo++;clearTimeout(g.ct);g.ct=setTimeout(gBreak,2000);let add=pts;gFloat(x,y,'+'+pts);
+function gHit(pts,x,y,col,tone){buzz('LIGHT');const g=game;g.combo++;clearTimeout(g.ct);g.ct=setTimeout(gBreak,2000);let add=pts;gFloat(x,y,'+'+pts);
   if(g.combo%5===0){add+=2;gFloat(x,y-22,'Streak! +2');gTone('gold');}else gTone(tone||'hit',Math.min(7,g.combo-1));
   gBurst(x,y,col);gScore(g.score+add);gStreak();}
 function gMiss(cost,x,y){const g=game;g.combo=0;clearTimeout(g.ct);gStreak();if(cost){gScore(Math.max(0,g.score-cost));gFloat(x,y,'−'+cost);}sfx('no');}
@@ -4066,7 +4090,42 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{if(!gOn())return;if(game.nudge&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();game.nudge(e.key==='ArrowLeft'?-.08:.08);}else if(game.skip&&(e.key===' '||e.key==='Enter')&&document.activeElement&&document.activeElement.id!=='pgSit'){e.preventDefault();game.skip();}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden||!game||!game.alive)return;if(game.started||game.ending)finishGame();else{if(pgT)pgT.stop();pgT=null;game=null;closeModal();}});
 
+/* ---- 0.32: reminders in the iPhone app. One gentle nudge, never a pile. ---- */
+let remT=null;
+const remindSoon=()=>{if(!NATIVE||!PL.LocalNotifications)return;clearTimeout(remT);remT=setTimeout(()=>remindSync(false),1000);};
+const NUDGE_L=['Today’s card is waiting by the fire.','Your Forgelings saved you a warm spot.','One small thing today? Your card is ready when you are.','The fire is lit. Today’s card is face down, waiting.'];
+function nudgeAt(t){const m=/^(\d{1,2}):(\d{2}) (am|pm)$/.exec(t||'');if(!m)return null;let h=+m[1]%12;if(m[3]==='pm')h+=12;return [h,+m[2]];}
+async function remindSync(ask){
+  if(!NATIVE||!PL.LocalNotifications||!state)return false;const LN=PL.LocalNotifications;
+  try{
+    const want=!!state.settings.nudge||(!!state.wander&&state.settings.wnote!==false);
+    let p=await LN.checkPermissions();
+    if(p.display!=='granted'){if(!ask||!want)return false;p=await LN.requestPermissions();if(p.display!=='granted'){toast('Notifications are off for Forgelings in your phone’s settings.');return false;}}
+    await LN.cancel({notifications:[{id:1},{id:2}]});const list=[],now=new Date(),hm=nudgeAt(state.settings.nudge);
+    if(hm){const d=new Date(now);d.setHours(hm[0],hm[1],0,0);if(d<=now||state.status==='done'||state.status==='rest')d.setDate(d.getDate()+1);
+      list.push({id:1,title:'Forgelings',body:NUDGE_L[dnum(dkey(d))%NUDGE_L.length],schedule:{at:d,allowWhileIdle:true}});}
+    const w=state.wander,c=w&&cardById(w.id);
+    if(c&&state.settings.wnote!==false&&w.ready>Date.now()+30000)list.push({id:2,title:'Forgelings',body:`${c.nick||c.name} is back from wandering, with something for your shelf.`,schedule:{at:new Date(w.ready),allowWhileIdle:true}});
+    if(list.length)await LN.schedule({notifications:list});
+    return true;
+  }catch(e){return false;}
+}
+function remindHTML(){
+  if(!NATIVE)return '';const S=state.settings;
+  return `<div class="setblock"><b>Reminders</b><p class="muted small">One gentle nudge on days today’s card is still waiting. Never more than one, and missing a day never costs anything.</p>
+    <div class="chips" role="group" aria-label="Daily reminder">${[[null,'Off'],['8:00 am','8:00 am'],['12:00 pm','12:00 pm'],['6:00 pm','6:00 pm']].map(a=>`<button class="chip" data-setnudge="${a[0]||''}" aria-pressed="${(S.nudge||null)===a[0]}">${a[1]}</button>`).join('')}</div>
+    <div class="chips"><button class="chip" id="setWnote" aria-pressed="${S.wnote!==false}">Tell me when a wanderer is back ${S.wnote!==false?'on':'off'}</button><button class="chip" id="setHaptic" aria-pressed="${S.haptics!==false}">Haptics ${S.haptics!==false?'on':'off'}</button></div></div>`;
+}
+/* ---- 0.32: haptics ---- */
+function buzz(k){if(!NATIVE||!PL.Haptics||(state&&state.settings.haptics===false))return;try{const p=k==='success'?PL.Haptics.notification({type:'SUCCESS'}):PL.Haptics.impact({style:k||'LIGHT'});if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+/* ---- 0.32: the native share sheet, for text and for files ---- */
+function nshareFile(blob,name,title){
+  return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=async()=>{try{
+    const b64=String(fr.result).split(',')[1],w=await PL.Filesystem.writeFile({path:name,data:b64,directory:'CACHE'});
+    await PL.Share.share({title,files:[w.uri],dialogTitle:title});res();}catch(e){rej(e);}};fr.readAsDataURL(blob);});
+}
 /* ================= Start ================= */
+function boot(){
 state=load()||migrate(fresh());
 let blocked=false;try{blocked=!!localStorage.getItem(BLOCK);}catch(e){}
 if(blocked){showBlocked();}
@@ -4079,8 +4138,10 @@ else{
   setTimeout(giftMaybe,1200);window.addEventListener('hashchange',()=>{giftRead();giftMaybe();});
   if(returned&&modal.hidden){tab='hearth';render();window.scrollTo(0,0);}
   if(state.ageBand)arrive();
-  wanderTick();
+  wanderTick();remindSync(false);
 }
+}
+if(NATIVE)nrestore().then(boot,boot);else boot();
 
 })();
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.classList&&e.target.classList.contains('mphit')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}});
