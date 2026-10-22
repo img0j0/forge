@@ -1014,7 +1014,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.32.0',APPVER='1.0.0';
+const VERSION='prototype 0.33.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1094,7 +1094,7 @@ const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00')
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{}};}
+function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1135,6 +1135,8 @@ function sanitize(s){
   if(s.sid!==undefined&&!(typeof s.sid==='string'&&/^[a-z0-9]{6,24}$/.test(s.sid)))delete s.sid;
   if(s.giftsGot!==undefined)s.giftsGot=Array.isArray(s.giftsGot)?s.giftsGot.filter(x=>typeof x==='string').slice(-200):[];
   if(s.giftsSent!==undefined&&!(Number.isInteger(s.giftsSent)&&s.giftsSent>=0))s.giftsSent=0;
+  if(s.mapMax!==undefined&&!(Array.isArray(s.mapMax)&&s.mapMax.length===5&&s.mapMax.every(x=>Number.isInteger(x)&&x>=0&&x<=3)))delete s.mapMax;
+  if(s.disc!==undefined&&typeof s.disc!=='string')delete s.disc;
   if(s.hearth&&s.hearth.curio!==undefined&&!(typeof s.hearth.curio==='string'&&CURIOS.some(x=>x.id===s.hearth.curio)))delete s.hearth.curio;
   if(Array.isArray(s.mEchoed))s.mEchoed=s.mEchoed.filter(x=>typeof x==='string');
   if(s.curios&&typeof s.curios==='object'&&!Array.isArray(s.curios)){const ok=new Set(CURIOS.map(x=>x.id));Object.keys(s.curios).forEach(k=>{if(!ok.has(k)||!s.curios[k]||typeof s.curios[k]!=='object')delete s.curios[k];});}else s.curios={};
@@ -1150,7 +1152,7 @@ function sanitize(s){
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
-function migrate(s){sanitize(s);s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
+function migrate(s){sanitize(s);if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
 function load(){
   let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){return null;}
   if(!raw)return null;
@@ -2008,7 +2010,7 @@ const MAPP=[
 ];
 let mapPreview=null;
 const MAXG=[9,9,9,7,5];
-const mapTier=n=>n>=6?3:n>=3?2:n>=1?1:0;
+const mapTier=n=>n>=10?3:n>=4?2:n>=1?1:0,mapTierOld=n=>n>=6?3:n>=3?2:n>=1?1:0;
 const r1=v=>Math.round(v*10)/10;
 function inPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c;}return c;}
 const mapMid=P=>[P.reduce((a,p)=>a+p[0],0)/P.length,P.reduce((a,p)=>a+p[1],0)/P.length];
@@ -2135,7 +2137,8 @@ function placesListHTML(ti){
 /* 0.27.1: one name per realm everywhere, the one the Map shows. */
 function mapName(ti){if(!(ti>=0&&ti<=4))return 'somewhere';const m=mapState()[ti],mood=state.settings.mood,dk=mood==='dark'||(mood==='mix'&&whash(m.ti*7+m.tier)%2===0);return dk?THEMES[ti].dark.name:THEMES[ti].name;}
 function mapState(){
-  return THEMES.map((T,ti)=>{const cs=state.cards.filter(c=>c.theme===ti);return{ti,n:cs.length,tier:mapPreview!=null?mapPreview:mapTier(cs.length),shade:cs.some(c=>c.dark)};});
+  if(!Array.isArray(state.mapMax))state.mapMax=[0,0,0,0,0];
+  return THEMES.map((T,ti)=>{const cs=state.cards.filter(c=>c.theme===ti),t=Math.max(mapTier(cs.length),state.mapMax[ti]||0);if(t>(state.mapMax[ti]||0))state.mapMax[ti]=t;return{ti,n:cs.length,tier:mapPreview!=null?mapPreview:t,shade:cs.some(c=>c.dark)};});
 }
 /* ---- 0.31: the inked map. Open sea for waves, and trails between neighbouring realms. ---- */
 function segD(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy);}
@@ -2525,12 +2528,16 @@ function wanderStart(c,realm){
 function wanderCollect(){
   const w=state.wander;if(!w||Date.now()<w.ready)return;
   const c=cardById(w.id),r=mulberry32(w.seed);
-  const to=Number.isInteger(w.realm)&&w.realm>=0?w.realm:-1,base=to>=0?rCurios(to):CURIOS,unfound=base.filter(x=>!state.curios[x.id]),pool=unfound.length?unfound:base,cu=pool[Math.floor(r()*pool.length)];
+  const fresh=state.disc!==todayKey(),to=Number.isInteger(w.realm)&&w.realm>=0?w.realm:-1,base=to>=0?rCurios(to):CURIOS,unfound=fresh?base.filter(x=>!state.curios[x.id]):[],owned=base.filter(x=>state.curios[x.id]),anyOwned=CURIOS.filter(x=>state.curios[x.id]);
+  const pool=unfound.length?unfound:owned.length?owned:fresh||!anyOwned.length?base:anyOwned,cu=pool[Math.floor(r()*pool.length)];
   const isNew=!state.curios[cu.id],cur=state.curios[cu.id]||{n:0,cid:w.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;
   state.wstat.back++;state.wander=null;
-  let place='';{const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&placesFound(t)<5),dto=to>=0?(open.includes(to)?to:-1):(open.length?open[Math.floor(r()*open.length)]:-1);
+  if(isNew)state.disc=todayKey();
+  let place='';if(fresh){const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&placesFound(t)<5),dto=to>=0?(open.includes(to)?to:-1):(open.length?open[Math.floor(r()*open.length)]:-1);
     if(dto>=0){if(!state.explore)state.explore={};state.explore[dto]=(state.explore[dto]||0)+1;const pf=placesFound(dto),pl=PLACES[dto][pf-1];
-      place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(mapName(dto))}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(mapName(dto))}.`} See it on the Map tab.</p></div>`;}}
+      state.disc=todayKey();place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(mapName(dto))}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(mapName(dto))}.`} See it on the Map tab.</p></div>`;}}
+  let quiet='';if(!fresh&&c){const nm0=c.nick||c.name,more=CURIOS.some(x=>!state.curios[x.id])||[0,1,2,3,4].some(t=>rKnownTi(t)&&placesFound(t)<5);c.bond=(c.bond||0)+1;
+    quiet=`<div class="tale"><b>A quiet path today</b><p class="small">The paths share one new find a day, and today’s is already home. ${esc(nm0)} wandered happily anyway and came back with a spare. Bond with ${esc(nm0)} +1.${more?' Tomorrow’s first wander will find something new.':''}</p></div>`;}
   let done='';const rq=state.request,ra=rq?cardById(rq.cid):null;
   if(rq&&ra&&to===rq.realm){
     const before=bondLevel(ra);ra.bond=(ra.bond||0)+3;const K=KEEPR[rq.realm],nk=!state.keepsR.includes(K.id);if(nk)state.keepsR.push(K.id);
@@ -2545,7 +2552,7 @@ function wanderCollect(){
   openSheet(`<p class="muted center small">${esc(head)}</p>
     <div class="cbig">${cImg(cu.id,80,{cls:'cpop'})}</div>
     <h2 style="text-align:center">${cu.name}</h2><p class="center">${esc(line)}</p>
-    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${place}${isNew?talePageHTML(cu.id):''}${done}
+    <p class="muted small center">Curios found: ${have} of ${CURIOS.length}</p>${place}${isNew?talePageHTML(cu.id):''}${quiet}${done}
     <div class="stack"><button class="primary" id="wcOk" data-close>Lovely</button></div>`);
 }
 function wanderTick(){
@@ -2762,7 +2769,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=36;
+const SEEN_V=37;
 let ui={editJ:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2910,14 +2917,14 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
+    <ul class="newlist"><li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li>
+    <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
     <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li>
     <li><b>Gifts for friends.</b> Send a curio to a friend from the curio shelf at the Hearth. They get a link that opens in their own Forgelings, and the curio goes on their shelf. You keep yours.</li>
     <li><b>A new name: Forgelings.</b> The app is now called Forgelings, after the creatures at its heart. The Forge is still the world they come from, and nothing in your collection changes.</li>
     <li><b>A Forgeling that notices.</b> When you do your small thing, the Forgeling by the fire notices, and your bond grows. Every so often it also brings back something you wrote in the margin a while ago, so you can say how it went.</li>
     <li><b>Places on the map.</b> Each realm has five places to find. Your first Forgeling there reveals one, and every wander there uncovers another. Watch the Map fill in, one landmark at a time.</li>
-    <li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li>
-    <li><b>Deeper games.</b> Play in the Hearth lets any Forgeling by the fire play any of the five games. Your Forgeling's stats shape each one. One of its stats is a trait, Close bond brings a gift, and dark Forgelings play their realm's twist. Every game has a Start card, sounds, sparkles, streaks and rounds that build up.</li></ul>
+    <li><b>Old tales.</b> Every realm forgot a tale, and each of its curios remembers one page. Find all four curios from a realm to make its tale whole. Read them on the Map tab, under Tales.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3703,7 +3710,7 @@ function openWanderTo(c){
   wPickId=c.id;const n=c.nick||c.name,rq=state.request,ra=rq?cardById(rq.cid):null;
   const opts=rKnown().map(ti=>{const all=rCurios(ti),f=all.filter(x=>state.curios[x.id]).length,asked=rq&&rq.realm===ti&&ra;
     return `<button class="moodbtn" data-wgo="${ti}"><div><b>${esc(rName(ti))}</b><span>${f} of ${all.length} curios from here found${asked?`. ${esc(ra.nick||ra.name)} asked for something from here.`:'.'}</span></div></button>`;}).join('');
-  openSheet(`<h2>Where should ${esc(n)} wander?</h2><p class="muted small">Realms on your map. ${(state.wstat.sent||0)===0?'This first time, they are back in about 20 minutes.':'They are back in about three hours.'}</p>${opts}
+  openSheet(`<h2>Where should ${esc(n)} wander?</h2><p class="muted small">Realms on your map. ${(state.wstat.sent||0)===0?'This first time, they are back in about 20 minutes.':'They are back in about three hours.'}${state.disc===todayKey()?' Today’s new find is already home, so this wander brings back a spare, a story and a little bond.':''}</p>${opts}
     <button class="moodbtn" data-wgo="-1"><div><b>Anywhere</b><span>Wherever the path goes. Good for finding something new.</span></div></button>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
 }
@@ -4070,8 +4077,8 @@ function finishGame(){
   const m=g.twist?.8:1,pts=score>=Math.ceil(G.hi*m)?3:score>=Math.ceil(G.mid*m)?2:1;
   let line=g.c.dark?`${n} rumbles with approval. ${unitOf(G,score)}.`:`${n} cheers. ${unitOf(G,score)}!`;
   if(pts===3&&state.games.curioDay!==todayKey()&&Math.random()<.4){
-    const ti=Math.abs(g.c.theme|0)%5,all=rCurios(ti),un=all.filter(x=>!state.curios[x.id]),pool=un.length?un:all,cu=pool[Math.floor(Math.random()*pool.length)];
-    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();const nw=cur.n===1,q=taleOf(cu.id);line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`+(nw&&q&&loreOn()?(talePages(q.ti)===4?` It holds the last page of an old ${mapName(q.ti)} tale. The tale is whole. Read it on the Map tab, under Tales.`:` It remembers a page of an old ${mapName(q.ti)} tale. Read it on the Map tab, under Tales.`):'');}
+    const ti=Math.abs(g.c.theme|0)%5,all=rCurios(ti),un=state.disc===todayKey()?[]:all.filter(x=>!state.curios[x.id]),own=all.filter(x=>state.curios[x.id]),pool=un.length?un:own.length?own:all,cu=pool[Math.floor(Math.random()*pool.length)];
+    if(cu){const cur=state.curios[cu.id]||{n:0,cid:g.c.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;state.games.curioDay=todayKey();const nw=cur.n===1;if(nw)state.disc=todayKey();const q=taleOf(cu.id);line+=` Afterwards, ${n} found something nearby: ${cu.name.toLowerCase()}.`+(nw&&q&&loreOn()?(talePages(q.ti)===4?` It holds the last page of an old ${mapName(q.ti)} tale. The tale is whole. Read it on the Map tab, under Tales.`:` It remembers a page of an old ${mapName(q.ti)} tale. Read it on the Map tab, under Tales.`):'');}
   }
   if(nb)line+=' A new best!';
   doVisit(g.c,'play',pts,line);
