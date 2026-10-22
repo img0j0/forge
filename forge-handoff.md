@@ -12,7 +12,7 @@ Last updated October 22, 2026, at prototype **0.34.0**. This replaces the 0.16.0
 
 ## Where things stand
 
-**Forge** is a cozy pixel-creature daily-habit app in one HTML/JS file. Each day you turn over a card with one small thing to do. Do it, and you find a unique Forgeling. Forgelings sit by your Hearth, tell their stories and wander the Map.
+**Forgelings** (renamed from Forge in 0.28.1; "the Forge" is the world's name) is a cozy pixel-creature daily-habit app in one HTML/JS file. Each day you turn over a card with one small thing to do. Do it, and you find a unique Forgeling. Forgelings sit by your Hearth, tell their stories and wander the Map.
 
 - **Live app:** https://img0j0.github.io/forge/. It's installable (Add to Home Screen) and works offline. Hunter uses it daily on his iPhone, and it also works in Edge.
 - **Testing:** Hunter uses it himself, then friends and family. The invite text asks testers to send feedback with **Settings → Send my report**.
@@ -65,7 +65,7 @@ Last updated October 22, 2026, at prototype **0.34.0**. This replaces the 0.16.0
 
 ## Key technical facts
 
-- Saves live in localStorage under `forge-app-v1`; seen notes are under `forge-app-v1-seen`. `SEEN_V=31`. The age block key is `forge-age-block`, and `MIN_AGE=18`.
+- Saves live in localStorage under `forge-app-v1`; seen notes are under `forge-app-v1-seen`. `SEEN_V=38` (0.35 sets 39). The age block key is `forge-age-block`, and `MIN_AGE=18`.
 - `sanitize()` repairs damaged saves, and `migrate()` fills new fields from `fresh()`. Newer fields: `explore` (wanders per realm, 0–4), `own` (`text`, `days`), `backup` (`at`, `ask`), `games` (best scores, rounds played, the day a game last found a curio), `settings.sky`, `hearth.fseen`, `request`, `reqLast`, `reqDone`, `keepsR`, `wander.realm`, `echo`.
 - The world calendar is a pure function of the date (epoch 2026-01-01). ERAS and EVENTS are append-only, and EV2=287 gates new events, so history never changes.
 - Bond stories and Hearth furnishings are derived, not stored: stories from each Forgeling's seed, realm and calling; furnishings from the history of completed callings.
@@ -125,10 +125,10 @@ On top of that: the 125-day journey passes 9/9 (all 16 Hearth items, 14 requests
 
 The gameplan doc is https://claude.ai/artifact/H6jmn6CXRKzg4t2E8i9BaE. Phase 1's four build items shipped in 0.24.0 and are marked Done there.
 
-0. **Games (0.25.0) are new.** Watch for tester notes on difficulty, the +2/+3 targets and whether streaks feel good; retune from real scores. Simulation tools used for tuning live in the kit's `tools/` folder.
+0. **Build 0.35, the Forge, next** (see "Starting a new session" and the Forge section below). Then 0.36 the other side, 0.37 relics and gifts, and the Keeper purchase in 1.1.
+0a. **Games (0.25.0):** Watch for tester notes on difficulty, the +2/+3 targets and whether streaks feel good; retune from real scores. Simulation tools used for tuning live in the kit's `tools/` folder.
 1. **Remaining Phase 1 items wait on testers:** the simplicity pass (fold away what testers don't find or use in week one) and game tuning (difficulty and the +2/+3 bond thresholds, from real scores).
-2. **Gate to Phase 2:** at least 5 testers have used Forge for 3 weeks.
-3. **Phase 2:** wrap Forge as a native app (Capacitor), real reminders scheduled on the phone, iCloud or Google backups, TestFlight and Play internal testing. Hunter opens the Apple and Google developer accounts and books the lawyer review.
+2. **Native app:** the Capacitor groundwork shipped in 0.32.0 (safe saves, real reminders, haptics, share sheet) and lives on the `ios-app` branch. What's left is in the iPhone app section below. No formal lawyer review (Hunter's call); see the launch prep notes.
 4. **For the next build:** write `patch35.py` reading `base34.html` (a copy of the 0.34.0 build), and set `SEEN_V=39`. After shipping, copy the build into the ios-app branch as `forgelings.html`. The app is about 567 KB of the 640 KB budget; What's New keeps 8 entries. Further savings if ever needed: strip JS comments (about 10 KB) and the prototype tools from the release build only, in `pwa.py`. To change a curio's art, edit `curios/sprites.py`, run it and `tojs.py`, then rebuild. **Naming rule:** the app is Forgelings, and the world is the Forge. Never call the app plain "Forge" (qa_281 checks this).
 5. **Companion, part 3 (not built yet):** weave the player's own margin lines and stories into each Forgeling's five story chapters. Wait for tester reactions to 0.28.0 first.
 
@@ -147,7 +147,7 @@ The gameplan doc is https://claude.ai/artifact/H6jmn6CXRKzg4t2E8i9BaE. Phase 1's
 - `forgelings.html` is a copy of the latest build. `build-www.py` marks it as the store edition, then `npm run sync` and `npm run open`. `ios-setup.py` re-applies the icon (pixel campfire, 1024), a dark launch screen, portrait iPhone-only, arm64, and ITSAppUsesNonExemptEncryption=false. The README walks Hunter through the Mac setup, running on his iPhone, and TestFlight.
 - `store/`: `listing.md` (name, subtitle, promo text, keywords, description, URLs, App Privacy answer), `screens/forgelings-1..7.png` (1320x2868), `shots.py` (raw captures of a curated state, store edition, @3x) and `compose.py` (captions, frame, and the 'Kind by design' slide).
 - **Hunter has no Mac.** He's considering a used M1 Mac mini or MacBook Air (Apple Silicon only: Xcode 26.4+ needs macOS Tahoe 26.2, and macOS 27 drops Intel). A cloud build service is the fallback.
-- **Revenue plan (recommended, not yet decided):** free forever, plus a one-time 'Keeper' unlock (about $9.99, cosmetic only) in 1.1, launching 1.0 free. Apple Small Business Program = 15%. Charging makes him an EU trader (an LLC or PO box keeps his address private), and the terms need updating.
+- **Revenue plan (agreed in the Forge design doc, October 22):** free forever, launching 1.0 free, plus a one-time 'Keeper' unlock with the Keeper's Anvil cosmetic patterns (about $9.99) in 1.1. Never materials, packs, odds or progress. Apple Small Business Program = 15%. Charging makes him an EU trader (an LLC or PO box keeps his address private), and the terms need updating.
 - Still to do before submission: Apple Developer Program enrollment, testing on a real iPhone (reminders, storage, haptics, share), TestFlight with testers, and wording the terms for a public release ('early version shared for testing').
 
 ## The Forge (design approved, October 22, 2026)
@@ -180,13 +180,13 @@ Don't chase focus timers, app blockers, leaderboards or heavy stats. Pitch: the 
 ## Open items
 
 1. **Real-use feedback.** Hunter uses Forge daily and shares it with friends and family. The number to watch is how many testers still open it after three weeks without a reminder.
-2. **No reminders.** 0.27.1 removed the placeholder nudge setting because it sent nothing. Real reminders come with the native app in Phase 2 (local notifications need no server).
+2. **Reminders exist only in the iPhone app** (0.32.0, local notifications). The website has none, by design.
 3. **Legal, taking the cheap route (no formal lawyer, per Hunter):**
    - Keep 18+ and collect nothing for now.
    - Use a law school clinic or a flat-fee online review before charging money, adding a server or analytics, or opening to teens. See the launch prep doc.
    - Do a trademark search on "Forge" and "Forgelings" before investing in branding.
    - The privacy note and terms were drafted by Claude and are not legal advice.
-4. **Money:** undecided. Whatever is chosen should never sell odds or progress. Options are a one-time purchase, an optional supporter tier, or seasonal content.
+4. **Money:** the Keeper unlock with the Anvil in 1.1 (see the Forge section). Never sell odds, materials or progress.
 5. **Sprint doc** (https://claude.ai/code/artifact/297a5ff6-7bd6-4a02-9555-f5aa43618f02) is stale since 0.15.4.
 6. **qa_16** was lost from the kit and could be rebuilt.
 7. **Ideas not built:**
