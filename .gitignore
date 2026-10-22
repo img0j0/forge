@@ -1,0 +1,10 @@
+__pycache__/
+node_modules/
+pwa/
+qa/*.log
+qa/*.json
+!qa/package.json
+qa/*.png
+qa/full_summary.txt
+odds_real.js
+*.zip
