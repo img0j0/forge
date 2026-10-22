@@ -381,6 +381,12 @@ ul.places li b{font-weight:700}
 .hero:has(#btnShowFav){background:var(--ped) center 192px/176px 22px no-repeat,radial-gradient(circle at 50% 104px,var(--glow) 0,transparent 128px),var(--dot) 0 0/8px 8px repeat,var(--surface) !important;background-clip:padding-box !important}
 .hero #btnShowFav{margin-bottom:10px}
 .hero .favswap{margin-top:6px}
+.art{position:relative}
+.chb{position:absolute;right:.3em;bottom:.3em;width:1.6em;height:2em;image-rendering:pixelated;filter:drop-shadow(0 .1em 0 #0A0814)}
+.mini .chb{right:.5em;bottom:.5em;width:2.4em;height:3em}
+ul.forgel li{align-items:center}ul.forgel li .fi{width:28px;height:34px;background:none}ul.forgel li.on .fi{background:none}
+ul.forgel li>span:nth-child(2){flex:1;min-width:0}ul.forgel li .chip{flex:none;margin-left:auto}
+ul.forgel li.can b{color:var(--plum)}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -749,7 +755,7 @@ function commit(g,m,o){
     if(!inm(x,y)&&(inm(x-1,y)||inm(x+1,y)||inm(x,y-1)||inm(x,y+1)))g[y*N+x]=o.o||1;
   }
 }
-const CH={o:1,b:2,s:3,h:4,l:5,a:6,w:7,p:8,g:9,G:10,k:11,c:16,t:14,y:17};
+const CH={o:1,b:2,s:3,h:4,l:5,a:6,w:7,p:8,g:9,G:10,k:11,c:16,t:14,y:17,A:19,B:20,C:21,D:22,E:23};
 function stamp(g,x,y,rows,flipH){rows.forEach((row,j)=>{const r=flipH?row.split('').reverse().join(''):row;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;const px=x+i,py=y+j;if(px>=0&&py>=0&&px<N&&py<N)g[py*N+px]=CH[ch];}});}
 const both=fn=>{fn(false);fn(true);};
 
@@ -796,6 +802,7 @@ function makePal(S,c){
   p[11]=shade(b,dk?-.55:-.42);p[14]=dk?'#E6DEC6':'#FFFFFF';p[15]=dk?'#A89F86':'#D8D0F0';
   p[16]='#FF8FB0';p[17]='#FFD84A';p[18]='#C98A12';
   const out=[[0,0,0]];for(let i=1;i<19;i++)out[i]=hexRGB(p[i]||'#000000');
+  CHARM_COL.forEach((h,i)=>out[19+i]=hexRGB(h));
   const pulse=out.slice();pulse[9]=hexRGB(mix(p[9],p[10],.45));
   return {pal:out,palP:pulse};
 }
@@ -915,6 +922,7 @@ function buildSprite(S,bob,blink){
     else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=0;x<N;x++){const i=sy*N+x;if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
     else if(S.keep==='cap'){const cm=mask();fillEll(cm,16,top+1.2,6.4,3.4);for(let y=Math.ceil(top+1.2);y<N;y++)for(let x=0;x<N;x++)cm[y*N+x]=0;commit(g,cm,{b:6,s:13,h:null});const bm=mask();fillEll(bm,16,top-2.6,1.6,1.4);commit(g,bm,{b:7,s:7,h:null});}
     else if(S.keep==='lantern'){const lx=16+half+2,ly=mouthY+1;stamp(g,Math.min(N-3,lx),ly,['.o.','ooo','yyy','yyy','yyy','ooo'],false);}
+    else if(/^charm[0-4]$/.test(S.keep)){const L='ABCDE'[+S.keep[5]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
   }
   return g;
 }
@@ -1022,7 +1030,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.34.0',APPVER='1.0.0';
+const VERSION='prototype 0.35.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1102,7 +1110,7 @@ const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00')
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{}};}
+function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1146,6 +1154,7 @@ function sanitize(s){
   if(s.mapMax!==undefined&&!(Array.isArray(s.mapMax)&&s.mapMax.length===5&&s.mapMax.every(x=>Number.isInteger(x)&&x>=0&&x<=3)))delete s.mapMax;
   if(s.disc!==undefined&&typeof s.disc!=='string')delete s.disc;
   if(s.homeFav!==undefined&&s.homeFav!==null&&!Number.isInteger(s.homeFav))delete s.homeFav;
+  if(s.forge!==undefined){const f=s.forge;if(!f||typeof f!=='object')delete s.forge;else{if(!Number.isInteger(f.spent)||f.spent<0)f.spent=0;if(!Array.isArray(f.made))f.made=[];f.made=f.made.filter((x,i,a)=>typeof x==='string'&&a.indexOf(x)===i);if(!f.log||typeof f.log!=='object')f.log={};if(typeof f.bell!=='string')f.bell='';if(typeof f.comp!=='string')f.comp='';if(!Number.isInteger(f.compTo))f.compTo=-1;}}
   if(s.findSeen!==undefined&&typeof s.findSeen!=='string')delete s.findSeen;
   if(s.hearth&&s.hearth.curio!==undefined&&!(typeof s.hearth.curio==='string'&&CURIOS.some(x=>x.id===s.hearth.curio)))delete s.hearth.curio;
   if(Array.isArray(s.mEchoed))s.mEchoed=s.mEchoed.filter(x=>typeof x==='string');
@@ -1162,7 +1171,7 @@ function sanitize(s){
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
-function migrate(s){sanitize(s);if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
+function migrate(s){sanitize(s);if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.forge)s.forge={spent:0,made:[],log:{},bell:'',comp:'',compTo:-1};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
 function load(){
   let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){return null;}
   if(!raw)return null;
@@ -1202,11 +1211,11 @@ function makeCard(o){
 function cardHTML(c,o){
   o=o||{};const T=THEMES[c.theme],V=VECTORS[c.v],R=RAR[c.rarity],dk=c.dark,fs=(o.w||260)/20;CMAP[ckey(c)]=c;
   const stars=[0,1,2,3,4].map(i=>`<i class="${i<=c.rarity?'on':''}"></i>`).join('');
-  const SN=dk?['Might','Dread','Guile']:['Grit','Spark','Calm'];
+  const SN=dk?['Might','Dread','Guile']:['Grit','Spark','Calm'],ch=charmOf(c),cc=ch?Object.assign({},c,{keep:''}):c;if(ch)CMAP[ckey(cc)]=cc;
   return `<div class="tilt idle"><div class="card ${dk?'dk':'ct'} r-${R.id}${o.mini?' mini':''}" style="font-size:${fs.toFixed(2)}px" data-cid="${c.id}">
     <div class="face front" style="--frame:${R.frame};--edge:${R.edge}"><div class="panel">
       <div class="head"><b class="cname">${esc(c.nick||c.name)}</b><span class="tbadge" style="background:${V.color}">${V.name}</span></div>
-      <div class="art"><canvas class="pcv" width="48" height="37" data-k="${ckey(c)}" aria-label="${esc(c.name)}, a ${R.name} ${dk?'dark':'cute'} Forgeling"></canvas></div>
+      <div class="art"><canvas class="pcv" width="48" height="37" data-k="${ckey(cc)}" aria-label="${esc(c.name)}, a ${R.name} ${dk?'dark':'cute'} Forgeling"></canvas>${ch?`<img class="chb" src="${fgURL(ch.id)}" alt="Wearing the ${esc(ch.name)}" title="${esc(ch.name)}">`:''}</div>
       <div class="sub"><span class="th">${dk?T.dark.name:T.name}, ${dk?'dark':'cute'}</span><span class="stars" role="img" aria-label="${R.name}">${stars}</span></div>
       <div class="stats">${SN.map((n,i)=>`<div class="stat"><span>${n}</span><div class="bar"><i style="width:${c.stats[i]}%"></i></div><span>${c.stats[i]}</span></div>`).join('')}</div>
       <div class="ability"><b>${V.ability}.</b> ${V.blurb}</div>
@@ -1367,6 +1376,7 @@ function openReveal(c,packGained,allIn){
     <div id="rvAfter" hidden style="display:grid;gap:10px;width:100%;justify-items:center">
       ${state.settings.lore!==false?'<p class="whisper" id="rvWhisper"></p>':''}
       ${packGained?'<p class="rv-title" style="color:#FFD36B">That was your fifth day. A pack is ready!</p>':''}
+      <p class="muted small" id="rvEmber">${allIn?'Two embers':'An ember'} for the Forge.</p>
       <button class="primary" id="rvName">Name your Forgeling</button>
       <button class="ghost" id="rvSkip">Skip for now</button></div>`,false);
   attachTilt($('#stage'));hydrate(modal);
@@ -1554,7 +1564,7 @@ function feedbackForReport(){
 
 function pilotReport(){
   const H=state.history,done=H.filter(h=>h.status==='done').length,rest=H.filter(h=>h.status==='rest').length,miss=H.filter(h=>h.status==='skipped').length;
-  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
+  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
 }
 function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
@@ -1589,6 +1599,7 @@ function renderSettings(){
       <button class="tool" data-tool="week"><b>Simulate 6 days</b><span>Earns 5 Forgelings (one rest day) and unlocks a pack.</span></button>
       <button class="tool" data-tool="pack"><b>Give me a pack</b><span>Jump straight to the pack opening.</span></button>
       <button class="tool" data-tool="wander"><b>Finish the wander</b><span>The wanderer comes back right now.</span></button>
+      <button class="tool" data-tool="spares"><b>Spares for the Forge</b><span>Two spares of every curio from realms on your map, for trying the Forge.</span></button>
       <button class="tool" data-tool="mappreview"><b>Preview the map</b><span>Tap to cycle every realm through blank, pencil, drawn and inked, then back to your own.</span></button>
       <button class="tool" data-tool="world"><b>What is the world doing?</b><span>The current era and the last few events.</span></button>
       <button class="tool" data-tool="agecard"><b>Age my newest Forgeling</b><span>Makes it 15 days old, so you can read its second reading.</span></button>
@@ -2517,7 +2528,7 @@ function openCurio(id){
   const line=rec.from?`${rec.from} sent this as a gift.`:(c&&c.dark?cu.d:cu.c).replace(/\{n\}/g,who);
   const by=fireCurio()===id;
   openSheet(`<div class="cbig">${cImg(id,96,{cls:'cpop',alt:cu.name})}</div><h2 class="center">${esc(cu.name)}</h2><p class="center">${esc(line)}</p>
-    <p class="muted small center">${rec.at?'Found '+esc(dateLabel(rec.at))+'. ':''}${rec.n>1?'You have '+rec.n+'.':''}</p>
+    <p class="muted small center">${rec.at?'Found '+esc(dateLabel(rec.at))+'. ':''}${rec.n>1?'You have '+rec.n+', '+(rec.n-1)+' spare. Spares can go to the Forge, never your last one.':''}</p>
     ${talePageHTML(id).replace('class="tale new"','class="tale"')}
     <div class="stack"><button class="${by?'outline':'primary'}" id="curFire" data-id="${id}" ${by?'disabled':''}>${by?'It is by the fire':'Set it by the fire'}</button></div>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Close</button></div>`);
@@ -2527,9 +2538,9 @@ function wPanelHTML(c,n){
   const shelf=shelfHTML();
   let body;
   if(w&&wc&&wReady())body=`<h2 style="margin:0">${wn} is back</h2><p class="muted small">They have something to show you.</p><button class="primary" id="hCollect" style="margin-top:8px">See what they found</button>`;
-  else if(w&&wc)body=`<h2 style="margin:0">${wn} is out wandering${w.realm>=0?' in '+esc(rName(w.realm)):''}</h2><p class="muted small">Back in <span id="wLeft">${wLeftText()}</span>. There is no rush. If you are away, they will wait by the fire.</p>`;
+  else if(w&&wc)body=`<h2 style="margin:0">${wn} is out wandering${w.realm>=0?' in '+esc(rName(w.realm)):''}</h2><p class="muted small">Back in <span id="wLeft">${wLeftText()}</span>. There is no rush. If you are away, they will wait by the fire.</p>${fgMade('bell')?(fgState().bell===todayKey()?'<p class="muted small">The bell has rung today.</p>':'<button class="outline" id="hBell" style="margin-top:8px">Ring the bell</button>'):''}`;
   else body=`<h2 style="margin:0">Wander</h2><p class="muted small">Send ${esc(n)} out for a few hours, anywhere or to a realm on your map. They come back with something small for your shelf.</p><button class="outline" id="hWander" style="margin-top:8px">Send ${esc(n)} wandering</button>`;
-  return `<div class="panel-box" style="margin-top:8px">${reqHTML()}${body}<details class="more"><summary>Curio shelf, ${have} of ${CURIOS.length}</summary>${shelf}${have?'<button class="outline" id="hGift" style="margin-top:10px">Send a curio to a friend</button>':''}</details></div>`;
+  return `<div class="panel-box" style="margin-top:8px">${reqHTML()}${body}<details class="more"><summary>Curio shelf, ${have} of ${CURIOS.length}</summary>${shelf}${have?'<button class="outline" id="hGift" style="margin-top:10px">Send a curio to a friend</button>':''}</details></div>${forgePanelHTML()}`;
 }
 function wanderStart(c,realm){
   if(state.wander)return;
@@ -2551,7 +2562,7 @@ function wanderCollect(){
     if(dto>=0){if(!state.explore)state.explore={};state.explore[dto]=(state.explore[dto]||0)+1;const pf=placesFound(dto),pl=PLACES[dto][pf-1];
       state.disc=todayKey();place=`<div class="tale new"><b>A new place on your map: ${esc(pl.n)}</b><p class="world">${esc(pl.x)}</p><p class="small">${pf===5?`That is the last place in ${esc(mapName(dto))}. The realm is fully charted.`:`Another place is drawn on your map of ${esc(mapName(dto))}.`} See it on the Map tab.</p></div>`;}}
   let quiet='';if(!fresh&&c){const nm0=c.nick||c.name,more=CURIOS.some(x=>!state.curios[x.id])||[0,1,2,3,4].some(t=>rKnownTi(t)&&placesFound(t)<5);c.bond=(c.bond||0)+1;
-    quiet=`<div class="tale"><b>A quiet path today</b><p class="small">The paths share one new find a day, and today’s is already home. ${esc(nm0)} wandered happily anyway and came back with a spare. Bond with ${esc(nm0)} +1.${more?' Tomorrow’s first wander will find something new.':''}</p></div>`;}
+    quiet=`<div class="tale"><b>A quiet path today</b><p class="small">The paths share one new find a day, and today’s is already home. ${esc(nm0)} wandered happily anyway and came back with a spare for the Forge. Bond with ${esc(nm0)} +1.${more?' Tomorrow’s first wander will find something new.':''}</p></div>`;}
   let done='';const rq=state.request,ra=rq?cardById(rq.cid):null;
   if(rq&&ra&&to===rq.realm){
     const before=bondLevel(ra);ra.bond=(ra.bond||0)+3;const K=KEEPR[rq.realm],nk=!state.keepsR.includes(K.id);if(nk)state.keepsR.push(K.id);
@@ -2607,7 +2618,7 @@ const PLACE=(n,i)=>n===1?[48,22]:n===2?[[22,24],[74,24]][i]:[[8,26],[48,16],[88,
 const HEART=['.#.#.','#####','#####','.###.','..#..'],STARB=['..#..','.###.','#####','.###.','..#..'];
 function drawHearth(t){
   const cv=$('#hearthCv');if(!cv||cv.offsetParent===null)return;
-  const mode=todMode(),bdk=(state.hearth.bd&&backdropOK(state.hearth.bd))?state.hearth.bd:'',fs=furnNow(),key=mode+'|'+bdk+'|'+fs.join(',');if(!hbg||hbgMode!==key){hbg=buildHearthBG(mode,bdk,fs);hbgMode=key;}
+  const mode=todMode(),bdk=(state.hearth.bd&&backdropOK(state.hearth.bd))?state.hearth.bd:'',fs=furnNow().concat(forgedHearth()),key=mode+'|'+bdk+'|'+fs.join(',');if(!hbg||hbgMode!==key){hbg=buildHearthBG(mode,bdk,fs);hbgMode=key;}
   const ctx=cv.getContext('2d');if(!hImg)hImg=ctx.createImageData(HW,HH);
   const d=hImg.data;
   for(let i=0;i<HW*HH;i++){d[i*4]=hbg[i*3];d[i*4+1]=hbg[i*3+1];d[i*4+2]=hbg[i*3+2];d[i*4+3]=255;}
@@ -2670,7 +2681,7 @@ function renderHearth(){
   if(tab==='hearth'&&state.comp&&state.comp.date===state.date&&!state.comp.seen){state.comp.seen=1;save();hf.msg=state.comp.line+(/new by the fire|new things by the fire/.test(hf.msg||'')?' '+hf.msg:'');}
   const c=cs[hf.sel],lv=bondLevel(c),cur=BOND_AT[lv-1],nx=lv<5?BOND_AT[lv]:null,left=visitsLeft(),n=c.nick||c.name,away=wOut()&&state.wander.id===c.id;
   const pct=nx?Math.round(((c.bond||0)-cur)/(nx-cur)*100):100;
-  const keeps=[{id:'',name:'None',lvl:1}].concat(KEEPS).concat(KEEPR.filter(k=>state.keepsR.includes(k.id)).map(k=>({id:k.id,name:k.name,lvl:1}))).map(k=>`<button class="chip" data-keep="${k.id}" ${lv<k.lvl?'disabled style="opacity:.45"':''} aria-pressed="${(c.keep||'')===k.id}">${k.name}${lv<k.lvl?' (level '+k.lvl+')':''}</button>`).join('');
+  const keeps=[{id:'',name:'None',lvl:1}].concat(KEEPS).concat(KEEPR.filter(k=>state.keepsR.includes(k.id)).map(k=>({id:k.id,name:k.name,lvl:1}))).concat(charmKeeps()).map(k=>`<button class="chip" data-keep="${k.id}" ${lv<k.lvl?'disabled style="opacity:.45"':''} aria-pressed="${(c.keep||'')===k.id}">${k.name}${lv<k.lvl?' (level '+k.lvl+')':''}</button>`).join('');
   const unl=earnedIds(),bds=[{id:'',name:'Auto',ribbon:null}].concat(BACKDROPS).map(b=>{const ok=!b.id||unl.includes(b.ribbon),rb=b.ribbon?RIBBONS.find(r=>r.id===b.ribbon).name:'';return `<button class="chip" data-bd="${b.id}" ${ok?'':'disabled style="opacity:.45"'} aria-pressed="${(state.hearth.bd||'')===b.id}">${b.name}${ok?'':' (ribbon: '+rb+')'}</button>`;}).join('');
   el.innerHTML=`<p class="muted small" style="margin-bottom:8px">The Forge leaves a small fire burning in your corner of the world. Forgelings you trust come to sit by it.</p>
     <div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
@@ -2747,6 +2758,9 @@ $('#view-hearth').addEventListener('click',e=>{
   else if(b.id==='hRelight')startWake();
   else if(b.id==='hWander'&&c)openWanderTo(c);
   else if(b.id==='hCollect')wanderCollect();
+  else if(b.id==='hForge')openForge();
+  else if(b.id==='hBell')bellRing();
+  else if(b.id==='hCompass')compassAsk();
   else if(b.id==='hSnack'&&c)openSnack(c);
   else if(b.id==='hStory'&&c)openStory(c);
   else if(b.id==='hPlay'&&c)openGames(c);
@@ -2783,7 +2797,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=38;
+const SEEN_V=39;
 let ui={editJ:false,showFind:false};
 function saveJournal(text){
   const t=text.trim();
@@ -2897,6 +2911,8 @@ const RIBBONS=[
   {id:'tale1',name:'Tale Keeper',desc:'Make a realm\'s old tale whole.',g:1,f:()=>talesDone()},
   {id:'tales5',name:'Keeper of Old Tales',desc:'Make all five old tales whole.',g:5,f:()=>talesDone()},
   {id:'gift1',name:'Kind Gesture',desc:'Send a curio to a friend.',g:1,f:()=>state.giftsSent||0},
+  {id:'forge1',name:'First Forging',desc:'Make something at the Forge.',g:1,f:()=>(state.forge&&state.forge.made.length)||0},
+  {id:'forge5',name:'Smith',desc:'Make five pieces at the Forge.',g:5,f:()=>(state.forge&&state.forge.made.length)||0},
   {id:'giftgot',name:'Well Loved',desc:'Open a gift from a friend.',g:1,f:()=>(state.giftsGot||[]).length},
   {id:'journal',name:'Thoughtful',desc:'Answer 7 daily questions.',g:7,f:()=>Object.keys(state.journal).length},
   {id:'bond3',name:'Close Friends',desc:'Reach bond level 3 with a Forgeling. Unlocks the Snowfall backdrop.',g:3,f:()=>Math.max(1,...state.cards.map(bondLevel))},
@@ -2931,14 +2947,14 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
+    <ul class="newlist"><li><b>The Forge.</b> Every day you do your small thing earns an ember (two when you go all in), and they never fade. At the Hearth, forge spare curios and embers into charms your Forgelings can wear, a bell that rings a wanderer home, a compass that points to something unfound, and pieces for the fire. Every piece is signed by the Forgeling who helped. The Forge never takes your last copy of a curio.</li>
+    <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
     <li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li>
     <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
     <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li>
     <li><b>Gifts for friends.</b> Send a curio to a friend from the curio shelf at the Hearth. They get a link that opens in their own Forgelings, and the curio goes on their shelf. You keep yours.</li>
     <li><b>A new name: Forgelings.</b> The app is now called Forgelings, after the creatures at its heart. The Forge is still the world they come from, and nothing in your collection changes.</li>
-    <li><b>A Forgeling that notices.</b> When you do your small thing, the Forgeling by the fire notices, and your bond grows. Every so often it also brings back something you wrote in the margin a while ago, so you can say how it went.</li>
-    <li><b>Places on the map.</b> Each realm has five places to find. Your first Forgeling there reveals one, and every wander there uncovers another. Watch the Map fill in, one landmark at a time.</li></ul>
+    <li><b>A Forgeling that notices.</b> When you do your small thing, the Forgeling by the fire notices, and your bond grows. Every so often it also brings back something you wrote in the margin a while ago, so you can say how it went.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3403,6 +3419,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='pgSit'){const c=cardById(+b.dataset.cid);if(c){const fr=game&&game.free;if(pgT){pgT.stop();pgT=null;}game=null;if(fr){closeModal();renderHearth();}else doVisit(c,'sit',1,lineFor(c,'sit',''));}}
   else if(b.dataset.pick){const id=+b.dataset.pick,i=pickSel.indexOf(id);if(i>=0){pickSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}else if(pickSel.length<3){pickSel.push(id);b.classList.add('on');b.setAttribute('aria-pressed','true');}else{sfx('no');toast('Three is plenty for one fire.');}}
   else if(b.id==='pickSave'){state.hearth.slots=pickSel.slice();hf.sel=0;hf.msg='';save();closeModal();renderHearth();toast(pickSel.length?'The fire has new company.':'The fire will pick someone for you.');}
+  else if(b.dataset.fmake){fgMake(b.dataset.fmake);}
   else if(b.dataset.equip){const c=cardById(+b.dataset.cid);if(c){c.keep=b.dataset.equip;save();closeModal();renderHearth();renderChronicle();}}
   else if(b.id==='packTear'){b.classList.add('opening');chime(1);setTimeout(()=>{if(!pk)return;pk.step='card';pk.i=0;pk.flipped=false;drawPack();},650);}
   else if(b.id==='packNext'){if(pk.i<4){pk.i++;pk.flipped=false;drawPack();}else{pk.step='sum';drawPack();}}
@@ -3542,6 +3559,7 @@ function runTool(name,btn){
   else if(name==='preview'){const seq=[0,1,2,3,4,5,6,7,8,9,10,11,null],i=seq.indexOf(soloPreview),nx=seq[(i+1)%seq.length];soloPreview=nx;tab='hearth';render();window.scrollTo(0,0);toast(nx==null?'Alone Hours: its own calling':'Alone Hours: '+VECTORS[nx].name);}
   else if(name==='together'){const cs=slotCards(),k=todayKey();const hh=state.hearth;if(!hh.pairs)hh.pairs={};for(let i=0;i<cs.length;i++)for(let j=i+1;j<cs.length;j++){const key=pkey(cs[i].id,cs[j].id),p=hh.pairs[key]||(hh.pairs[key]={d:0,last:''});p.d+=10;p.last=k;}save();tab='hearth';render();window.scrollTo(0,0);toast(cs.length>1?'Ten more days by the fire.':'Seat two or more first.');}
   else if(name==='sleep'){const T=(((state.hearth.sleep&&state.hearth.sleep.tier)||0)%3)+1;sleepRun=null;state.hearth.sleep={tier:T};save();tab='hearth';render();window.scrollTo(0,0);}
+  else if(name==='spares'){const ks=rKnown();if(!ks.length){toast('Find a Forgeling first.');return;}CURIOS.filter(x=>ks.includes(CREALM[x.id])).forEach(x=>{const cur=state.curios[x.id]||{n:0,cid:0,at:todayKey()};cur.n=Math.max(cur.n,1)+2;state.curios[x.id]=cur;});save();tab='hearth';render();window.scrollTo(0,0);toast('Two spares of each curio. Open the Forge at the Hearth.');}
   else if(name==='wander'){if(state.wander){state.wander.ready=Date.now()-1;state.wander.notified=false;save();tab='hearth';render();window.scrollTo(0,0);wanderTick();}else toast('Nobody is out wandering.');}
   else if(name==='holo'||name==='legend'){const c=makeCard({rarity:name==='holo'?3:4,source:'pack'});state.cards.push(c);save();render();inspect(c.id);}
   else if(name==='reset'){
@@ -3683,7 +3701,7 @@ function furnListHTML(){
     const how=V?(ok?`You have ${DID[f.v]} ${t.v[f.v]} times.`:`After ${FURN_V} ${V.name} days. ${t.v[f.v]} so far.`):(ok?`For ${f.need===1?'your first calling':f.need+' callings done'}.`:`After ${f.need===1?'your first calling':f.need+' callings done'}. ${t.all} so far.`);
     return `<li class="${ok?'on':''}"><span class="fi" aria-hidden="true">${ok?'✓':''}</span><span><b>${f.name}</b><small>${how}</small></span></li>`;}).join('')}</ul></details>`;
 }
-const FCOL={k:'#6B4A2E',w:'#A0703F',g:'#4FA36A',G:'#2F7A4A',l:'#8FD08A',s:'#B4B9C1',S:'#767B85',b:'#4F93C8',B:'#A6D8F2',r:'#D9475A',p:'#F29BB5',W:'#F4F0E8',m:'#4D5262',o:'#C8743E',a:'#E3B341',y:'#FFD36B',Y:'#FFF6CF',P:'#9B7BD8'};
+const FCOL={0:'#4FA36A',1:'#FF8A2E',2:'#4F93C8',3:'#BFE6FF',4:'#9B7BD8',k:'#6B4A2E',w:'#A0703F',g:'#4FA36A',G:'#2F7A4A',l:'#8FD08A',s:'#B4B9C1',S:'#767B85',b:'#4F93C8',B:'#A6D8F2',r:'#D9475A',p:'#F29BB5',W:'#F4F0E8',m:'#4D5262',o:'#C8743E',a:'#E3B341',y:'#FFD36B',Y:'#FFF6CF',P:'#9B7BD8'};
 const FSPR={
  menhir:['.SS.','SssS','Sss.','SsSs','Ssss','SsSs','Ssss','SSSS'],
  bell:['wwwwwww','w..k..w','w..a..w','w.aaa.w','w.aaa.w','waaaaaw','w..a..w','w.....w','w.....w','k.....k'],
@@ -3715,9 +3733,86 @@ function furnDraw(put,fs,dim){
   if(has('stump'))spr(89,61,FSPR.stump);
   if(has('fern'))spr(106,60,FSPR.fern);
   if(has('mail'))spr(119,57,FSPR.mail);
+  if(has('stand')){for(let y=46;y<=59;y++){const o=Math.round((y-46)/3.5);put(60-o,y,C('m'));put(68+o,y,C('m'));}for(let x=59;x<=69;x++)put(x,46,C('m'));put(64,47,C('m'));put(64,48,C('m'));put(63,49,C('a'));put(65,49,C('a'));}
+  if(has('kettle'))spr(76,55,FGSPR.kettle);
+  if(has('chimes'))spr(16,12,FGSPR.chimes);
 }
 
 
+
+/* ---- 0.35: the Forge. Embers from the days you show up, spares from wandering, forged into signed pieces. ---- */
+const FORGE_R=[
+ {id:'charm0',kind:'Keepsake',name:'Charm of Meadow',ti:0,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'charm1',kind:'Keepsake',name:'Charm of Ember',ti:1,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'charm2',kind:'Keepsake',name:'Charm of Tide',ti:2,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'charm3',kind:'Keepsake',name:'Charm of Frost',ti:3,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'charm4',kind:'Keepsake',name:'Charm of Dusk',ti:4,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'bell',kind:'Tool',name:'Wanderer’s bell',sp:2,emb:3,what:'Once a day, rings a wanderer home early.'},
+ {id:'compass',kind:'Tool',name:'Compass',sp:3,emb:4,what:'Once a day, the needle settles toward a realm that still holds something unfound.'},
+ {id:'kettle',kind:'Hearth',name:'A copper kettle',sp:2,emb:2,what:'Sits by the fire for good.'},
+ {id:'stand',kind:'Hearth',name:'An iron stand',sp:2,emb:2,what:'Stands over the fire for good.'},
+ {id:'chimes',kind:'Hearth',name:'Wind chimes',sp:2,emb:2,what:'Hang by the fire for good.'}];
+const CHARM_COL=['#4FA36A','#FF8A2E','#4F93C8','#BFE6FF','#9B7BD8'];
+const FGSPR={
+ charm:['...kk...','..k..k..','..k..k..','...kk...','..kXXk..','.kXXXXk.','.kXYXXk.','.kXXXXk.','..kXXk..','...kk...'],
+ bell:['...aa...','..a..a..','..aaaa..','.aaaaaa.','.aYaaaa.','.aaaaaa.','aaaaaaaa','...kk...'],
+ compass:['..ssss..','.sWWWWs.','sWWrWWWs','sWWrWWWs','sWWWbWWs','sWWWbWWs','.sWWWWs.','..ssss..'],
+ kettle:['...kk...','..kkkk..','.kooook.','kooooook','kooooook','.kooook.','..kkkk..','.k....k.'],
+ stand:['mmmmmmmm','m..mm..m','m..mm..m','m..mm..m','m.aaaa.m','m......m','m......m','mm....mm'],
+ chimes:['kkkkkkkk','.k.k.k.k','.s.a.s.a','.s.a.s.a','.s.a.s..','.s...s..','.....s..','........']};
+const FG_URL={};
+function fgRows(id){const m=/^charm([0-4])$/.exec(id);if(m)return FGSPR.charm.map(r=>r.replace(/X/g,m[1]));return FGSPR[id]||null;}
+function fgURL(id){
+  if(FG_URL[id])return FG_URL[id];const rows=fgRows(id);if(!rows)return '';
+  try{const cv=document.createElement('canvas');cv.width=8;cv.height=10;const x=cv.getContext('2d'),im=x.createImageData(8,10);
+    rows.forEach((row,j)=>{for(let i=0;i<8;i++){const ch=row[i];if(!ch||ch==='.')continue;const h=FCOL[ch];if(!h)continue;const q=hexRGB(h),o=(j*8+i)*4;im.data[o]=q[0];im.data[o+1]=q[1];im.data[o+2]=q[2];im.data[o+3]=255;}});
+    x.putImageData(im,0,0);return FG_URL[id]=cv.toDataURL();}catch(e){return '';}
+}
+const fgImg=(id,sz,o)=>{o=o||{};const u=fgURL(id);return u?`<img class="cimg${o.cls?' '+o.cls:''}" src="${u}" width="${Math.round(sz*.8)}" height="${sz}" alt="${o.alt?esc(o.alt):''}">`:'';};
+const fgState=()=>state.forge||(state.forge={spent:0,made:[],log:{},bell:'',comp:'',compTo:-1});
+function embEarned(){const seen=new Set();let n=0;(state.history||[]).forEach(h=>{if(h&&h.status==='done'&&!seen.has(h.date)){seen.add(h.date);n+=h.allIn?2:1;}});return n;}
+function embers(){return Math.max(0,embEarned()-(fgState().spent||0));}
+const fgMade=id=>fgState().made.includes(id);
+const forgedHearth=()=>FORGE_R.filter(r=>r.kind==='Hearth'&&fgMade(r.id)).map(r=>r.id);
+const charmKeeps=()=>FORGE_R.filter(r=>r.ti!==undefined&&fgMade(r.id)).map(r=>({id:r.id,name:r.name,lvl:1}));
+const charmOf=c=>{const m=c&&/^charm([0-4])$/.exec(c.keep||'');return m?FORGE_R.find(r=>r.id===c.keep):null;};
+function spareList(ti){return CURIOS.filter(x=>(ti===undefined||CREALM[x.id]===ti)&&state.curios[x.id]&&state.curios[x.id].n>1).map(x=>({id:x.id,name:x.name,n:state.curios[x.id].n-1})).sort((a,b)=>b.n-a.n);}
+const spareTotal=ti=>spareList(ti).reduce((s,x)=>s+x.n,0);
+function fgCan(r){return !fgMade(r.id)&&embers()>=r.emb&&spareTotal(r.ti)>=r.sp;}
+function fgNeeds(r){const sp=spareTotal(r.ti),e=embers(),rn=r.ti!==undefined?THEMES[r.ti].name+' ':'';
+  return `Needs ${r.sp} ${rn}${r.sp===1?'spare':'spares'} and ${r.emb} embers. You have ${sp} ${rn}${sp===1?'spare':'spares'} and ${e} ${e===1?'ember':'embers'}.`;}
+function fgSmith(){const cs=slotCards(),c=cs[Math.min(hf.sel,cs.length-1)],out=wOut()?state.wander.id:-1;if(c&&c.id!==out)return c;return cs.find(x=>x.id!==out)||c||null;}
+function openForge(){
+  const f=fgState(),s=fgSmith(),e=embers(),sp=spareTotal(),made=f.made.length;
+  const rows=FORGE_R.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id];
+    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,20)}</span><span><b>${esc(r.name)}</b><small>${r.kind}. ${esc(r.what)}</small><small>${ok?`Forged by ${esc(L?L.by:'a Forgeling')}, ${esc(L?dateLabel(L.at):'')}.`:esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
+  openSheet(`<h2>The Forge</h2><p class="muted small">${e} ${e===1?'ember':'embers'} and ${sp} spare ${sp===1?'curio':'curios'}. ${made} of ${FORGE_R.length} pieces made.${s?` Whoever helps signs the piece. Today that is ${esc(s.nick||s.name)}.`:' Seat a Forgeling by the fire to help.'}</p>
+    <p class="muted small">Embers come from the days you do your small thing, two on days you go all in, and they never fade. Spares are extra copies of a curio. The Forge never takes your last one, and nothing here is ever sold.</p>
+    <ul class="furn forgel">${rows}</ul>
+    <div class="row" style="justify-content:center"><button class="ghost" data-close>Close</button></div>`);
+}
+function fgMake(id){
+  const r=FORGE_R.find(x=>x.id===id),s=fgSmith();if(!r||!s||!fgCan(r))return;
+  const f=fgState();let need=r.sp;const used=[];
+  const sl=spareList(r.ti);for(let guard=0;need>0&&guard<40;guard++)sl.forEach(x=>{if(need>0&&state.curios[x.id].n>1){state.curios[x.id].n--;need--;used.push(x.name.toLowerCase());}});
+  f.spent=(f.spent||0)+r.emb;f.made.push(r.id);f.log[r.id]={by:s.nick||s.name,at:todayKey(),used};
+  if(r.kind==='Hearth'){hbg=null;}
+  save();sfx('save');chime(2);hf.msg=`Forged with ${s.nick||s.name}: ${r.name.toLowerCase()}.`;renderHearth();renderToday();
+  const cnt={};used.forEach(u=>cnt[u]=(cnt[u]||0)+1);const ul=Object.keys(cnt).map(k=>cnt[k]>1?`${k} ×${cnt[k]}`:k).join(', ');
+  openSheet(`<p class="muted center small">Hot from the Forge</p><div class="cbig">${fgImg(r.id,90,{cls:'cpop',alt:r.name})}</div><h2 class="center">${esc(r.name)}</h2>
+    <p class="center">Forged by ${esc(s.nick||s.name)}, ${esc(dateLabel(todayKey()))}.</p><p class="muted small center">Made with ${esc(ul)} and ${r.emb} embers. ${r.kind==='Hearth'?'It is by the fire now.':r.id==='bell'?'It hangs by the Wander path.':r.id==='compass'?'It sits on the Forge panel.':''}</p>
+    <div class="stack">${r.ti!==undefined?`<button class="primary" data-equip="${r.id}" data-cid="${s.id}">${esc(s.nick||s.name)} wears it</button>`:''}<button class="${r.ti!==undefined?'ghost':'primary'}" data-close>Lovely</button></div>`);
+}
+function bellRing(){const f=fgState(),w=state.wander;if(!fgMade('bell')||!w||f.bell===todayKey())return;if(Date.now()>=w.ready)return;const c=cardById(w.id);w.ready=Date.now();w.notified=false;f.bell=todayKey();save();chime(1);toast(`The bell rings out. ${c?(c.nick||c.name):'Your wanderer'} turns for home.`);wanderTick();renderHearth();}
+function compassAsk(){const f=fgState();if(!fgMade('compass'))return;if(f.comp!==todayKey()){const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&(rCurios(t).some(x=>!state.curios[x.id])||placesFound(t)<5));f.comp=todayKey();f.compTo=open.length?open[Math.floor(Math.random()*open.length)]:-1;save();}renderHearth();}
+function compassLine(){const f=fgState();if(f.comp!==todayKey())return '';return f.compTo>=0?`The needle settles toward ${esc(mapName(f.compTo))}. Something there is still unfound.`:'The needle spins, then rests. Nothing on your map is left unfound.';}
+function forgePanelHTML(){
+  const f=fgState(),e=embers(),made=f.made.length;let tools='';
+  if(fgMade('compass'))tools+=f.comp===todayKey()?`<p class="small" id="hCompLine" style="margin:8px 0 0">${compassLine()}</p>`:`<button class="outline" id="hCompass" style="margin-top:8px">Ask the compass</button>`;
+  return `<div class="panel-box forgep" style="margin-top:8px"><div class="row" style="margin:0"><h2 style="margin:0">The Forge</h2><span class="muted small" id="hEmbers">${e} ${e===1?'ember':'embers'}</span></div>
+    <p class="muted small">${made?`${made} of ${FORGE_R.length} pieces made.`:'Nothing forged yet.'} Embers come from the days you show up. Spare curios are the rest, never your last one.</p>${tools}
+    <button class="outline" id="hForge" style="margin-top:8px">Open the Forge</button></div>`;
+}
 /* ---- Wandering somewhere: each curio belongs to a realm, and a wander can head for one realm on your map. ---- */
 const CREALM={acorn:0,flower:0,feather:0,mushroom:0,leaf:1,spark:1,bone:1,crystal:1,shell:2,pebble:2,rain:2,coin:2,snow:3,moon:3,bell:3,glimmer:3,key:4,candle:4,thread:4,map:4};
 const rKnown=()=>[0,1,2,3,4].filter(ti=>state.cards.some(c=>c.theme===ti));
@@ -3727,7 +3822,7 @@ let wPickId=null;
 function openWanderTo(c){
   wPickId=c.id;const n=c.nick||c.name,rq=state.request,ra=rq?cardById(rq.cid):null;
   const opts=rKnown().map(ti=>{const all=rCurios(ti),f=all.filter(x=>state.curios[x.id]).length,asked=rq&&rq.realm===ti&&ra;
-    return `<button class="moodbtn" data-wgo="${ti}"><div><b>${esc(rName(ti))}</b><span>${f} of ${all.length} curios from here found${asked?`. ${esc(ra.nick||ra.name)} asked for something from here.`:'.'}</span></div></button>`;}).join('');
+    return `<button class="moodbtn" data-wgo="${ti}"><div><b>${esc(rName(ti))}</b><span>${f} of ${all.length} curios from here found${asked?`. ${esc(ra.nick||ra.name)} asked for something from here.`:'.'}${fgState().comp===todayKey()&&fgState().compTo===ti?' The compass points here.':''}</span></div></button>`;}).join('');
   openSheet(`<h2>Where should ${esc(n)} wander?</h2><p class="muted small">Realms on your map. ${(state.wstat.sent||0)===0?'This first time, they are back in about 20 minutes.':'They are back in about three hours.'}${state.disc===todayKey()?' Today’s new find is already home, so this wander brings back a spare, a story and a little bond.':''}</p>${opts}
     <button class="moodbtn" data-wgo="-1"><div><b>Anywhere</b><span>Wherever the path goes. Good for finding something new.</span></div></button>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
