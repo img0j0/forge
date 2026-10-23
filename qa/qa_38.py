@@ -10,7 +10,7 @@ def load(pg,s):
 def lines(s,n,start=8):
     base=_d.date.fromisoformat(s["date"]); return {(base-_d.timedelta(days=start+i*2)).isoformat():{"v":i%12,"text":f"old line {i}"} for i in range(n)}
 def scribe_px(pg):  # count pixels of the Scribe's quill ink on the Hearth canvas
-    return pg.evaluate("()=>{const cv=document.getElementById('hearthCv');if(!cv)return -1;const d=cv.getContext('2d').getImageData(108,30,20,30).data;let n=0;for(let i=0;i<d.length;i+=4){if(Math.abs(d[i]-0x5A)<30&&Math.abs(d[i+1]-0x3F)<30&&Math.abs(d[i+2]-0xC0)<40)n++;}return n}")
+    return pg.evaluate("()=>{const cv=document.getElementById('hearthCv');if(!cv)return -1;const d=cv.getContext('2d').getImageData(94,54,20,18).data;let n=0;for(let i=0;i<d.length;i+=4){if(Math.abs(d[i]-0x5A)<30&&Math.abs(d[i+1]-0x3F)<30&&Math.abs(d[i+2]-0xC0)<40)n++;}return n}")
 with sync_playwright() as p:
     b=p.chromium.launch(); bad=[]
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); dev(pg,"week"); closemodals(pg)
@@ -20,7 +20,7 @@ with sync_playwright() as p:
     rec("Before","the book promises someone will come at 60","At 60, someone will come to the fire to read with you." in pg.inner_text("#view-chronicle"))
     # the 59th and 60th lines: the arrival
     s=st(pg); s["journal"]=lines(s,59); s["status"]="done"; load(pg,s); tabto(pg,"today")
-    pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(300); pg.fill("#jIn","The sixtieth line."); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(900)
+    pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(300); pg.fill("#jIn","The sixtieth line."); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(250)
     rec("Arrive","the sixtieth line brings the Scribe, with a toast","The Scribe has come" in pg.inner_text("#toast"))
     tabto(pg,"hearth"); pg.wait_for_timeout(700)
     rec("Arrive","the Hearth says someone new has come to the fire","Someone new has come to the fire" in pg.inner_text("#hmsg"),pg.inner_text("#hmsg"))

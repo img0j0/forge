@@ -38,10 +38,12 @@ rep("  if(tab==='hearth'&&state.comp&&state.comp.date===state.date&&!state.comp.
     "  if(tab==='hearth'&&!hf.msg){const sr=scribeRead();if(sr)hf.msg=sr;}\n  if(tab==='hearth'&&state.comp&&state.comp.date===state.date&&!state.comp.seen){")
 # drawn by the fire, inside the firelight, on its own post at the right
 rep("  {const fc=heapOn?null:fireCurio(),px=fc&&cpix(fc);if(px)px.forEach(([x,y,c])=>setpx(39+x,55+y,c));}",
-    "  {const fc=heapOn?null:fireCurio(),px=fc&&cpix(fc);if(px)px.forEach(([x,y,c])=>setpx(39+x,55+y,c));}\n  if(!heapOn&&scribeHere()){const P=scribePal(),X=117,Y=36,bob=REDUCE?0:Math.floor(t/1400)%2;for(let y=Y+12;y<HH-12;y++){setpx(X+3,y,[90,62,40]);setpx(X+4,y,[107,74,46]);}SCRIBE_SPR.forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch!=='.'&&P[ch])setpx(X+i-1,Y+j-bob,ch==='w'&&!REDUCE&&(t%5200)<160?P.b:P[ch]);}});}")
+    "  {const fc=heapOn?null:fireCurio(),px=fc&&cpix(fc);if(px)px.forEach(([x,y,c])=>setpx(39+x,55+y,c));}\n  if(!heapOn&&scribeHere()){const P=scribePal(),X=99,Y=60,bob=REDUCE?0:Math.floor(t/1400)%2;for(let x=X;x<X+9;x++)setpx(x,Y+12,[40,30,26]);SCRIBE_SPR.forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch!=='.'&&P[ch])setpx(X+i-1,Y+j-bob,ch==='w'&&!REDUCE&&(t%5200)<160?P.b:P[ch]);}});}")
 # the arrival
 rep("  if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};",
-    "  const wasL=linesWritten();\n  if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};\n  if(wasL<SCRIBE_AT&&linesWritten()>=SCRIBE_AT){hf.msg='Someone new has come to the fire. It carries a quill, and it would like to read with you.';setTimeout(()=>toast('Sixty lines. The Scribe has come to your Hearth.'),600);}")
+    "  const wasL=linesWritten();\n  if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};\n  ui.scribeArr=wasL<SCRIBE_AT&&linesWritten()>=SCRIBE_AT;if(ui.scribeArr)hf.msg='Someone new has come to the fire. It carries a quill, and it would like to read with you.';")
+rep("closeModal();renderToday();renderChronicle();checkRibbons();toast('Saved to your Journal. It stays on this device.');}",
+    "closeModal();renderToday();renderChronicle();checkRibbons();toast(ui.scribeArr?'Sixty lines. The Scribe has come to your Hearth.':'Saved to your Journal. It stays on this device.');ui.scribeArr=false;}")
 rep("<p class=\"muted small\">${nxt}</p>", "<p class=\"muted small\">${L>=SCRIBE_AT?'The Scribe sits by your fire and reads with you. ':''}${nxt}</p>")
 rep("  {id:'forge1',name:'First Forging',", "  {id:'scribe',name:'The Scribe',desc:'Write 60 lines in your book, whenever you like.',g:60,f:()=>linesWritten()},\n  {id:'forge1',name:'First Forging',")
 rep("\\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}", "\\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}\\nScribe: ${scribeHere()?'by the fire':'not yet'}")
