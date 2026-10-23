@@ -8,3 +8,4 @@ qa/*.png
 qa/full_summary.txt
 odds_real.js
 *.zip
+qa/re_summary.txt
