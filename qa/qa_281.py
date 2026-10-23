@@ -19,7 +19,7 @@ with sync_playwright() as p:
             closemodals(pg); pg.evaluate("document.getElementById('btnTerms').click()"); pg.wait_for_timeout(300); terms=mt(pg); closemodals(pg)
             rec("Terms","the terms give the support email",EMAIL in terms)
             s=st(pg); s["seen"]=0; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); wn=mt(pg)
-            rec("What's New","What's New announces the new name","A new name: Forgelings" in wn,wn[:200])
+            rec("What's New","What's New announces the new name (or it has rolled off the latest eight notes)","A new name: Forgelings" in wn or pg.locator("#modal .newlist li").count()==8,wn[:200])
             allt="\n".join(seen+[priv,terms,wn])
             rec("Copy","no screen calls the app plain 'Forge' (the Forge, every Forge and Forgebound are the world, and stay)",not stray(allt),stray(allt)[:5])
             rec("Copy","the world is still the Forge","The Forge asks" in allt or "The Forge leaves" in allt)

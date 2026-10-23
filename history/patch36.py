@@ -120,6 +120,11 @@ rep("\\nNudge: ${state.settings.nudge||'off'}", "\\nWants: ${(state.want||[]).ma
 # ---- heading order on Today (the margin panel's h2 used to sit between the title and Latest finds) ----
 rep('<h3 style="margin-top:6px">Latest finds</h3>', '<h2 class="sub3">Latest finds</h2>')
 rep('/* Nav */', 'h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}\n/* Nav */')
+# ---- by day, your lines in Journal cards were dark ink on dark glass (the panel list missed the card-like boxes) ----
+rep('html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .inkm{color:#FFD36B}',
+    'html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .inkm{color:#FFD36B}')
+rep('html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .mine{',
+    'html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .mine{')
 # ---- version, What's New ----
 rep('<title>Forgelings (prototype 0.35.4)</title>', '<title>Forgelings (prototype 0.36.0)</title>')
 rep("const VERSION='prototype 0.35.4'", "const VERSION='prototype 0.36.0'")

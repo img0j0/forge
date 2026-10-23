@@ -14,7 +14,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base354.html` | The current build, 0.35.4 (identical files) |
+| `work.html`, `base36.html` | The current build, 0.36.0 (identical files) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
 | `legal/` | `page.py` builds privacy, terms and support pages into `legal/out/` |
@@ -26,7 +26,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 ## Making the next version
 
-1. Write `patch36.py` at the top of this folder. It reads `base354.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch354.py`. Bump the title, `VERSION`, `SEEN_V` (to 41) and add a What's New entry.
+1. Write `patch36.py` at the top of this folder. It reads `base36.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch36.py`. Bump the title, `VERSION`, `SEEN_V` (to 41) and add a What's New entry.
 2. Check the script: extract the `<script>` and run `node --check` on it.
 3. Add `qa/qa_36.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
 4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.
