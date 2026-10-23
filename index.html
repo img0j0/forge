@@ -497,8 +497,10 @@ h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .echo .ghost{padding-left:0;margin-top:2px}
 .didlist{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
 .mapwrap{background:var(--mpaper);border:1.5px solid var(--line);border-radius:22px;padding:6px;margin:0 -6px 12px;box-shadow:0 6px 22px rgba(46,42,71,.12)}
-.mphit{cursor:pointer;-webkit-tap-highlight-color:transparent}.mphit:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
-.mp-sel{stroke:var(--plum)}
+.mphit{cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}.mphit:focus{outline:none}.mphit:focus-visible{outline:none;stroke:var(--plum);stroke-width:1.8;stroke-dasharray:4 3}
+.mp-selglow{stroke:#FFD36B;opacity:.55}
+html:not(.reduce) .mp-selglow{animation:mpBreath 1.5s ease-in-out 2}
+@keyframes mpBreath{0%,100%{opacity:.55}50%{opacity:.9}}
 .mp-paper{fill:var(--mpaper)}.mp-burn{stop-color:var(--mburn)}.mp-fog{fill:var(--mfog)}.mp-grain{fill:var(--mgrain)}.mp-rib{fill:var(--mrib)}.mp-inkf{fill:var(--ink)}.mp-bleed{opacity:var(--mbleed)}
 .realmpage{margin-bottom:10px}
 .mapsvg{display:block;width:100%;height:auto;max-height:80vh}
@@ -1101,7 +1103,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.0',APPVER='1.0.0';
+const VERSION='prototype 0.38.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -2329,7 +2331,7 @@ function mapHTML(){
   g=sea+trails+g;
   ms.forEach(m=>{
     const P=MAPP[m.ti],d=blobPath(P,m.ti+1,[3.4,2.3,1.3,.5][m.tier]),sel=ch.realm===m.ti;
-    if(sel)g+=`<path d="${d}" class="mp-st mp-sel" fill="none" stroke-width="2.4" stroke-dasharray="2 5" transform="translate(0 0)"/>`;
+    if(sel)g+=`<g class="mp-selg" aria-hidden="true"><path d="${d}" class="mp-selglow" fill="none" stroke-width="7" stroke-linejoin="round" filter="url(#mpGlow)"/><path d="${d}" class="mp-gold mp-sel" fill="none" stroke-width="2.2" stroke-linejoin="round" filter="url(#mpInk)"/></g>`;
     g+=`<path d="${d}" class="mphit" data-realm="${m.ti}" role="button" tabindex="0" aria-pressed="${sel}" aria-label="${m.tier>0?esc(nameOf(m)):'An undrawn corner'}, ${sel?'close its page':'open its page'}" fill="transparent" stroke="none"/>`;
   });
   if(ms[1].tier>0&&ms[2].tier>0)g+=`<path d="M204 253Q240 247 276 255" class="mp-st" fill="none" stroke-width="1.1" stroke-dasharray="1 4" stroke-opacity=".7"/>`;
@@ -2342,7 +2344,7 @@ function mapHTML(){
   const foot=noneKnown?'Blank paper. The first line is waiting.':allInk?'Nothing left blank. The corners have started to curl.':allKnown?'Every corner has a line in it. Some are still soft.':'The rest is waiting to be drawn.';
   const aria='A hand-drawn map of the Forge. Realms you have visited are drawn in, and the rest are faint. '+foot;
   const svg=`<svg class="mapsvg" viewBox="0 0 340 430" role="group" aria-label="${esc(aria)}">
-    <defs><filter id="mpBlur" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1"/></filter>
+    <defs><filter id="mpBlur" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1"/></filter><filter id="mpGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>
       <filter id="mpInk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
       <filter id="mpWash" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="9" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.38" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
       <filter id="mpBleed" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.6"/></filter>
