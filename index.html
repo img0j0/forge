@@ -393,6 +393,12 @@ ul.forgel li.can b{color:var(--plum)}
 .ownitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .ownitem .ot{min-width:0}.ownitem .ot b{font-weight:700}.ownitem .ot small{display:block;color:var(--muted);font-size:13px;margin-left:20px}
 h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
+.feel{width:100%;margin-top:6px}.feel .feelq{font-weight:700;margin:0 0 2px}.feel .chips{justify-content:center}
+.card .inkwash{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 0 .2em rgba(200,184,255,.85),inset 0 0 2.4em .7em rgba(96,64,205,.72),inset 0 0 .7em .2em rgba(185,166,255,.7)}
+.card .inkdrop{vertical-align:-.05em;margin-right:.35em;width:.6em;height:.8em}
+.card .cbk .binfo .inkl{color:#D9CCFF;font-style:italic}
+.bookrow{display:flex;gap:14px;align-items:center}.bookrow .book{flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25))}.bookrow h2{margin:0 0 2px}
+.feelc{margin:4px 0 0}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -1095,7 +1101,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.36.0',APPVER='1.0.0';
+const VERSION='prototype 0.37.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1188,7 +1194,7 @@ function todayTask(){const o=todayOwnObj();return o?o.text:taskFor(state.todayV,
 function todayBand(){const o=todayOwnObj();return o?(o.k>=0?'Yours · '+WANTS[o.k].n:'Yours'):VECTORS[state.todayV].name;}
 const PEN='<svg class="pi pen" viewBox="0 0 12 12" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M9 1h2v2h-2zM8 3h2v1h-2zM7 4h2v1h-2zM6 5h2v1h-2zM5 6h2v1h-2zM4 7h2v1h-2zM3 8h2v1h-2zM2 9h2v1h-2zM1 10h2v1h-2z"/></svg>';
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto',ownMix:'mix'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},want:[],wantAsked:false,owns:[],todayOwn:null,forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
+function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto',ownMix:'mix'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},want:[],wantAsked:false,owns:[],todayOwn:null,feel:{},forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1199,7 +1205,7 @@ function sanitize(s){
   s.cards=s.cards.filter(c=>c&&typeof c==='object'&&Number.isFinite(c.id)&&!seenId.has(c.id)&&seenId.add(c.id)).map(c=>{
     c.seed=Number.isFinite(c.seed)?c.seed:Math.abs(Math.round(c.id*2654435761))%2147483647;
     c.v=int(c.v,0,VECTORS.length-1,0);c.theme=int(c.theme,0,THEMES.length-1,0);c.rarity=int(c.rarity,0,4,0);c.dark=!!c.dark;
-    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);
+    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}
     c.bond=Math.max(0,num(c.bond,0));c.wi=num(c.wi,Math.abs(c.seed)%1000);c.serial=num(c.serial,1);c.dayN=num(c.dayN,1);
     c.date=str(c.date,dkey(new Date()));c.dateLabel=str(c.dateLabel,'');c.source=str(c.source,'daily');
     if(!Array.isArray(c.stats)||c.stats.length!==3||c.stats.some(x=>typeof x!=='number'))c.stats=statsFor(c.seed,c.rarity);
@@ -1222,6 +1228,7 @@ function sanitize(s){
   s.opens=[...new Set((Array.isArray(s.opens)?s.opens:[]).filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort();
   s.history=(Array.isArray(s.history)?s.history:[]).filter(x=>x&&typeof x==='object'&&typeof x.date==='string');
   if(!s.journal||typeof s.journal!=='object'||Array.isArray(s.journal))s.journal={};
+  {const f=s.feel&&typeof s.feel==='object'&&!Array.isArray(s.feel)?s.feel:{},ok={};Object.keys(f).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)&&['easy','good','hard'].includes(f[k])).sort().slice(-800).forEach(k=>ok[k]=f[k]);s.feel=ok;}
   Object.keys(s.journal).forEach(k=>{const j=s.journal[k];if(!j||typeof j!=='object'||typeof j.text!=='string')delete s.journal[k];else if(j.reply!==undefined&&!['did','still','let'].includes(j.reply))delete j.reply;});
   if(s.comp!==undefined&&s.comp!==null&&(typeof s.comp!=='object'||typeof s.comp.date!=='string'||!Number.isFinite(s.comp.cid)||typeof s.comp.line!=='string'))s.comp=null;
   if(s.mEcho!==undefined&&s.mEcho!==null&&(typeof s.mEcho!=='object'||typeof s.mEcho.date!=='string'||typeof s.mEcho.k!=='string'))s.mEcho=null;
@@ -1296,18 +1303,18 @@ function cardHTML(c,o){
   o=o||{};const T=THEMES[c.theme],V=VECTORS[c.v],R=RAR[c.rarity],dk=c.dark,fs=(o.w||260)/20;CMAP[ckey(c)]=c;
   const stars=[0,1,2,3,4].map(i=>`<i class="${i<=c.rarity?'on':''}"></i>`).join('');
   const SN=dk?['Might','Dread','Guile']:['Grit','Spark','Calm'],ch=charmOf(c),cc=ch?Object.assign({},c,{keep:''}):c;if(ch)CMAP[ckey(cc)]=cc;
-  return `<div class="tilt idle"><div class="card ${dk?'dk':'ct'} r-${R.id}${o.mini?' mini':''}" style="font-size:${fs.toFixed(2)}px" data-cid="${c.id}">
+  return `<div class="tilt idle"><div class="card ${dk?'dk':'ct'} r-${R.id}${o.mini?' mini':''}${c.ink?' inked':''}" style="font-size:${fs.toFixed(2)}px" data-cid="${c.id}">
     <div class="face front" style="--frame:${R.frame};--edge:${R.edge}"><div class="panel">
       <div class="head"><b class="cname">${esc(c.nick||c.name)}</b><span class="tbadge" style="background:${V.color}">${V.name}</span></div>
       <div class="art"><canvas class="pcv" width="48" height="37" data-k="${ckey(cc)}" aria-label="${esc(c.name)}, a ${R.name} ${dk?'dark':'cute'} Forgeling"></canvas>${ch?`<img class="chb" src="${fgURL(ch.id)}" alt="Wearing the ${esc(ch.name)}" title="${esc(ch.name)}">`:''}</div>
       <div class="sub"><span class="th">${dk?T.dark.name:T.name}, ${dk?'dark':'cute'}</span><span class="stars" role="img" aria-label="${R.name}">${stars}</span></div>
       <div class="stats">${SN.map((n,i)=>`<div class="stat"><span>${n}</span><div class="bar"><i style="width:${c.stats[i]}%"></i></div><span>${c.stats[i]}</span></div>`).join('')}</div>
       <div class="ability"><b>${V.ability}.</b> ${V.blurb}</div>
-      <div class="foot"><span>${EDITION}</span><span>No. ${pad(c.serial)}</span></div>
+      <div class="foot"><span>${EDITION}</span><span>${c.ink?INKDROP:''}No. ${pad(c.serial)}</span></div>${c.ink?'<div class="inkwash" aria-hidden="true"></div>':''}
     </div><div class="shine"></div><div class="glare"></div></div>
-    <div class="face cbk${(c.tale||c.gossip)?' dense':''}"><div class="bsp" aria-hidden="true"></div><div class="binfo">
+    <div class="face cbk${(c.tale||c.gossip||c.ink)?' dense':''}"><div class="bsp" aria-hidden="true"></div><div class="binfo">
       <div class="m1">${c.source==='pack'?'Pulled from a pack':'Earned'} on day ${c.dayN}</div><div class="m2">${esc(c.dateLabel)}</div><div class="m2">${c.own?'Yours: '+esc(c.own):V.name}${c.allIn?', went all in':''}</div>${worldBack(c)}
-      ${c.nick?`<div class="m2">Born as ${esc(c.name)}</div>`:''}${c.tale?`<div class="m3">\u201C${esc(c.tale)}\u201D</div>`:''}<div class="m4">${EDITION}, No. ${pad(c.serial)}</div></div></div>
+      ${c.nick?`<div class="m2">Born as ${esc(c.name)}</div>`:''}${c.ink?`<div class="m3 inkl">\u201C${esc(c.ink)}\u201D</div>`:''}${c.tale?`<div class="m3">\u201C${esc(c.tale)}\u201D</div>`:''}<div class="m4">${EDITION}, No. ${pad(c.serial)}</div></div></div>
     ${o.cover?'<div class="cover" id="cover" role="button" tabindex="0" aria-label="Turn the card over"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg></div>':''}
     </div></div>`;
 }
@@ -1606,7 +1613,7 @@ function renderToday(){
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
   if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
-  const jr=state.journal[state.date];if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':'Add a line to your journal'}</button>`;const reflect='';
+  const jr=state.journal[state.date],fl=(state.feel||{})[state.date];if(s==='done')hero+=`<div class="feel"><p class="feelq">${fl?'Today felt '+fl+'.':'How did it feel?'}</p><div class="chips" role="group" aria-label="How did it feel?">${FEELS.map(f=>`<button class="chip" data-feel="${f}" aria-pressed="${fl===f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}</div></div>`;if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':s==='done'&&state.todayCard?'Add a line, and ink today’s Forgeling':'Add a line to your journal'}</button>`;const reflect='';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}<div class="group">${rows.join('')}</div>
     <div class="row" style="margin:0 2px 14px"><div class="dots" aria-label="This week">${weekDots()}</div><span class="muted small">${done} ${done===1?'day':'days'} showed up</span></div>
@@ -1650,7 +1657,7 @@ function feedbackForReport(){
 
 function pilotReport(){
   const H=state.history,done=H.filter(h=>h.status==='done').length,rest=H.filter(h=>h.status==='rest').length,miss=H.filter(h=>h.status==='skipped').length;
-  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
+  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nLines written: ${linesWritten()}\nFeelings noted: ${Object.keys(state.feel||{}).length}\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
 }
 function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
@@ -2886,7 +2893,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=41;
+const SEEN_V=42;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -2909,13 +2916,57 @@ function openMargin(){
 function saveJournal(text){
   const t=text.trim();
   if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};
+  {const c=state.status==='done'&&state.todayCard?cardById(state.todayCard):null;if(c&&c.date===state.date){if(t)c.ink=t.slice(0,200);else delete c.ink;}}
   save();
 }
+const FEELS=['easy','good','hard'];
+const INKDROP='<svg class="pi inkdrop" viewBox="0 0 6 8" width="6" height="8" aria-label="Ink-touched" role="img"><path fill="#B9A6FF" d="M2 0h2v2h-2zM1 2h4v2h-4zM0 4h6v3h-6zM1 7h4v1h-4z"/></svg>';
+const linesWritten=()=>Object.values(state.journal||{}).filter(j=>j&&j.text).length;
+const BOOK_AT=[1,10,30,60,100];
+function favRealm(){const n=[0,0,0,0,0];state.cards.forEach(c=>{if(c.theme>=0&&c.theme<5)n[c.theme]++;});return n.indexOf(Math.max(...n));}
+function bookSVG(L){
+  const tier=BOOK_AT.filter(x=>L>=x).length,leather=['#3E7A4A','#A4471F','#2F5F8A','#5F7FA0','#5B3F8E'][favRealm()],cov=tier>=2?leather:'#7C7090',edge=tier>=5?'#FFD36B':'#F4ECD8';
+  return `<svg class="pi book" viewBox="0 0 30 38" width="90" height="114" role="img" aria-label="Your book${tier>=2?', bound in leather':''}${tier>=3?', with a ribbon':''}${tier>=5?', gold edges and a clasp':''}">
+    <path fill="#1A1430" d="M3 1h24v1h1v34h-1v1h-24v-1h-1v-34h1z"/><path fill="${edge}" d="M25 3h2v32h-2z"/><path fill="${cov}" d="M3 2h22v34h-22z"/><path fill="rgba(0,0,0,.25)" d="M3 2h3v34h-3z"/>
+    <path fill="rgba(255,255,255,.18)" d="M8 8h14v1h-14zM8 29h14v1h-14z"/><path fill="${tier>=2?'#FFD36B':'#E9E2F4'}" d="M10 12h10v1h-10zM11 14h8v1h-8zM12 16h6v1h-6z"/>
+    ${tier>=3?'<path fill="#D9475A" d="M19 0h2v6h-1v-1h-1zM19 36h2v2h-2z"/>':''}${tier>=5?'<path fill="#FFD36B" d="M23 17h4v4h-4z"/><path fill="#C98A12" d="M24 18h2v2h-2z"/>':''}</svg>`;
+}
+function bookHTML(){
+  const L=linesWritten(),nx=BOOK_AT.find(x=>L<x),nxt={1:'Your first line gives it a cover.',10:'At 10 lines, it is bound in leather.',30:'At 30, it gets a ribbon that opens to an old line.',60:'At 60, someone will come to the fire to read with you.',100:'At 100, gold edges and a clasp.'}[nx]||'Every line from here is just for you.';
+  return `<div class="panel-box bookp"><div class="bookrow">${bookSVG(L)}<div><h2>Your book</h2><p class="muted small">${L?`${L} ${L===1?'line':'lines'} written. Every line counts, whenever you write it.`:'Nothing written yet. Writing is never needed, and every line counts whenever you write it.'}</p><p class="muted small">${nxt}</p>${L>=30?'<button class="outline" id="bookRibbon" style="margin-top:6px">Open to an old line</button>':''}</div></div></div>`;
+}
+const MONTHS_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const ORD=['first','second','third','fourth','fifth','sixth'];
+const timesW=n=>n===1?'once':n===2?'twice':`on ${n} days`;
+function monthWords(ym){
+  const inM=k=>typeof k==='string'&&k.slice(0,7)===ym,hs=state.history.filter(h=>h&&inM(h.date));
+  const seen=new Set(),done=hs.filter(h=>h.status==='done'&&!seen.has(h.date)&&seen.add(h.date)).length,rest=hs.filter(h=>h.status==='rest').length;
+  const fe=Object.keys(state.feel||{}).filter(inM),cnt={easy:0,good:0,hard:0};fe.forEach(k=>cnt[state.feel[k]]++);
+  const lines=Object.keys(state.journal||{}).filter(k=>inM(k)&&state.journal[k].text).length;
+  if(!done&&!rest&&!fe.length&&!lines)return '';
+  const mn=MONTHS_L[+ym.slice(5,7)-1],out=[];
+  out.push(`In ${mn} you showed up on ${done} ${done===1?'day':'days'}${rest?`, and rested on ${rest}`:''}.`);
+  (state.owns||[]).forEach(o=>{const n=o.days.filter(inM).length;if(n)out.push(`You did “${esc(o.text)}” ${timesW(n)}.`);});
+  if(fe.length>=3){const top=['good','easy','hard'].sort((a,b)=>cnt[b]-cnt[a])[0];out.push(top==='hard'?'A lot of it was hard, and you did it anyway.':`Most days felt ${top}.`);
+    if(cnt.hard>=2){const wk=[0,0,0,0,0,0];fe.forEach(k=>{if(state.feel[k]==='hard')wk[Math.floor((+k.slice(8,10)-1)/7)]++;});out.push(`Your hardest week was the ${ORD[wk.indexOf(Math.max(...wk))]}.`);}}
+  if(lines)out.push(`You wrote ${lines} ${lines===1?'line':'lines'} in your book.`);
+  return out.join(' ');
+}
+function monthHTML(){
+  const k=todayKey(),cur=k.slice(0,7),d=new Date(k+'T00:00:00');d.setDate(1);d.setMonth(d.getMonth()-1);const prev=dkey(d).slice(0,7);
+  const a=monthWords(cur),p=monthWords(prev);if(!a&&!p)return '';
+  return `<div class="panel-box"><h2>Your month in words</h2>${a?`<p>${a}</p>`:''}${p?`<details class="more"><summary>${MONTHS_L[+prev.slice(5,7)-1]}</summary><p style="margin:4px 0 8px">${p}</p></details>`:''}</div>`;
+}
+function openRibbon(){
+  const ks=Object.keys(state.journal).filter(k=>state.journal[k].text&&k!==state.date);if(!ks.length){toast('Your book opens to today. Older lines will be here.');return;}
+  const k=ks[Math.floor(Math.random()*ks.length)],e=state.journal[k];
+  openSheet(`<p class="muted center small">The ribbon falls open at</p><h2 class="center">${esc(dateLabel(k))}</h2><p class="mine" style="margin:12px 0">“${esc(e.text)}”</p>${(state.feel||{})[k]?`<p class="muted small center">It felt ${state.feel[k]} that day.</p>`:''}<div class="stack"><button class="primary" data-close>Close the book</button></div>`);
+}
 function journalHTML(){
-  const ks=Object.keys(state.journal).sort().reverse();
+  const ks=[...new Set(Object.keys(state.journal).concat(Object.keys(state.feel||{})))].sort().reverse();
   if(!ks.length)return '<p class="muted">Your journal starts with the first question you answer on the Today screen. It stays on this device.</p>';
-  return '<p class="muted small" style="margin-bottom:8px">Private. Only on this device.</p>'+ks.slice(0,40).map(k=>{const e=state.journal[k],V=VECTORS[e.v];
-    return `<div class="calling" style="--rc:${V.color}"><div class="row" style="margin:0"><b>${V.name}</b><span class="muted small">${esc(dateLabel(k))}</span></div><p class="muted small" style="margin:4px 0">${esc(V.question)}</p><p class="mine">\u201C${esc(e.text)}\u201D</p>${e.reply?`<p class="later">${LATER[e.reply]}</p>`:''}</div>`;}).join('');
+  return '<p class="muted small" style="margin-bottom:8px">Private. Only on this device.</p>'+ks.slice(0,40).map(k=>{const e=state.journal[k],h=state.history.find(x=>x.date===k),vv=e&&VECTORS[e.v]?e.v:h&&VECTORS[h.v]?h.v:0,V=VECTORS[vv],f=(state.feel||{})[k];
+    return `<div class="calling" style="--rc:${V.color}"><div class="row" style="margin:0"><b>${V.name}</b><span class="muted small">${esc(dateLabel(k))}</span></div>${e?`<p class="muted small" style="margin:4px 0">${esc(V.question)}</p><p class="mine">“${esc(e.text)}”</p>`:''}${f?`<p class="muted small feelc">Felt ${f}.</p>`:''}${e&&e.reply?`<p class="later">${LATER[e.reply]}</p>`:''}</div>`;}).join('');
 }
 function lastDays(n){const out=[];for(let i=n-1;i>=0;i--){const d=nowDate();d.setDate(d.getDate()-i);out.push(dkey(d));}return out;}
 function recapHTML(){
@@ -3050,18 +3101,18 @@ function ribbonsHTML(){
     const v=Math.min(r.g,r.f()),on=v>=r.g;
     return `<div class="rib${on?' on':''}"><div class="ico" role="img" aria-label="${on?'Earned':v+' of '+r.g}">${on?'\u2713':v+'/'+r.g}</div><div style="flex:1;min-width:0"><b>${r.name}</b><small>${r.desc}</small>${on?'':r.g<=12?`<div class="dots" aria-hidden="true">${Array.from({length:r.g},(_,i)=>`<i class="${i<v?'on':''}"></i>`).join('')}</div>`:`<span class="soft">${v} of ${r.g} so far</span>`}</div></div>`;}).join('')}</div>`;
 }
-const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
+const journeyHTML=()=>bookHTML()+monthHTML()+recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
+    <ul class="newlist"><li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
+    <li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
     <li><b>Living Sky.</b> The whole app now sits in the sky that follows your day, from bright morning to dusk to a starry night, with glowing panels, gold buttons and pixel icons. Prefer the old look? Settings, Sky, Plain.</li>
     <li><b>The Forge.</b> Every day you do your small thing earns an ember (two when you go all in), and they never fade. At the Hearth, forge spare curios and embers into charms your Forgelings can wear, a bell that rings a wanderer home, a compass that points to something unfound, and pieces for the fire. Every piece is signed by the Forgeling who helped. The Forge never takes your last copy of a curio.</li>
     <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
     <li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li>
     <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
-    <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li>
-    <li><b>Gifts for friends.</b> Send a curio to a friend from the curio shelf at the Hearth. They get a link that opens in their own Forgelings, and the curio goes on their shelf. You keep yours.</li></ul>
+    <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3580,6 +3631,7 @@ $('#view-today').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='btnOwn'){toggleOwn();return;}
   if(b.id==='btnWant'){openWant();return;}
+  if(b.dataset.feel){const f=b.dataset.feel;if(!FEELS.includes(f))return;state.feel=state.feel||{};if(state.feel[state.date]===f)delete state.feel[state.date];else{state.feel[state.date]=f;chime(0);}save();renderToday();renderChronicle();const n=$(`#view-today [data-feel="${f}"]`);if(n)n.focus({preventScroll:true});return;}
   if(b.id==='btnBackup'){openBackupNudge();return;}
   if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard')openVector();
   else if(b.id==='btnDone')startDone(false);
@@ -3611,6 +3663,7 @@ $('#view-binder').addEventListener('click',e=>{
 });
 $('#view-chronicle').addEventListener('click',e=>{
   const ins=e.target.closest('[data-insp]');if(ins){inspect(+ins.dataset.insp);return;}
+  if(e.target.closest('#bookRibbon')){openRibbon();return;}
   const rh=e.target.closest('.mphit');if(rh){const r=+rh.dataset.realm;ch.realm=ch.realm===r?null:r;renderChronicle();const f=document.querySelector('.mphit[data-realm="'+r+'"]');if(f)f.focus({preventScroll:true});return;}
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.sub){ch.sub=b.dataset.sub;ch.more=1;renderChronicle();}
