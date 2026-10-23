@@ -384,7 +384,8 @@ ul.places li b{font-weight:700}
 .art{position:relative}
 .chb{position:absolute;right:.3em;bottom:.3em;width:1.6em;height:2em;image-rendering:pixelated;filter:drop-shadow(0 .1em 0 #0A0814)}
 .mini .chb{right:.5em;bottom:.5em;width:2.4em;height:3em}
-ul.forgel li{align-items:center}ul.forgel li .fi{width:28px;height:34px;background:none}ul.forgel li.on .fi{background:none}
+ul.forgel li{align-items:center}ul.forgel li .fi{width:34px;height:42px;background:none;display:grid;place-items:center}
+ul.forgel li .fi .cimg{width:32px;height:40px}ul.forgel li.on .fi{background:none}
 ul.forgel li>span:nth-child(2){flex:1;min-width:0}ul.forgel li .chip{flex:none;margin-left:auto}
 ul.forgel li.can b{color:var(--plum)}
 /* Nav */
@@ -627,9 +628,9 @@ html.reduce .mk-ring{animation:none}
 /* ---- 0.35.1: Living Sky. The page is the sky; the interface is dark glass on it. ---- */
 :root{--step:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px))}
 .pi{shape-rendering:crispEdges}
-html:root.ls{--bg:#17152A;--surface:#1E1846;--ink:#FFF7EC;--muted:#D2C9EE;--plum:#FFD36B;--plum-ink:#2E2A47;--chip:rgba(255,255,255,.1);--line:rgba(255,244,201,.2);--bg:#120E30;--scr:#FFB067;--stamp:#3A2C2E;--stampEdge:#7A5A3A;--mpaper:#1F1B38;--mburn:rgba(0,0,0,.42);--mfog:#3D3768;--mgrain:#FFFFFF;--mrib:#2C2750;--mbleed:.4;--frame:var(--frameD);--ped:var(--pedD);--dot:var(--dotD);--glow:rgba(255,180,100,.26);--glass:rgba(20,15,48,.9);--tsh:rgba(14,10,36,.55)}
+html:root.ls{--bg:#17152A;--surface:#1E1846;--ink:#FFF7EC;--muted:#D2C9EE;--plum:#FFD36B;--plum-ink:#2E2A47;--chip:rgba(255,255,255,.1);--line:rgba(255,244,201,.2);--bg:#120E30;--scr:#FFB067;--stamp:#3A2C2E;--stampEdge:#7A5A3A;--mpaper:#1F1B38;--mburn:rgba(0,0,0,.42);--mfog:#3D3768;--mgrain:#FFFFFF;--mrib:#2C2750;--mbleed:.4;--frame:var(--frameD);--ped:var(--pedD);--dot:var(--dotD);--glow:rgba(255,180,100,.26);--glass:rgba(20,15,48,.94);--tsh:rgba(14,10,36,.55)}
 html:root.ls[data-skyink="dark"]{--ink:#17203A;--muted:#2C3850;--plum:#4A2E8C;--plum-ink:#FFFFFF;--chip:rgba(255,255,255,.55);--line:rgba(23,32,58,.28);--scr:#8A3A12;--tsh:rgba(255,255,255,.5)}
-html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.tabs,.binder,.mapwrap){--ink:#FFF7EC;--muted:#D2C9EE;--plum:#FFD36B;--plum-ink:#2E2A47;--chip:rgba(255,255,255,.1);--line:rgba(255,244,201,.2);--bg:#120E30;--scr:#FFB067;color:var(--ink)}
+html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.tabs,.binder,.mapwrap,.ov){--ink:#FFF7EC;--muted:#D2C9EE;--plum:#FFD36B;--plum-ink:#2E2A47;--chip:rgba(255,255,255,.1);--line:rgba(255,244,201,.2);--bg:#120E30;--scr:#FFB067;color:var(--ink)}
 html.ls body{background:var(--bg)}
 html.ls .panel-box,html.ls .group,html.ls .hero,html.ls .setblock{background:var(--dot) 0 0/8px 8px repeat,var(--glass) !important;background-clip:padding-box !important}
 html.ls .hero:is(:has(#btnShowToday),:has(#btnTurn),:has(#btnShowFav)){background:var(--ped) center 192px/176px 22px no-repeat,radial-gradient(circle at 50% 104px,var(--glow) 0,transparent 128px),var(--dot) 0 0/8px 8px repeat,var(--glass) !important;background-clip:padding-box !important}
@@ -637,7 +638,7 @@ html.ls .sheet{background:var(--dot) 0 0/8px 8px repeat,#1E1846;border-radius:0;
 html.ls .binder{background:var(--glass);border-radius:0;clip-path:var(--step)}
 html.ls .top h1{font:400 46px/.9 var(--px2);letter-spacing:.5px;text-shadow:0 3px 0 var(--tsh)}
 html.ls .top #dateLabel{font-weight:700;margin-top:4px}
-html.ls .hmsg{font:400 22px/1.1 var(--px2);font-style:normal;color:var(--plum);text-shadow:0 2px 0 var(--tsh)}
+html.ls .hmsg{font:400 20px/1.15 var(--px2);font-style:normal;color:var(--plum);text-shadow:0 2px 0 var(--tsh)}
 html.ls .primary{border-radius:0;clip-path:var(--step);background:linear-gradient(to top,#C98A12 0 5px,#FFD36B 5px);color:#2E2A47;padding:14px 22px 19px}
 html.ls .primary:active{transform:none;background:linear-gradient(to top,#C98A12 0 2px,#FFD36B 2px);padding:17px 22px 16px}
 html.ls .outline{border:0;border-radius:0;clip-path:var(--step);box-shadow:inset 0 0 0 2px var(--plum);padding:14px 18px}
@@ -1086,7 +1087,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.35.2',APPVER='1.0.0';
+const VERSION='prototype 0.35.3',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1484,8 +1485,8 @@ function packSVG(){
   return `<svg viewBox="0 0 160 230" aria-hidden="true"><defs><linearGradient id="pkg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C68D6"/><stop offset="1" stop-color="#3F2F86"/></linearGradient></defs>
     <path d="${d}" fill="url(#pkg)" stroke="#FFD36B" stroke-width="2" stroke-linejoin="round"/><path d="M14 40H146" stroke="#FFD36B" stroke-width="2" stroke-dasharray="3 5" opacity=".7"/>
     <g transform="translate(53 60) scale(3)" shape-rendering="crispEdges"><g fill="#6E2228"><path d="M9 0h1v1h-1zm-1 1h1v1h-1zm2 0h1v1h-1zm-2 1h1v1h-1zm2 0h1v1h-1zm-3 1h1v1h-1zm3 0h1v1h-1zm-7 1h1v1h-1zm4 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm-12 1h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm-13 1h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm-13 1h1v1h-1zm3 0h1v1h-1zm7 0h1v1h-1zm3 0h1v1h-1zm-13 1h1v1h-1zm13 0h1v1h-1zm-13 1h1v1h-1zm13 0h1v1h-1zm-12 1h1v1h-1zm11 0h1v1h-1zm-11 1h1v1h-1zm11 0h1v1h-1zm-10 1h1v1h-1zm9 0h1v1h-1zm-8 1h2v1h-2zm6 0h2v1h-2z"/></g><g fill="#FFD66A"><path d="M9 1h1v1h-1zm0 1h1v1h-1zm-1 1h2v1h-2zm0 1h3v1h-3zm-1 1h2v1h-2zm3 0h1v1h-1zm-3 1h1v1h-1zm3 0h1v1h-1zm-4 1h2v1h-2zm4 0h2v1h-2zm-4 1h2v1h-2zm4 0h2v1h-2zm-4 1h6v1h-6zm2 1h2v1h-2z"/></g><g fill="#FF8A2E"><path d="M3 5h1v1h-1zm11 0h1v1h-1zm-11 1h1v1h-1zm11 0h1v1h-1zm-11 1h2v1h-2zm10 0h2v1h-2zm-9 1h2v1h-2zm8 0h2v1h-2zm-8 1h2v1h-2zm8 0h2v1h-2zm-7 1h3v1h-3zm5 0h3v1h-3zm-4 1h6v1h-6zm2 1h2v1h-2z"/></g><g fill="#FFF6CF"><path d="M9 5h1v1h-1zm-1 1h2v1h-2zm0 1h2v1h-2zm0 1h2v1h-2z"/></g><g fill="#E5441E"><path d="M3 8h1v1h-1zm11 0h1v1h-1zm-11 1h1v1h-1zm11 0h1v1h-1zm-10 1h1v1h-1zm9 0h1v1h-1zm-9 1h2v1h-2zm8 0h2v1h-2zm-7 1h3v1h-3zm5 0h3v1h-3zm-3 1h4v1h-4z"/></g><g fill="#462E1E"><path d="M3 14h12v1h-12zm-1 1h1v1h-1zm13 0h1v1h-1zm-12 1h12v1h-12z"/></g><g fill="#7A5434"><path d="M3 15h12v1h-12z"/></g></g>
-    <text x="80" y="172" text-anchor="middle" font-family="Press Start 2P,monospace" font-size="15" fill="#fff">FORGE</text>
-    <text x="80" y="196" text-anchor="middle" font-family="VT323,monospace" font-size="17" fill="#E7E0FF">5 pixel Forgelings</text></svg>`;
+    <text x="80" y="172" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="11" fill="#fff">FORGELINGS</text>
+    <text x="80" y="196" text-anchor="middle" font-family="'VT323',monospace" font-size="17" fill="#E7E0FF">5 pixel Forgelings</text></svg>`;
 }
 function openPack(){
   if(state.packs<1)return;state.packs--;state.packsOpened++;
@@ -1495,7 +1496,7 @@ function openPack(){
 }
 function drawPack(){
   let body='';
-  if(pk.step==='sealed')body=`<p class="rv-title">Your pack is ready</p><button class="packbtn" id="packTear" aria-label="FORGE 5 pixel Forgelings. Tear open the pack">${packSVG()}</button><p class="rv-hint">Tap the pack to tear it open</p>`;
+  if(pk.step==='sealed')body=`<p class="rv-title">Your pack is ready</p><button class="packbtn" id="packTear" aria-label="FORGELINGS 5 pixel Forgelings. Tear open the pack">${packSVG()}</button><p class="rv-hint">Tap the pack to tear it open</p>`;
   else if(pk.step==='card'){const c=pk.cards[pk.i];body=`<p class="rv-title">Card ${pk.i+1} of 5</p><div class="stage" id="stage">${cardHTML(c,{w:bigW(),cover:true})}</div><p class="rv-hint" id="rvHint">Tap the card to turn it over</p><button class="primary" id="packNext" hidden>${pk.i<4?'Next card':'See all five'}</button>`;}
   else{const w=Math.min(104,(vw()-36-24)/3);body=`<p class="rv-title">Pack pulled</p><div class="sumgrid">${pk.cards.map(c=>cardHTML(c,{w,mini:true})).join('')}</div><p class="rv-hint">Open any Forgeling in your binder to give it a name and a tale.</p><button class="primary" id="packDone">Open my binder</button>`;}
   openOverlay(body,false);
@@ -3422,7 +3423,7 @@ function shareCanvas(c){
   x.fillStyle='#EDE3F2';x.font='400 27px "Nunito Sans", sans-serif';wrap(found,600).slice(0,3).forEach(l=>{y+=40;x.fillText(l,W/2,y);});
   let when='';try{when=new Date(c.date+'T00:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});}catch(e){}
   if(when){y+=38;x.fillStyle='#B9A9C9';x.font='400 22px "Nunito Sans", sans-serif';x.fillText(when,W/2,y);}
-  x.fillStyle='#FFD36B';x.font='22px "Press Start 2P", monospace';x.fillText('FORGE',W/2,H-72);
+  x.fillStyle='#FFD36B';x.font='18px "Press Start 2P", monospace';x.fillText('FORGELINGS',W/2,H-72);
   x.fillStyle='#B9A9C9';x.font='400 20px "Nunito Sans", sans-serif';x.fillText('Every Forgeling is one of a kind',W/2,H-40);
   return cv;
 }
@@ -3674,7 +3675,7 @@ function drawSky(force){
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const f=y/H*NB;let bi=Math.floor(f);if(f-bi>(BAY[(y&3)*4+(x&3)]+.5)/16)bi++;const t=Math.min(1,bi/NB),o=(y*W+x)*4;d[o]=lerp(s0[0],s1[0],t);d[o+1]=lerp(s0[1],s1[1],t);d[o+2]=lerp(s0[2],s1[2],t);d[o+3]=255;}
   const r=mulberry32(4242);
   if(P.st)for(let i=0,n=Math.round(W*H/300);i<n;i++){const x=r()*W,y=r()*H*.62;if(y<H*.11&&x<W*.62)continue;put(x,y,P.st);if(x>W*.62&&r()<.18){put(x+1,y,P.st);put(x-1,y,P.st);put(x,y+1,P.st);put(x,y-1,P.st);}}
-  if(P.orb){const cx=W-15,cy=Math.round(H*.17),R=ph==='day'?5:4;for(let y=-R;y<=R;y++)for(let x=-R;x<=R;x++)if(x*x+y*y<=R*R+1)put(cx+x,cy+y,P.orb);if(ph==='night')for(let y=-R;y<=R;y++)for(let x=-R;x<=R;x++)if((x+2)*(x+2)+(y-1)*(y-1)<=R*R-2)put(cx+x+2,cy+y-1,P.s[0]);}
+  if(P.orb){const cx=W-15,cy=Math.round(H*.17),R=5;for(let y=-R;y<=R;y++)for(let x=-R;x<=R;x++)if(x*x+y*y<=R*R+1&&!(ph==='night'&&(x-2)*(x-2)+(y+1)*(y+1)<=R*R-4))put(cx+x,cy+y,P.orb);}
   for(let x=0;x<W;x++){const t=Math.round(H*.81+3*Math.sin(x*.11+1)+2*Math.sin(x*.27));for(let y=t;y<H;y++)put(x,y,P.h[0]);}
   for(let x=0;x<W;x++){const t=Math.round(H*.875+2.5*Math.sin(x*.08+3)+1.5*Math.sin(x*.31));for(let y=t;y<H;y++)put(x,y,P.h[1]);}
   ctx.putImageData(img,0,0);
@@ -3806,11 +3807,11 @@ function furnDraw(put,fs,dim){
 
 /* ---- 0.35: the Forge. Embers from the days you show up, spares from wandering, forged into signed pieces. ---- */
 const FORGE_R=[
- {id:'charm0',kind:'Keepsake',name:'Charm of Meadow',ti:0,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
- {id:'charm1',kind:'Keepsake',name:'Charm of Ember',ti:1,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
- {id:'charm2',kind:'Keepsake',name:'Charm of Tide',ti:2,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
- {id:'charm3',kind:'Keepsake',name:'Charm of Frost',ti:3,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
- {id:'charm4',kind:'Keepsake',name:'Charm of Dusk',ti:4,sp:2,emb:2,what:'A charm any Forgeling can wear. It shows by the fire and in the corner of the card.'},
+ {id:'charm0',kind:'Keepsake',name:'Charm of Meadow',ti:0,sp:2,emb:2,what:''},
+ {id:'charm1',kind:'Keepsake',name:'Charm of Ember',ti:1,sp:2,emb:2,what:''},
+ {id:'charm2',kind:'Keepsake',name:'Charm of Tide',ti:2,sp:2,emb:2,what:''},
+ {id:'charm3',kind:'Keepsake',name:'Charm of Frost',ti:3,sp:2,emb:2,what:''},
+ {id:'charm4',kind:'Keepsake',name:'Charm of Dusk',ti:4,sp:2,emb:2,what:''},
  {id:'bell',kind:'Tool',name:'Wanderer’s bell',sp:2,emb:3,what:'Once a day, rings a wanderer home early.'},
  {id:'compass',kind:'Tool',name:'Compass',sp:3,emb:4,what:'Once a day, the needle settles toward a realm that still holds something unfound.'},
  {id:'kettle',kind:'Hearth',name:'A copper kettle',sp:2,emb:2,what:'Sits by the fire for good.'},
@@ -3842,17 +3843,18 @@ const charmKeeps=()=>FORGE_R.filter(r=>r.ti!==undefined&&fgMade(r.id)).map(r=>({
 const charmOf=c=>{const m=c&&/^charm([0-4])$/.exec(c.keep||'');return m?FORGE_R.find(r=>r.id===c.keep):null;};
 function spareList(ti){return CURIOS.filter(x=>(ti===undefined||CREALM[x.id]===ti)&&state.curios[x.id]&&state.curios[x.id].n>1).map(x=>({id:x.id,name:x.name,n:state.curios[x.id].n-1})).sort((a,b)=>b.n-a.n);}
 const spareTotal=ti=>spareList(ti).reduce((s,x)=>s+x.n,0);
+const FG_KIND={Keepsake:'Charms can be worn by any Forgeling, by the fire and on its card.'};
 function fgCan(r){return !fgMade(r.id)&&embers()>=r.emb&&spareTotal(r.ti)>=r.sp;}
 function fgNeeds(r){const sp=spareTotal(r.ti),e=embers(),rn=r.ti!==undefined?THEMES[r.ti].name+' ':'';
-  return `Needs ${r.sp} ${rn}${r.sp===1?'spare':'spares'} and ${r.emb} embers. You have ${sp} ${rn}${sp===1?'spare':'spares'} and ${e} ${e===1?'ember':'embers'}.`;}
+  return `Needs ${r.sp} ${rn}${r.sp===1?'spare':'spares'} and ${r.emb} embers (you have ${sp} and ${e}).`;}
 function fgSmith(){const cs=slotCards(),c=cs[Math.min(hf.sel,cs.length-1)],out=wOut()?state.wander.id:-1;if(c&&c.id!==out)return c;return cs.find(x=>x.id!==out)||c||null;}
 function openForge(){
   const f=fgState(),s=fgSmith(),e=embers(),sp=spareTotal(),made=f.made.length;
   const rows=FORGE_R.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id];
-    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,20)}</span><span><b>${esc(r.name)}</b><small>${r.kind}. ${esc(r.what)}</small><small>${ok?`Forged by ${esc(L?L.by:'a Forgeling')}, ${esc(L?dateLabel(L.at):'')}.`:esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
+    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,30)}</span><span><b>${esc(r.name)}</b><small>${r.what?r.kind+'. '+esc(r.what):r.kind}</small><small>${ok?`Forged by ${esc(L?L.by:'a Forgeling')}, ${esc(L?dateLabel(L.at):'')}.`:esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
   openSheet(`<h2>The Forge</h2><p class="muted small">${e} ${e===1?'ember':'embers'} and ${sp} spare ${sp===1?'curio':'curios'}. ${made} of ${FORGE_R.length} pieces made.${s?` Whoever helps signs the piece. Today that is ${esc(s.nick||s.name)}.`:' Seat a Forgeling by the fire to help.'}</p>
     <p class="muted small">Embers come from the days you do your small thing, two on days you go all in, and they never fade. Spares are extra copies of a curio. The Forge never takes your last one, and nothing here is ever sold.</p>
-    <ul class="furn forgel">${rows}</ul>
+    <p class="muted small" style="margin-top:6px">${esc(FG_KIND.Keepsake)}</p><ul class="furn forgel">${rows}</ul>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Close</button></div>`);
 }
 function fgMake(id){
@@ -3861,7 +3863,7 @@ function fgMake(id){
   const sl=spareList(r.ti);for(let guard=0;need>0&&guard<40;guard++)sl.forEach(x=>{if(need>0&&state.curios[x.id].n>1){state.curios[x.id].n--;need--;used.push(x.name.toLowerCase());}});
   f.spent=(f.spent||0)+r.emb;f.made.push(r.id);f.log[r.id]={by:s.nick||s.name,at:todayKey(),used};
   if(r.kind==='Hearth'){hbg=null;}
-  save();sfx('save');chime(2);hf.msg=`Forged with ${s.nick||s.name}: ${r.name.toLowerCase()}.`;renderHearth();renderToday();
+  save();sfx('save');chime(2);hf.msg=`Forged with ${s.nick||s.name}: ${/^An? /.test(r.name)?r.name[0].toLowerCase()+r.name.slice(1):r.name}.`;renderHearth();renderToday();
   const cnt={};used.forEach(u=>cnt[u]=(cnt[u]||0)+1);const ul=Object.keys(cnt).map(k=>cnt[k]>1?`${k} ×${cnt[k]}`:k).join(', ');
   openSheet(`<p class="muted center small">Hot from the Forge</p><div class="cbig">${fgImg(r.id,90,{cls:'cpop',alt:r.name})}</div><h2 class="center">${esc(r.name)}</h2>
     <p class="center">Forged by ${esc(s.nick||s.name)}, ${esc(dateLabel(todayKey()))}.</p><p class="muted small center">Made with ${esc(ul)} and ${r.emb} embers. ${r.kind==='Hearth'?'It is by the fire now.':r.id==='bell'?'It hangs by the Wander path.':r.id==='compass'?'It sits on the Forge panel.':''}</p>
