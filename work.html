@@ -1203,7 +1203,7 @@ function sanitize(s){
   s.cards=s.cards.filter(c=>c&&typeof c==='object'&&Number.isFinite(c.id)&&!seenId.has(c.id)&&seenId.add(c.id)).map(c=>{
     c.seed=Number.isFinite(c.seed)?c.seed:Math.abs(Math.round(c.id*2654435761))%2147483647;
     c.v=int(c.v,0,VECTORS.length-1,0);c.theme=int(c.theme,0,THEMES.length-1,0);c.rarity=int(c.rarity,0,4,0);c.dark=!!c.dark;
-    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);c.ink=str(c.ink,'').slice(0,200);
+    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}
     c.bond=Math.max(0,num(c.bond,0));c.wi=num(c.wi,Math.abs(c.seed)%1000);c.serial=num(c.serial,1);c.dayN=num(c.dayN,1);
     c.date=str(c.date,dkey(new Date()));c.dateLabel=str(c.dateLabel,'');c.source=str(c.source,'daily');
     if(!Array.isArray(c.stats)||c.stats.length!==3||c.stats.some(x=>typeof x!=='number'))c.stats=statsFor(c.seed,c.rarity);

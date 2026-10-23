@@ -73,7 +73,7 @@ with sync_playwright() as p:
     bad+=["journal: "+v for v in axe(pg)]
     # damaged
     s=st(pg); s["feel"]={"x":"good","2026-01-01":"meh","2026-01-02":"hard"}; s["cards"][0]["ink"]=7; load(pg,s); s=st(pg)
-    rec("Damaged","broken feelings and ink are repaired",s["feel"]=={"2026-01-02":"hard"} and s["cards"][0]["ink"]=="" and not pg._errs,s["feel"])
+    rec("Damaged","broken feelings and ink are repaired",s["feel"]=={"2026-01-02":"hard"} and not s["cards"][0].get("ink") and all("ink" not in c for c in s["cards"][1:] if not c.get("ink")) and not pg._errs,s["feel"])
     s=st(pg); s["cards"][0]["ink"]="<img src=x onerror=alert(1)>"; load(pg,s); tabto(pg,"binder"); pg.evaluate(f"()=>{{const e=document.querySelector('#view-binder .card[data-cid=\"{s['cards'][0]['id']}\"]');e&&e.click()}}"); pg.wait_for_timeout(700)
     pg.evaluate("document.getElementById('inspFlip').click()"); pg.wait_for_timeout(700)
     rec("Safe","ink lines show as text, never markup",pg.locator("#stage .cbk img").count()==0 and "<img src=x" in pg.inner_text("#stage .cbk"))

@@ -20,7 +20,7 @@ def rep(old, new, count=1):
 rep("want:[],wantAsked:false,owns:[],todayOwn:null,", "want:[],wantAsked:false,owns:[],todayOwn:null,feel:{},")
 rep("Object.keys(s.journal).forEach", r"""{const f=s.feel&&typeof s.feel==='object'&&!Array.isArray(s.feel)?s.feel:{},ok={};Object.keys(f).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)&&['easy','good','hard'].includes(f[k])).sort().slice(-800).forEach(k=>ok[k]=f[k]);s.feel=ok;}
   Object.keys(s.journal).forEach""")
-rep("c.own=str(c.own,'').slice(0,60);", "c.own=str(c.own,'').slice(0,60);c.ink=str(c.ink,'').slice(0,200);")
+rep("c.own=str(c.own,'').slice(0,60);", "c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}")
 
 # ---- How did it feel?, on Today after a done day; the line link now promises ink ----
 rep("  const jr=state.journal[state.date];if(s==='done'||s==='rest')hero+=`<button class=\"ghost marginlink\" id=\"btnMargin\">${jr?'Edit today’s line':'Add a line to your journal'}</button>`;",
