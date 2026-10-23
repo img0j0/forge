@@ -2,7 +2,8 @@ from lib import *
 # 0.18.1: the living sky. Colours per time of day and theme, the Sky setting, live changes, damaged settings.
 FAKE="""(()=>{const R=Date;let off=+(sessionStorage.getItem('__off')||localStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
 class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"""
-TOP={("light","dawn"):"#F5E2EC",("light","day"):"#DCEFFA",("light","dusk"):"#E6DCF6",("light","night"):"#D8D9F1",
+# 0.35.1 (Living Sky): the Light sky is now vivid (SKYV), so its top colours changed.
+TOP={("light","dawn"):"#F4B7A6",("light","day"):"#8FD3F2",("light","dusk"):"#3F357F",("light","night"):"#0B0F2A",
      ("dark","dawn"):"#1C1630",("dark","day"):"#122039",("dark","dusk"):"#191533",("dark","night"):"#0B0E26"}
 def hexrgb(h): return [int(h[i:i+2],16) for i in (1,3,5)]
 def top(pg): return pg.evaluate("()=>{const c=document.getElementById('skyCv');if(!c||c.hidden)return null;return [...c.getContext('2d').getImageData(0,0,1,1).data.slice(0,3)]}")
