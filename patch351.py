@@ -44,6 +44,9 @@ html.ls .hearthwrap{border:0;border-radius:0;clip-path:var(--step)}
 html.ls .mapwrap{border-radius:0;clip-path:var(--step);border:0;box-shadow:none}
 html.ls .act{border-radius:0;clip-path:var(--step);border:0;box-shadow:inset 0 0 0 2px var(--plum);background:rgba(255,255,255,.04)}
 html.ls .pip{border-radius:0}
+html.ls :is(.rib,.chron,.realm,.calling,.mecho,.otale),html.ls #view-chronicle .cal span.c{%(INK)s;color:var(--ink)}
+html.ls :is(.rib,.chron,.realm,.calling,.mecho,.otale){background-color:var(--glass);border-radius:0;clip-path:var(--step)}
+html.ls #view-chronicle .cal span.c:not(.done){background-color:var(--glass)}
 html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .inkm{color:#FFD36B}
 html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .mine{color:#FFE9A8;background:rgba(255,211,107,.12)}
 html.ls :is(.primary,.outline,.chip,.fchip,.pill,.moodbtn,.tool,.act,.binder button):focus-visible{outline:none;box-shadow:inset 0 0 0 3px #FFFFFF,inset 0 0 0 5px #2E2A47}
