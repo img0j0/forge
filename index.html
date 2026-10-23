@@ -389,6 +389,10 @@ ul.forgel li .fi .cimg{width:32px;height:40px}ul.forgel li.on .fi{background:non
 ul.forgel li>span:nth-child(2){flex:1;min-width:0}ul.forgel li .chip{flex:none;margin-left:auto}
 ul.forgel li.can b{color:var(--plum)}
 .hero .marginlink{margin-top:2px}
+.pen{vertical-align:-2px;margin-right:6px}
+.ownitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.ownitem .ot{min-width:0}.ownitem .ot b{font-weight:700}.ownitem .ot small{display:block;color:var(--muted);font-size:13px;margin-left:20px}
+h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -657,8 +661,8 @@ html.ls :is(.rib,.chron,.realm,.calling,.mecho,.otale){background-color:var(--gl
 html.ls #view-chronicle .cal span.c:not(.done){background-color:var(--glass)}
 html.ls[data-skyink="dark"] .inkm{color:#5A3A00}
 html.ls[data-skyink="dark"] .mine{color:#4A3000}
-html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .inkm{color:#FFD36B}
-html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap) .mine{color:#FFE9A8;background:rgba(255,211,107,.12)}
+html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .inkm{color:#FFD36B}
+html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .mine{color:#FFE9A8;background:rgba(255,211,107,.12)}
 html.ls :is(.primary,.outline,.chip,.fchip,.pill,.moodbtn,.tool,.act,.binder button):focus-visible{outline:none;box-shadow:inset 0 0 0 3px #FFFFFF,inset 0 0 0 5px #2E2A47}
 html.ls .tabs{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:440px;margin:0 auto;padding:7px 4px 6px;background:rgba(16,12,40,.95);border:0;clip-path:var(--step)}
 html.ls .tab{color:var(--muted)}
@@ -723,6 +727,9 @@ const VECTORS=[
   {name:'Presence',ability:'Right Here',color:'#BDE5CB',blurb:'Be fully where you are.',task:`Put your phone away for one whole meal or walk.`,question:`What is here right now that I'm missing?`}
 ];
 /* 0.24: more ways to say each calling, so the daily card stays fresh. The original phrasing is one of them. */
+/* 0.36: what you want more of. v = the callings it leans toward, t = the realm your own things of this kind lean to. */
+const WANTS=[{n:'Moving',v:[11,6,5],t:0},{n:'Calm',v:[8,11],t:2},{n:'Connection',v:[4,9],t:1},{n:'Making things',v:[7,3,6],t:1},
+  {n:'Focus',v:[2,1,0],t:3},{n:'Rest',v:[8,6,11],t:4},{n:'Learning',v:[2,7,10],t:3},{n:'Order',v:[10,0],t:2}];
 const TASK_ALT=[
  [`Pick one thing on your plate and decide you won't do it.`,`Clear one small space: a drawer, a desktop or an inbox folder.`,`Say no to one thing that doesn't need a yes.`],
  [`Do first the one thing that would make today feel done.`,`Find the task that unblocks someone else, and do it.`,`Spend ten minutes setting up tomorrow so it starts easier.`],
@@ -1088,7 +1095,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.35.4',APPVER='1.0.0';
+const VERSION='prototype 0.36.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1167,8 +1174,21 @@ const todayKey=()=>dkey(nowDate());
 const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+function wantVs(){return [...new Set((state.want||[]).flatMap(k=>WANTS[k]?WANTS[k].v:[]))];}
+function todayOwnObj(){return state.todayOwn!=null?(state.owns||[]).find(o=>o.id===state.todayOwn)||null:null;}
+function pickToday(avoid){
+  const mode=(state.settings&&state.settings.ownMix)||'mix',ow=(state.owns||[]).filter(o=>o&&o.text);state.todayOwn=null;
+  if(ow.length&&mode!=='surprise'&&Math.random()<(mode==='mine'?.8:.5)){
+    const last=(state.history.filter(h=>h&&h.status==='done').slice(-1)[0]||{}).own,pool=ow.length>1?ow.filter(o=>o.id!==last):ow,o=pool[rand(pool.length)];state.todayOwn=o.id;
+    const vs=o.k>=0?WANTS[o.k].v:wantVs(),p=vs.filter(v=>!avoid.includes(v));if(p.length)return p[rand(p.length)];if(vs.length)return vs[rand(vs.length)];return pickVector(avoid);}
+  const lean=wantVs().filter(v=>!avoid.includes(v));if(lean.length&&Math.random()<2/3)return lean[rand(lean.length)];
+  return pickVector(avoid);
+}
+function todayTask(){const o=todayOwnObj();return o?o.text:taskFor(state.todayV,state.date);}
+function todayBand(){const o=todayOwnObj();return o?(o.k>=0?'Yours · '+WANTS[o.k].n:'Yours'):VECTORS[state.todayV].name;}
+const PEN='<svg class="pi pen" viewBox="0 0 12 12" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M9 1h2v2h-2zM8 3h2v1h-2zM7 4h2v1h-2zM6 5h2v1h-2zM5 6h2v1h-2zM4 7h2v1h-2zM3 8h2v1h-2zM2 9h2v1h-2zM1 10h2v1h-2z"/></svg>';
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
-function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
+function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto',ownMix:'mix'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},want:[],wantAsked:false,owns:[],todayOwn:null,forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 function sanitize(s){
@@ -1179,7 +1199,7 @@ function sanitize(s){
   s.cards=s.cards.filter(c=>c&&typeof c==='object'&&Number.isFinite(c.id)&&!seenId.has(c.id)&&seenId.add(c.id)).map(c=>{
     c.seed=Number.isFinite(c.seed)?c.seed:Math.abs(Math.round(c.id*2654435761))%2147483647;
     c.v=int(c.v,0,VECTORS.length-1,0);c.theme=int(c.theme,0,THEMES.length-1,0);c.rarity=int(c.rarity,0,4,0);c.dark=!!c.dark;
-    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');
+    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);
     c.bond=Math.max(0,num(c.bond,0));c.wi=num(c.wi,Math.abs(c.seed)%1000);c.serial=num(c.serial,1);c.dayN=num(c.dayN,1);
     c.date=str(c.date,dkey(new Date()));c.dateLabel=str(c.dateLabel,'');c.source=str(c.source,'daily');
     if(!Array.isArray(c.stats)||c.stats.length!==3||c.stats.some(x=>typeof x!=='number'))c.stats=statsFor(c.seed,c.rarity);
@@ -1225,6 +1245,12 @@ function sanitize(s){
   {const g=s.games&&typeof s.games==='object'&&!Array.isArray(s.games)?s.games:{};const b=g.best&&typeof g.best==='object'&&!Array.isArray(g.best)?g.best:{};const ok={};['meadow','ember','tide','frost','dusk'].forEach(k=>{if(Number.isFinite(b[k])&&b[k]>0)ok[k]=Math.min(999,Math.round(b[k]));});s.games={best:ok,played:int(g.played,0,1e7,0),curioDay:typeof g.curioDay==='string'?g.curioDay:''};}
   {const o=s.own&&typeof s.own==='object'&&!Array.isArray(s.own)?s.own:{};const DK=/^\d{4}-\d{2}-\d{2}$/;s.own={text:typeof o.text==='string'?o.text.trim().slice(0,60):'',days:(Array.isArray(o.days)?o.days:[]).filter((d,i,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===i).sort().slice(-800)};
    const bk=s.backup&&typeof s.backup==='object'&&!Array.isArray(s.backup)?s.backup:{};s.backup={at:typeof bk.at==='string'&&DK.test(bk.at)?bk.at:'',ask:typeof bk.ask==='string'&&DK.test(bk.ask)?bk.ask:''};}
+  {const DK=/^\d{4}-\d{2}-\d{2}$/;s.want=(Array.isArray(s.want)?s.want:[]).filter((x,i,a)=>Number.isInteger(x)&&x>=0&&x<WANTS.length&&a.indexOf(x)===i).slice(0,3);s.wantAsked=!!s.wantAsked;
+   const ow=(Array.isArray(s.owns)?s.owns:[]).filter(o=>o&&typeof o==='object'&&typeof o.text==='string'&&o.text.trim()).slice(0,3).map((o,i)=>({id:Number.isInteger(o.id)&&o.id>0?o.id:i+1,text:o.text.trim().slice(0,60),k:Number.isInteger(o.k)&&o.k>=0&&o.k<WANTS.length?o.k:-1,days:(Array.isArray(o.days)?o.days:[]).filter((d,j,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===j).sort().slice(-800)}));
+   ow.forEach((o,i)=>{if(ow.findIndex(x=>x.id===o.id)!==i)o.id=Math.max(...ow.map(x=>x.id))+1;});
+   if(!ow.length&&s.own&&s.own.text){ow.push({id:1,text:s.own.text,k:-1,days:s.own.days.slice()});s.own={text:'',days:[]};}
+   s.owns=ow;s.todayOwn=Number.isInteger(s.todayOwn)&&ow.some(o=>o.id===s.todayOwn)?s.todayOwn:null;
+   if(s.settings&&typeof s.settings==='object'&&!['mix','mine','surprise'].includes(s.settings.ownMix))s.settings.ownMix='mix';}
   {const e=s.explore&&typeof s.explore==='object'&&!Array.isArray(s.explore)?s.explore:{};const ok={};[0,1,2,3,4].forEach(t=>{const v=e[t];if(Number.isFinite(v)&&v>0)ok[t]=Math.min(4,Math.round(v));});s.explore=ok;}
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
@@ -1243,7 +1269,7 @@ function rollover(){
   if(!['done','rest'].includes(state.status))state.history.push({date:state.date,status:'skipped',v:state.todayV});
   const d=new Date(state.date+'T00:00:00');d.setDate(d.getDate()+1);let g=0;
   while(dkey(d)<k&&g++<60){state.history.push({date:dkey(d),status:'skipped'});d.setDate(d.getDate()+1);}
-  state.date=k;state.todayV=pickVector(state.history.slice(-4).map(h=>h.v).filter(v=>v!=null).concat([state.todayV]));
+  state.date=k;state.todayV=pickToday(state.history.slice(-4).map(h=>h.v).filter(v=>v!=null).concat([state.todayV]));
   state.status='fresh';state.todayCard=null;
 }
 const cardById=id=>state.cards.find(c=>c.id===id);
@@ -1262,9 +1288,9 @@ function makeCard(o){
   const dark=o.dark!=null?o.dark:pickDark();
   const rarity=o.rarity!=null?o.rarity:rollRarity(o.weights||ODDS.daily);
   const nm=dark?[PRE_D,SUF_D]:[PRE,SUF],k=todayKey();
-  return {id:state.nextId++,seed,v:o.v!=null?o.v:rand(12),dark,rarity,theme:Math.floor(r()*THEMES.length),
+  return {id:state.nextId++,seed,v:o.v!=null?o.v:rand(12),dark,rarity,theme:(t=>o.theme!=null&&o.theme>=0&&o.theme<THEMES.length?o.theme:t)(Math.floor(r()*THEMES.length)),
     name:nm[0][Math.floor(r()*nm[0].length)]+nm[1][Math.floor(r()*nm[1].length)],stats:statsFor(seed,rarity),
-    serial:rarity>=3?1+seed%99:1+seed%999,date:k,kh:nowDate().getHours(),dayN:dayN(),dateLabel:dateLabel(k),note:'',nick:'',tale:'',wi:rand(1000),bond:0,keep:'',fire:[],allIn:!!o.allIn,source:o.source||'daily'};
+    serial:rarity>=3?1+seed%99:1+seed%999,date:k,kh:nowDate().getHours(),dayN:dayN(),dateLabel:dateLabel(k),note:'',nick:'',tale:'',wi:rand(1000),bond:0,keep:'',fire:[],allIn:!!o.allIn,source:o.source||'daily',own:o.own||''};
 }
 function cardHTML(c,o){
   o=o||{};const T=THEMES[c.theme],V=VECTORS[c.v],R=RAR[c.rarity],dk=c.dark,fs=(o.w||260)/20;CMAP[ckey(c)]=c;
@@ -1280,7 +1306,7 @@ function cardHTML(c,o){
       <div class="foot"><span>${EDITION}</span><span>No. ${pad(c.serial)}</span></div>
     </div><div class="shine"></div><div class="glare"></div></div>
     <div class="face cbk${(c.tale||c.gossip)?' dense':''}"><div class="bsp" aria-hidden="true"></div><div class="binfo">
-      <div class="m1">${c.source==='pack'?'Pulled from a pack':'Earned'} on day ${c.dayN}</div><div class="m2">${esc(c.dateLabel)}</div><div class="m2">${V.name}${c.allIn?', went all in':''}</div>${worldBack(c)}
+      <div class="m1">${c.source==='pack'?'Pulled from a pack':'Earned'} on day ${c.dayN}</div><div class="m2">${esc(c.dateLabel)}</div><div class="m2">${c.own?'Yours: '+esc(c.own):V.name}${c.allIn?', went all in':''}</div>${worldBack(c)}
       ${c.nick?`<div class="m2">Born as ${esc(c.name)}</div>`:''}${c.tale?`<div class="m3">\u201C${esc(c.tale)}\u201D</div>`:''}<div class="m4">${EDITION}, No. ${pad(c.serial)}</div></div></div>
     ${o.cover?'<div class="cover" id="cover" role="button" tabindex="0" aria-label="Turn the card over"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg></div>':''}
     </div></div>`;
@@ -1354,10 +1380,12 @@ function mEchoAnswer(c,a){
 }
 const LATER={did:'Later: you did it.',still:'Later: still on it.',let:'Later: you let it go.'};
 function earnDaily(allIn){
-  const c=makeCard({allIn,v:state.todayV,source:'daily',weights:allIn?ODDS.allIn:ODDS.daily});
+  const ow=todayOwnObj(),lt=ow&&ow.k>=0&&Math.random()<.6?WANTS[ow.k].t:null;
+  const c=makeCard({allIn,v:state.todayV,source:'daily',weights:allIn?ODDS.allIn:ODDS.daily,theme:lt,own:ow?ow.text:''});
+  if(ow&&!ow.days.includes(state.date)){ow.days.push(state.date);ow.days.sort();if(ow.days.length>800)ow.days.splice(0,ow.days.length-800);}
   state.cards.push(c);state.todayCard=c.id;state.status='done';
   state.history=state.history.filter(h=>h.date!==state.date);
-  state.history.push({date:state.date,status:'done',v:state.todayV,card:c.id,note:'',allIn:!!allIn});
+  state.history.push(Object.assign({date:state.date,status:'done',v:state.todayV,card:c.id,note:'',allIn:!!allIn},ow?{own:ow.id}:{}));
   state.progress++;let packGained=false;if(state.progress>=5){state.progress=0;state.packs++;packGained=true;}
   compNotice();save();return {c,packGained};
 }
@@ -1390,7 +1418,7 @@ function openVector(){
   openSheet(`<p class="muted center small">Day ${dayN()}, ${dateLabel(todayKey())}</p>
     <div class="flip${isFresh?'':' flipped'}" id="vflip"><div class="flip-in">
       <button class="vface vback" id="vBack"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg><span>Today's card</span><small>Tap to turn it over</small></button>
-      <div class="vface vfront"><div class="vband" style="background:${V.color}"><b>${V.name}</b></div><div class="vbody"><p>${V.blurb}</p><p><strong>Today's small thing</strong>${taskFor(state.todayV,state.date)}</p><p><strong>The Forge asks</strong>${V.question}</p></div></div>
+      <div class="vface vfront"><div class="vband" style="background:${V.color}"><b>${esc(todayBand())}</b></div><div class="vbody"><p>${todayOwnObj()?'Something you chose for yourself.':V.blurb}</p><p><strong>${todayOwnObj()?PEN+'Your small thing':'Today\'s small thing'}</strong>${esc(todayTask())}</p><p><strong>The Forge asks</strong>${V.question}</p></div></div>
     </div></div>
     ${first?`<button class="primary" id="vDoneNow" ${isFresh?'hidden':''}>I did it. Find my Forgeling</button><button class="ghost" id="vOk" ${isFresh?'hidden':''}>I'll do it in a bit</button>`:`<button class="primary" id="vOk" ${isFresh?'hidden':''}>Got it</button>`}
     ${first?'<p class="muted small center" style="margin-top:10px">No account needed. Do the small thing, then tap to find your first Forgeling.</p>':''}`,!isFresh);
@@ -1565,7 +1593,7 @@ function renderToday(){
     save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>'};
   let hero='';
   if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
-  else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${V.name}</div><p>${taskFor(state.todayV,state.date)}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
+  else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${esc(todayBand())}</div><p>${todayOwnObj()?PEN:''}${esc(todayTask())}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
   else if(s==='done'&&favShows()){const c=cardById(state.todayCard),f=homeFav(),fn=esc(f.nick||f.name);hero=`<button class="herocard" id="btnShowFav" aria-label="Look at ${fn}">${cardHTML(f,{w:136,mini:true})}</button><h2>${fn} is keeping you company</h2><p class="muted">${c?'Today’s find, '+esc(c.nick||c.name)+', is in your binder. ':''}${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${c?'<button class="ghost favswap" id="btnSeeFind">See today’s find</button>':''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else if(s==='done'){const c=cardById(state.todayCard),f=homeFav();hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${f&&c&&f.id!==c.id?`<button class="ghost favswap" id="btnFavBack">Show ${esc(f.nick||f.name)} here</button>`:''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else hero=`${homeFav()?`<button class="herocard" id="btnShowFav" aria-label="Look at ${esc(homeFav().nick||homeFav().name)}">${cardHTML(homeFav(),{w:136,mini:true})}</button>`:''}<h2>Resting today</h2><p class="muted">Your progress is safe and nothing is lost. A new card arrives tomorrow.</p><button class="ghost" id="btnUnrest">Actually, show me today's card</button><div style="width:100%;text-align:left">${echoHTML()}</div>`;
@@ -1576,13 +1604,13 @@ function renderToday(){
   else if(state.packs===0)rows.push(row('',IC.pack,'Next pack',`${5-state.progress} more ${5-state.progress===1?'day':'days'} to go. Rest days and missed days never reset this.`,`<div class="pips" role="img" aria-label="${state.progress} of 5 days toward your next pack">${pips}</div>`));
   if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();rows.push(row('btnHearth',IC.hearth,'The Hearth',(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'The fire is low for today.'))+(wl?' '+wl:''),'',nf.length>0));}
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
-  if(state.own&&state.own.text){const on=state.own.days.includes(todayKey());rows.unshift(`<button class="rowl ownrow${on?' ready':''}" id="btnOwn" aria-pressed="${on}"><span class="ri">${on?IC.tick:IC.ring}</span><span class="rt"><b>${esc(state.own.text)}</b><span class="rs">${on?'Done today. Tap again if you didn’t mean to.':'Your own small thing. Tap when it’s done.'}</span></span></button>`);}
+  if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
   const jr=state.journal[state.date];if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':'Add a line to your journal'}</button>`;const reflect='';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}<div class="group">${rows.join('')}</div>
     <div class="row" style="margin:0 2px 14px"><div class="dots" aria-label="This week">${weekDots()}</div><span class="muted small">${done} ${done===1?'day':'days'} showed up</span></div>
-    ${latest.length?`<h3 style="margin-top:6px">Latest finds</h3><div class="latest">${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:92,mini:true})}</button>`).join('')}</div>`:''}`;
+    ${latest.length?`<h2 class="sub3">Latest finds</h2><div class="latest">${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:92,mini:true})}</button>`).join('')}</div>`:''}`;
   hydrate(el);
 }
 function renderBinder(){
@@ -1622,7 +1650,7 @@ function feedbackForReport(){
 
 function pilotReport(){
   const H=state.history,done=H.filter(h=>h.status==='done').length,rest=H.filter(h=>h.status==='rest').length,miss=H.filter(h=>h.status==='skipped').length;
-  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
+  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
 }
 function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
@@ -1638,9 +1666,12 @@ function renderSettings(){
       ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}</div>
     <div class="setblock"><b>Comfort</b><p class="muted small">Motion, lore, and appearance.</p>
       <div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and tales ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app follows your day, from dawn to night, and the app’s colours follow the sky. Light and Dark set how bright it is. Plain keeps a quiet, flat look.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div></div>
-    <div class="setblock"><b>Your own small thing</b><p class="muted small">Optional. One habit of your own to tick off on Today, beside the daily card. It never earns packs, and missing it never counts against you.</p>
-      <label class="field"><span>Your small thing</span><input id="ownIn" maxlength="60" value="${esc(state.own.text)}" placeholder="For example: drink a glass of water" autocomplete="off"></label>
-      <div class="chips"><button class="pill" id="ownSave">${state.own.text?'Save changes':'Add it to Today'}</button>${state.own.text?'<button class="pill" id="ownClear">Remove it</button>':''}</div></div>
+    <div class="setblock" id="yourCards"><b>Your cards</b><p class="muted small">What do you want more of? Pick up to three, and your daily card leans toward them.</p>
+      <div class="chips" role="group" aria-label="What you want more of">${WANTS.map((w,i)=>`<button class="chip" data-swant="${i}" aria-pressed="${state.want.includes(i)}">${w.n}</button>`).join('')}</div>
+      <div class="lbl2">Your own small things</div><p class="muted small">Up to three. Some days the card you turn over is one of yours, and doing it finds a Forgeling like any other day.</p>
+      ${state.owns.map(o=>`<div class="ownitem"><span class="ot">${PEN}<b>${esc(o.text)}</b><small>${o.k>=0?WANTS[o.k].n:'Any kind'}</small></span><button class="pill" data-ownrm="${o.id}" aria-label="Remove ${esc(o.text)}">Remove</button></div>`).join('')}
+      ${state.owns.length<3?`<label class="field"><span>A new small thing</span><input id="ownIn" maxlength="60" placeholder="For example: walk for ten minutes" autocomplete="off"></label><div class="lbl2">What kind of thing is it?</div><div class="chips" role="group" aria-label="What kind of thing is it">${WANTS.map((w,i)=>`<button class="chip" data-ownk="${i}" aria-pressed="${ownK()===i}">${w.n}</button>`).join('')}</div><div class="chips"><button class="pill" id="ownAdd">Add it</button></div>`:''}
+      ${state.owns.length?`<div class="lbl2">How often yours come up</div><div class="chips" role="group" aria-label="How often yours come up">${[['mix','Every other day or so'],['mine','Most days'],['surprise','Only the world’s cards']].map(a=>`<button class="chip" data-ownmix="${a[0]}" aria-pressed="${(S.ownMix||'mix')===a[0]}">${a[1]}</button>`).join('')}</div>`:''}</div>
     ${remindHTML()}${installTipHTML()}
     <div class="setblock"><b>Fair odds</b><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button></div>
     <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forgelings stays on this device. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p>
@@ -2855,8 +2886,18 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=40;
-let ui={editJ:false,showFind:false};
+const SEEN_V=41;
+let ui={editJ:false,showFind:false,want:[],ownK:null};
+const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
+function openWant(){
+  ui.want=(state.want||[]).slice();
+  openSheet(`<h2>What do you want more of?</h2><p class="muted">Pick up to three. Your daily card will lean toward them, and still surprise you now and then.</p>
+    <div class="chips" role="group" aria-label="What you want more of" style="margin-top:10px">${WANTS.map((w,i)=>`<button class="chip" data-want="${i}" aria-pressed="${ui.want.includes(i)}">${w.n}</button>`).join('')}</div>
+    <p class="muted small" style="margin-top:10px">You can also add up to three small things of your own, and change all of this any time, in Settings.</p>
+    <div class="stack"><button class="primary" id="wantSave">Save</button></div>
+    <div class="row" style="justify-content:center"><button class="ghost" id="wantSkip">Keep it a surprise</button></div>`);
+}
+function wantSaved(){state.wantAsked=true;if(state.status==='fresh')state.todayV=pickToday([]);save();renderToday();renderSettings();}
 function openMargin(){
   const V=VECTORS[state.todayV],jr=state.journal[state.date];
   openSheet(`<h2>In the margin</h2><p class="muted"><i>The Forge asks:</i> ${esc(V.question)}</p>
@@ -2895,7 +2936,7 @@ function recapHTML(){
 function calendarHTML(){
   const days=lastDays(35),today=todayKey();
   const head=days.slice(0,7).map(k=>`<span class="wd">${new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'narrow'})}</span>`).join('');
-  let n=0,no=0;const ownSet=new Set((state.own&&state.own.days)||[]);
+  let n=0,no=0;const ownSet=new Set(((state.own&&state.own.days)||[]).concat(...(state.owns||[]).map(o=>o.days)));
   const cells=days.map(k=>{
     const h=state.history.find(x=>x.date===k);let cls='c',label='before you started';
     if(k<state.startDate){cls+=' future';}
@@ -3013,14 +3054,14 @@ const journeyHTML=()=>recapHTML()+calendarHTML()+ribbonsHTML();
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Living Sky.</b> The whole app now sits in the sky that follows your day, from bright morning to dusk to a starry night, with glowing panels, gold buttons and pixel icons. Prefer the old look? Settings, Sky, Plain.</li>
+    <ul class="newlist"><li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
+    <li><b>Living Sky.</b> The whole app now sits in the sky that follows your day, from bright morning to dusk to a starry night, with glowing panels, gold buttons and pixel icons. Prefer the old look? Settings, Sky, Plain.</li>
     <li><b>The Forge.</b> Every day you do your small thing earns an ember (two when you go all in), and they never fade. At the Hearth, forge spare curios and embers into charms your Forgelings can wear, a bell that rings a wanderer home, a compass that points to something unfound, and pieces for the fire. Every piece is signed by the Forgeling who helped. The Forge never takes your last copy of a curio.</li>
     <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
     <li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li>
     <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
     <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li>
-    <li><b>Gifts for friends.</b> Send a curio to a friend from the curio shelf at the Hearth. They get a link that opens in their own Forgelings, and the curio goes on their shelf. You keep yours.</li>
-    <li><b>A new name: Forgelings.</b> The app is now called Forgelings, after the creatures at its heart. The Forge is still the world they come from, and nothing in your collection changes.</li></ul>
+    <li><b>Gifts for friends.</b> Send a curio to a friend from the curio shelf at the Hearth. They get a link that opens in their own Forgelings, and the curio goes on their shelf. You keep yours.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3493,6 +3534,9 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspFlip')flipCard();
   else if(b.dataset.time){state.settings.nudge=b.dataset.time;save();modal.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b?'true':'false'));}
   else if(b.id==='giftKeep')giftKeep();
+  else if(b.dataset.want!==undefined){const k=+b.dataset.want,i=ui.want.indexOf(k);if(i>=0)ui.want.splice(i,1);else if(ui.want.length<3)ui.want.push(k);else{sfx('no');toast('Three at most. Tap one to swap it out.');return;}modal.querySelectorAll('[data-want]').forEach(x=>x.setAttribute('aria-pressed',String(ui.want.includes(+x.dataset.want))));}
+  else if(b.id==='wantSave'){state.want=ui.want.slice();closeModal();wantSaved();toast(state.want.length?'Your cards will lean that way. Add your own small things in Settings.':'Your cards stay a surprise.');}
+  else if(b.id==='wantSkip'){closeModal();wantSaved();toast('Your cards stay a surprise. Settings has this whenever you want it.');}
   else if(b.id==='jSave'){saveJournal(($('#jIn')||{}).value||'');closeModal();renderToday();renderChronicle();checkRibbons();toast('Saved to your Journal. It stays on this device.');}
   else if(b.id==='curFire'&&b.dataset.id){state.hearth.curio=b.dataset.id;save();const cu=CURIOS.find(x=>x.id===b.dataset.id);closeModal();hf.msg=`The ${cu.name.toLowerCase()} now sits by the fire.`;renderHearth();}
   else if(b.id==='giftGo')giftSend();
@@ -3535,6 +3579,7 @@ $('#view-today').addEventListener('click',e=>{
   const ins=e.target.closest('[data-insp]');if(ins){inspect(+ins.dataset.insp);return;}
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='btnOwn'){toggleOwn();return;}
+  if(b.id==='btnWant'){openWant();return;}
   if(b.id==='btnBackup'){openBackupNudge();return;}
   if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard')openVector();
   else if(b.id==='btnDone')startDone(false);
@@ -3591,8 +3636,11 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='setWnote'){state.settings.wnote=state.settings.wnote===false;save();renderSettings();if(state.settings.wnote!==false)remindSync(true);}
   else if(b.id==='setHaptic'){state.settings.haptics=state.settings.haptics===false;save();renderSettings();buzz('MEDIUM');}
   else if(b.id==='btnOdds')openOdds();
-  else if(b.id==='ownSave'){const v=(($('#ownIn')||{}).value||'').trim().slice(0,60);if(!v){sfx('no');toast('Write a few words first.');return;}state.own.text=v;save();renderSettings();renderToday();toast('Saved. It is on Today, ready to tick.');}
-  else if(b.id==='ownClear'){state.own.text='';save();renderSettings();renderToday();toast('Removed. Your past ticks stay in the Journal.');}
+  else if(b.dataset.swant!==undefined){const k=+b.dataset.swant,w=state.want,i=w.indexOf(k);if(i>=0)w.splice(i,1);else if(w.length<3)w.push(k);else{sfx('no');toast('Three at most. Tap one to swap it out.');return;}state.wantAsked=true;if(state.status==='fresh')state.todayV=pickToday([]);save();renderSettings();renderToday();}
+  else if(b.dataset.ownk!==undefined){ui.ownK=+b.dataset.ownk;document.querySelectorAll('#view-settings [data-ownk]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.ownk===ui.ownK)));}
+  else if(b.id==='ownAdd'){const v=(($('#ownIn')||{}).value||'').trim().slice(0,60);if(!v){sfx('no');toast('Write a few words first.');return;}if(state.owns.length>=3)return;const id=Math.max(0,...state.owns.map(o=>o.id))+1;state.owns.push({id,text:v,k:ownK(),days:[]});state.wantAsked=true;save();renderSettings();renderToday();toast('Added. Some days, it will be the card you turn over.');}
+  else if(b.dataset.ownrm!==undefined){const id=+b.dataset.ownrm,o=state.owns.find(x=>x.id===id);if(o){state.own.days=[...new Set(state.own.days.concat(o.days))].sort().slice(-800);state.owns=state.owns.filter(x=>x.id!==id);save();renderSettings();renderToday();toast('Removed. Its past days stay in the Journal.');}}
+  else if(b.dataset.ownmix!==undefined){state.settings.ownMix=b.dataset.ownmix;save();renderSettings();}
   else if(b.id==='btnExport')openExport();
   else if(b.id==='btnRestore')openRestore();
   else if(b.id==='fbSave')saveFeedback();
