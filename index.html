@@ -1101,7 +1101,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.37.0',APPVER='1.0.0';
+const VERSION='prototype 0.38.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1239,6 +1239,7 @@ function sanitize(s){
   if(s.mapMax!==undefined&&!(Array.isArray(s.mapMax)&&s.mapMax.length===5&&s.mapMax.every(x=>Number.isInteger(x)&&x>=0&&x<=3)))delete s.mapMax;
   if(s.disc!==undefined&&typeof s.disc!=='string')delete s.disc;
   if(s.homeFav!==undefined&&s.homeFav!==null&&!Number.isInteger(s.homeFav))delete s.homeFav;
+  if(s.scribeDay!==undefined&&typeof s.scribeDay!=='string')delete s.scribeDay;
   if(s.forge!==undefined){const f=s.forge;if(!f||typeof f!=='object')delete s.forge;else{if(!Number.isInteger(f.spent)||f.spent<0)f.spent=0;if(!Array.isArray(f.made))f.made=[];f.made=f.made.filter((x,i,a)=>typeof x==='string'&&a.indexOf(x)===i);if(!f.log||typeof f.log!=='object')f.log={};if(typeof f.bell!=='string')f.bell='';if(typeof f.comp!=='string')f.comp='';if(!Number.isInteger(f.compTo))f.compTo=-1;}}
   if(s.findSeen!==undefined&&typeof s.findSeen!=='string')delete s.findSeen;
   if(s.hearth&&s.hearth.curio!==undefined&&!(typeof s.hearth.curio==='string'&&CURIOS.some(x=>x.id===s.hearth.curio)))delete s.hearth.curio;
@@ -1345,11 +1346,27 @@ const COMP_L=[['{n} sat a little closer.','{n} did a small happy hop by the fire
 function companion(){
   return slotCards().filter(c=>c.id!==state.todayCard&&!(wOut()&&state.wander.id===c.id))[0]||null;
 }
+
+/* ---- 0.38: the Scribe, for people who write ---- */
+const SCRIBE_AT=60;
+const scribeHere=()=>linesWritten()>=SCRIBE_AT;
+const SCRIBE_SPR=['.k.....k.','.kb...bk.','kbbbbbbbk','kbwwbwwbk','kbwpbwpbk','kbbbybbbk','kblllllbk','kblklklbk','kbllllllk','.kbbbbbk.','..k.k.kqq','.......Qq'];
+function scribePal(){const h=whash((String(state.sid||'')+state.startDate).split('').reduce((a,ch)=>a*31+ch.charCodeAt(0)|0,7)),B=['#8B6A4E','#6E6A8E','#8E7A5E','#5E7A8E','#7E5E8E','#6E8A5E'][Math.abs(h)%6],L=['#E9D9B8','#D9D2EC','#E6DCC4','#CFE0E6','#E2D2E6','#D8E6CC'][Math.abs(h>>3)%6];
+  return {k:hexRGB('#2E2A47'),b:hexRGB(B),l:hexRGB(L),w:hexRGB('#F4ECD8'),p:hexRGB('#2E2A47'),y:hexRGB('#FFD36B'),q:hexRGB('#5A3FC0'),Q:hexRGB('#B9A6FF')};}
+const SCRIBE_L=['{d} days ago you wrote: “{t}” And here you are.','It finds a page from {d} days ago: “{t}” It reads it twice, slowly.','{d} days ago, in your hand: “{t}” The Scribe nods, as if it remembers too.'];
+function scribeRead(){
+  const k=todayKey();if(!scribeHere()||state.scribeDay===k)return '';
+  const ks=Object.keys(state.journal).filter(j=>state.journal[j].text&&dayDiff(j,k)>=7).sort();if(!ks.length)return '';
+  const pool=ks.filter(j=>dayDiff(j,k)>=14),pick=(pool.length?pool:ks)[whash(dnum(k)*13)%((pool.length?pool:ks).length)],t=state.journal[pick].text,d=dayDiff(pick,k);
+  state.scribeDay=k;save();
+  return 'The Scribe opens your book. '+SCRIBE_L[whash(dnum(k))%SCRIBE_L.length].replace('{d}',d).replace('{t}',t.length>90?t.slice(0,88)+'…':t);
+}
+const OWN_L=['You did “{o}” again. {n} noticed.','{n} remembers the last time you did “{o}”. Here you are again.','{n} heard you did “{o}” today, and looks quietly pleased.'];
 function compNotice(){
   const c=companion();if(!c){state.comp=null;return;}
   const before=bondLevel(c),L=COMP_L[c.dark?1:0],n=c.nick||c.name;
   c.bond=(c.bond||0)+1;
-  const line=L[whash(dnum(state.date)*31+c.id)%L.length].replace(/\{n\}/g,n),after=bondLevel(c);
+  const ow=todayOwnObj(),line=(ow?(ow.days.length<=1?'{n} saw you do \u201C{o}\u201D today, and thinks that is nice.':OWN_L[whash(dnum(state.date)*7+c.id)%OWN_L.length]).replace(/\{o\}/g,ow.text):L[whash(dnum(state.date)*31+c.id)%L.length]).replace(/\{n\}/g,n),after=bondLevel(c);
   state.comp={date:state.date,cid:c.id,line,up:after>before?after:0};
   hf.msg=line;
 }
@@ -1657,7 +1674,7 @@ function feedbackForReport(){
 
 function pilotReport(){
   const H=state.history,done=H.filter(h=>h.status==='done').length,rest=H.filter(h=>h.status==='rest').length,miss=H.filter(h=>h.status==='skipped').length;
-  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nLines written: ${linesWritten()}\nFeelings noted: ${Object.keys(state.feel||{}).length}\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
+  return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nLines written: ${linesWritten()}\nFeelings noted: ${Object.keys(state.feel||{}).length}\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}\nScribe: ${scribeHere()?'by the fire':'not yet'}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
 }
 function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
@@ -2747,6 +2764,7 @@ function drawHearth(t){
   if(heapOn&&T3>=3){[[96,60],[104,58],[112,61]].forEach((m,k)=>{const gl=Math.floor(t/700+k)%2,cap=gl?[255,150,200]:[240,120,180];for(let x=-2;x<=2;x++){setpx(m[0]+x,m[1]-2,cap);if(Math.abs(x)<=1)setpx(m[0]+x,m[1]-3,cap);}setpx(m[0]-1,m[1]-2,[255,230,240]);setpx(m[0],m[1]-1,[245,235,215]);setpx(m[0],m[1],[245,235,215]);});}
   drawSprout(setpx,t);
   {const fc=heapOn?null:fireCurio(),px=fc&&cpix(fc);if(px)px.forEach(([x,y,c])=>setpx(39+x,55+y,c));}
+  if(!heapOn&&scribeHere()){const P=scribePal(),X=99,Y=60,bob=REDUCE?0:Math.floor(t/1400)%2;for(let x=X;x<X+9;x++)setpx(x,Y+12,[40,30,26]);SCRIBE_SPR.forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch!=='.'&&P[ch])setpx(X+i-1,Y+j-bob,ch==='w'&&!REDUCE&&(t%5200)<160?P.b:P[ch]);}});}
   /* the fire */
   const FX=64,FY=60,fl=k=>Math.sin(t/80+k*1.9)*.9+Math.sin(t/37+k)*.5;
   for(let x=56;x<=72;x++){setpx(x,FY,[107,74,46]);setpx(x,FY+1,[107,74,46]);setpx(x,FY+2,[75,50,31]);}
@@ -2774,6 +2792,7 @@ function renderHearth(){
   if(state.hearth.sleep){el.innerHTML=sleepHTML();drawHearth(performance.now());return;}
   hf.sel=Math.min(hf.sel,cs.length-1);
   if(tab==='hearth'){reqMaybe();const nf=furnNew();if(nf.length){const f=FURN.find(x=>x.id===nf[0]);hf.msg=(/small request\.$/.test(hf.msg||'')?hf.msg+' ':'')+(nf.length===1?`Something new by the fire: ${f.name.toLowerCase()}.`:`${nf.length} new things by the fire. Have a look around.`);state.hearth.fseen=(state.hearth.fseen||[]).concat(nf);save();setTimeout(renderToday,0);}}
+  if(tab==='hearth'&&!hf.msg){const sr=scribeRead();if(sr)hf.msg=sr;}
   if(tab==='hearth'&&state.comp&&state.comp.date===state.date&&!state.comp.seen){state.comp.seen=1;save();hf.msg=state.comp.line+(/new by the fire|new things by the fire/.test(hf.msg||'')?' '+hf.msg:'');}
   const c=cs[hf.sel],lv=bondLevel(c),cur=BOND_AT[lv-1],nx=lv<5?BOND_AT[lv]:null,left=visitsLeft(),n=c.nick||c.name,away=wOut()&&state.wander.id===c.id;
   const pct=nx?Math.round(((c.bond||0)-cur)/(nx-cur)*100):100;
@@ -2893,7 +2912,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=42;
+const SEEN_V=43;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -2915,7 +2934,9 @@ function openMargin(){
 }
 function saveJournal(text){
   const t=text.trim();
+  const wasL=linesWritten();
   if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};
+  ui.scribeArr=wasL<SCRIBE_AT&&linesWritten()>=SCRIBE_AT;if(ui.scribeArr)hf.msg='Someone new has come to the fire. It carries a quill, and it would like to read with you.';
   {const c=state.status==='done'&&state.todayCard?cardById(state.todayCard):null;if(c&&c.date===state.date){if(t)c.ink=t.slice(0,200);else delete c.ink;}}
   save();
 }
@@ -2933,7 +2954,7 @@ function bookSVG(L){
 }
 function bookHTML(){
   const L=linesWritten(),nx=BOOK_AT.find(x=>L<x),nxt={1:'Your first line gives it a cover.',10:'At 10 lines, it is bound in leather.',30:'At 30, it gets a ribbon that opens to an old line.',60:'At 60, someone will come to the fire to read with you.',100:'At 100, gold edges and a clasp.'}[nx]||'Every line from here is just for you.';
-  return `<div class="panel-box bookp"><div class="bookrow">${bookSVG(L)}<div><h2>Your book</h2><p class="muted small">${L?`${L} ${L===1?'line':'lines'} written. Every line counts, whenever you write it.`:'Nothing written yet. Writing is never needed, and every line counts whenever you write it.'}</p><p class="muted small">${nxt}</p>${L>=30?'<button class="outline" id="bookRibbon" style="margin-top:6px">Open to an old line</button>':''}</div></div></div>`;
+  return `<div class="panel-box bookp"><div class="bookrow">${bookSVG(L)}<div><h2>Your book</h2><p class="muted small">${L?`${L} ${L===1?'line':'lines'} written. Every line counts, whenever you write it.`:'Nothing written yet. Writing is never needed, and every line counts whenever you write it.'}</p><p class="muted small">${L>=SCRIBE_AT?'The Scribe sits by your fire and reads with you. ':''}${nxt}</p>${L>=30?'<button class="outline" id="bookRibbon" style="margin-top:6px">Open to an old line</button>':''}</div></div></div>`;
 }
 const MONTHS_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const ORD=['first','second','third','fourth','fifth','sixth'];
@@ -3069,6 +3090,7 @@ const RIBBONS=[
   {id:'tale1',name:'Tale Keeper',desc:'Make a realm\'s old tale whole.',g:1,f:()=>talesDone()},
   {id:'tales5',name:'Keeper of Old Tales',desc:'Make all five old tales whole.',g:5,f:()=>talesDone()},
   {id:'gift1',name:'Kind Gesture',desc:'Send a curio to a friend.',g:1,f:()=>state.giftsSent||0},
+  {id:'scribe',name:'The Scribe',desc:'Write 60 lines in your book, whenever you like.',g:60,f:()=>linesWritten()},
   {id:'forge1',name:'First Forging',desc:'Make something at the Forge.',g:1,f:()=>(state.forge&&state.forge.made.length)||0},
   {id:'forge5',name:'Smith',desc:'Make five pieces at the Forge.',g:5,f:()=>(state.forge&&state.forge.made.length)||0},
   {id:'giftgot',name:'Well Loved',desc:'Open a gift from a friend.',g:1,f:()=>(state.giftsGot||[]).length},
@@ -3105,14 +3127,14 @@ const journeyHTML=()=>bookHTML()+monthHTML()+recapHTML()+calendarHTML()+ribbonsH
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
+    <ul class="newlist"><li><b>The Scribe.</b> Write sixty lines in your book, whenever you like, and a Scribe comes to your fire for good, with an ink-dipped quill. Now and then it reads one of your old lines back to you. And on days you do one of your own small things, your Forgelings notice.</li>
+    <li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
     <li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
     <li><b>Living Sky.</b> The whole app now sits in the sky that follows your day, from bright morning to dusk to a starry night, with glowing panels, gold buttons and pixel icons. Prefer the old look? Settings, Sky, Plain.</li>
     <li><b>The Forge.</b> Every day you do your small thing earns an ember (two when you go all in), and they never fade. At the Hearth, forge spare curios and embers into charms your Forgelings can wear, a bell that rings a wanderer home, a compass that points to something unfound, and pieces for the fire. Every piece is signed by the Forgeling who helped. The Forge never takes your last copy of a curio.</li>
     <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
     <li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li>
-    <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li>
-    <li><b>Curios, hand drawn.</b> Every curio now has its own pixel art. The curio shelf at the Hearth has real shelves, one for each realm, with outlines of what is still out there. Tap a curio to see it up close, and set your favourite by the fire.</li></ul>
+    <li><b>The map, inked.</b> The map is now drawn on old paper, with hand-inked coasts, watercolour realms, waves in the open sea, trails between the realms you know, and fog over the ones you don’t.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -3588,7 +3610,7 @@ modal.addEventListener('click',e=>{
   else if(b.dataset.want!==undefined){const k=+b.dataset.want,i=ui.want.indexOf(k);if(i>=0)ui.want.splice(i,1);else if(ui.want.length<3)ui.want.push(k);else{sfx('no');toast('Three at most. Tap one to swap it out.');return;}modal.querySelectorAll('[data-want]').forEach(x=>x.setAttribute('aria-pressed',String(ui.want.includes(+x.dataset.want))));}
   else if(b.id==='wantSave'){state.want=ui.want.slice();closeModal();wantSaved();toast(state.want.length?'Your cards will lean that way. Add your own small things in Settings.':'Your cards stay a surprise.');}
   else if(b.id==='wantSkip'){closeModal();wantSaved();toast('Your cards stay a surprise. Settings has this whenever you want it.');}
-  else if(b.id==='jSave'){saveJournal(($('#jIn')||{}).value||'');closeModal();renderToday();renderChronicle();checkRibbons();toast('Saved to your Journal. It stays on this device.');}
+  else if(b.id==='jSave'){saveJournal(($('#jIn')||{}).value||'');closeModal();renderToday();renderChronicle();checkRibbons();toast(ui.scribeArr?'Sixty lines. The Scribe has come to your Hearth.':'Saved to your Journal. It stays on this device.');ui.scribeArr=false;}
   else if(b.id==='curFire'&&b.dataset.id){state.hearth.curio=b.dataset.id;save();const cu=CURIOS.find(x=>x.id===b.dataset.id);closeModal();hf.msg=`The ${cu.name.toLowerCase()} now sits by the fire.`;renderHearth();}
   else if(b.id==='giftGo')giftSend();
   else if(b.dataset.gsw!==undefined){gs.cid=+b.dataset.gsw;modal.querySelectorAll('[data-gsw]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}
