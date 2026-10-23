@@ -68,8 +68,8 @@ with sync_playwright() as p:
             if len(st(pg)["cards"])!=n0+5: bad(k,"a pack did not add five cards")
             tabto(pg,"today")
         # journal, some days
-        if rng.random()<0.35 and vis(pg,"#jIn"):
-            pg.fill("#jIn",f"Line for {k}"); click(pg,"#jSave"); journal+=1
+        if rng.random()<0.35 and vis(pg,"#btnMargin"):
+            click(pg,"#btnMargin"); pg.wait_for_timeout(300); pg.fill("#jIn",f"Line for {k}"); click(pg,"#jSave"); journal+=1
         # hearth
         if rng.random()<0.6:
             tabto(pg,"hearth")

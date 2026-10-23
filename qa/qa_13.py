@@ -37,7 +37,15 @@ with sync_playwright() as p:
     tabto(pg,"today"); T=pg.inner_text("#view-today")
     rec("Theme","'Something to sit with' is gone from Today",("Something to sit with" not in T))
     pg.evaluate("document.body.innerHTML.includes('Something to sit with')")
-    rec("Theme","Today shows 'In the margin' and 'The Forge asks'" ,"In the margin" in T and "The Forge asks" in T,T[:0])
+    # 0.35.4: the margin left Today; once the card is done (or on a rest day) a link opens it in a sheet
+    stt=st(pg)["status"]; has=pg.locator("#view-today #btnMargin").count()==1
+    ok="In the margin" not in T and (has==(stt in ("done","rest")))
+    if has:
+        pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); m=mt(pg)
+        ok=ok and "In the margin" in m and "The Forge asks" in m
+        pg.fill("#jIn","A line from the sheet"); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
+        ok=ok and st(pg)["journal"].get(st(pg)["date"],{}).get("text")=="A line from the sheet" and pg.evaluate("document.getElementById('modal').hidden") and "Edit today’s line" in pg.inner_text("#view-today")
+    rec("Theme","the margin is off Today; after the day's card, a link opens 'In the margin' with 'The Forge asks', and saving goes to the journal",ok,(stt,has))
     html=open(S+"/work.html").read(); rec("Theme","no 'Something to sit with' remains anywhere in the app","Something to sit with" not in html)
     # preview tool still lands on the map
     dev(pg,"mappreview"); rec("Dev","Preview the map lands on the map",pg.evaluate("!!document.querySelector('.mapsvg')") and not pg._errs)
