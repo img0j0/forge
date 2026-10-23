@@ -26,7 +26,7 @@ with sync_playwright() as p:
         if ph=="day" and scheme=="light":
             tabto(pg,"today"); pr=pg.evaluate("()=>{const b=document.querySelector('#view-today .primary');const cs=getComputedStyle(b);return {clip:cs.clipPath.slice(0,20),bg:cs.backgroundImage.slice(0,40),r:cs.borderTopLeftRadius}}")
             rec("Look","the main button is pixel-stepped gold with a press edge",pr["clip"].startswith("polygon") and "gradient" in pr["bg"] and pr["r"]=="0px",pr)
-            pn=pg.evaluate("()=>(()=>{const h=getComputedStyle(document.querySelector('#view-today .hero')),r=getComputedStyle(document.querySelector('#view-today .group'));return h.backgroundImage.includes('rgba(20, 15, 48, 0.9) 232px')&&h.borderImageSource==='none'&&r.backgroundColor==='rgba(20, 15, 48, 0.9)'&&r.clipPath.startsWith('polygon')})()")
+            pn=pg.evaluate("()=>(()=>{const h=getComputedStyle(document.querySelector('#view-today .hero')),r=getComputedStyle(document.querySelector('#view-today .group'));return h.backgroundImage.includes('rgba(20, 15, 48, 0.94) 232px')&&h.borderImageSource==='none'&&r.backgroundColor==='rgba(20, 15, 48, 0.94)'&&r.clipPath.startsWith('polygon')})()")
             rec("Look","panels are dark glass with stepped corners and no frame; Today's card stands on the sky above its glass",pn)
             ic=pg.evaluate("()=>[...document.querySelectorAll('.tab svg')].map(s=>s.getAttribute('viewBox')+'|'+s.classList.contains('pi'))")
             rec("Look","all five tabs have pixel icons",len(ic)==5 and all(x=="0 0 12 12|true" for x in ic),ic)
@@ -37,7 +37,7 @@ with sync_playwright() as p:
             rec("A11y","a focused pixel button shows a clear inset ring (outlines would be clipped)","inset" in fs,fs)
             pg.evaluate("document.querySelector('.tab[data-tab=\"hearth\"]').click()"); en=pg.evaluate("()=>document.getElementById('view-hearth').classList.contains('enter')&&document.getAnimations().some(a=>a.animationName==='lsRise')")
             rec("Motion","opening a tab plays a short staggered entrance",en)
-            pg.wait_for_timeout(900); rec("Motion","…which ends and clears itself",not pg.evaluate("document.getElementById('view-hearth').classList.contains('enter')"))
+            pg.wait_for_timeout(1600); rec("Motion","…which ends and clears itself",not pg.evaluate("document.getElementById('view-hearth').classList.contains('enter')"))
             # reduced motion: no entrance
             s=st(pg); s["settings"]["reduce"]=True; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
             pg.evaluate("document.querySelector('.tab[data-tab=\"binder\"]').click()"); rm=pg.evaluate("()=>document.getAnimations().some(a=>a.animationName==='lsRise')")

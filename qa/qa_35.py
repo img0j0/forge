@@ -41,7 +41,7 @@ with sync_playwright() as p:
     t=forge_sheet(pg)
     names=["Charm of Meadow","Charm of Ember","Charm of Tide","Charm of Frost","Charm of Dusk","Wanderer’s bell","Compass","A copper kettle","An iron stand","Wind chimes"]
     rec("Sheet","all ten recipes are listed, each saying what it needs",all(n in t for n in names) and t.count("Needs ")==10 and "0 of 10 pieces made" in t,t[:200])
-    rec("Sheet","with no spares, nothing can be made yet, and the reason is shown",pg.locator("#modal [data-fmake]").count()==0 and "You have 0" in t)
+    rec("Sheet","with no spares, nothing can be made yet, and the reason is shown",pg.locator("#modal [data-fmake]").count()==0 and "(you have 0 and" in t)
     rec("Sheet","the sheet says who signs the piece",re.search(r"Today that is \S",t) is not None)
     bad+=["forge sheet: "+v for v in axe(pg)]
     closemodals(pg)
