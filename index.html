@@ -670,6 +670,15 @@ html.ls:not(.reduce) main>section.enter>*:nth-child(3){animation-delay:.08s}
 html.ls:not(.reduce) main>section.enter>*:nth-child(4){animation-delay:.12s}
 html.ls:not(.reduce) main>section.enter>*:nth-child(n+5){animation-delay:.16s}
 @keyframes lsRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---- 0.35.2: glass panels with gold rivets; Today's card stands on the sky ---- */
+html.ls .panel-box,html.ls .group,html.ls .hero,html.ls .setblock{border:0 !important;border-image:none !important;border-radius:0 !important;clip-path:var(--step) !important;background:linear-gradient(#FFD36B,#FFD36B) left 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) left 8px bottom 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px bottom 8px/4px 4px no-repeat,var(--dot) 0 0/8px 8px repeat,var(--glass) !important}
+html.ls .panel-box{padding:18px 18px 16px !important}
+html.ls .group{padding:6px 4px !important}
+html.ls .setblock{padding:20px 20px 18px !important}
+html.ls .hero{padding:24px 16px 20px !important}
+html.ls .hero:is(:has(#btnShowToday),:has(#btnTurn),:has(#btnShowFav)){clip-path:none !important;background:linear-gradient(#FFD36B,#FFD36B) left 8px top 240px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px top 240px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) left 8px bottom 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px bottom 8px/4px 4px no-repeat,var(--ped) center 204px/176px 22px no-repeat,radial-gradient(circle at 50% 116px,var(--glow) 0,transparent 128px),linear-gradient(to bottom,transparent 0 232px,var(--glass) 232px) !important}
+html.ls .hero:is(:has(#btnShowToday),:has(#btnTurn),:has(#btnShowFav)) h2{margin-top:16px}
 </style>
 </head>
 <body>
@@ -1077,7 +1086,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.35.1',APPVER='1.0.0';
+const VERSION='prototype 0.35.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
