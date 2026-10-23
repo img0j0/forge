@@ -388,6 +388,7 @@ ul.forgel li{align-items:center}ul.forgel li .fi{width:34px;height:42px;backgrou
 ul.forgel li .fi .cimg{width:32px;height:40px}ul.forgel li.on .fi{background:none}
 ul.forgel li>span:nth-child(2){flex:1;min-width:0}ul.forgel li .chip{flex:none;margin-left:auto}
 ul.forgel li.can b{color:var(--plum)}
+.hero .marginlink{margin-top:2px}
 /* Nav */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
@@ -1087,7 +1088,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.35.3',APPVER='1.0.0';
+const VERSION='prototype 0.35.4',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1577,7 +1578,7 @@ function renderToday(){
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
   if(state.own&&state.own.text){const on=state.own.days.includes(todayKey());rows.unshift(`<button class="rowl ownrow${on?' ready':''}" id="btnOwn" aria-pressed="${on}"><span class="ri">${on?IC.tick:IC.ring}</span><span class="rt"><b>${esc(state.own.text)}</b><span class="rs">${on?'Done today. Tap again if you didn’t mean to.':'Your own small thing. Tap when it’s done.'}</span></span></button>`);}
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
-  const jr=state.journal[state.date],reflect=s!=='fresh'?`<div class="panel-box"><h2>In the margin</h2><p class="muted"><i>The Forge asks:</i> ${esc(V.question)}</p>${jr&&!ui.editJ?`<p class="mine">“${esc(jr.text)}”</p><button class="ghost" id="jEdit" style="padding-left:0">Edit</button>`:`<label class="field" style="margin-top:8px"><span>Write one line in the margin. It stays on this device.</span><input id="jIn" maxlength="200" value="${esc(jr?jr.text:'')}" placeholder="Whatever comes to mind" autocomplete="off"></label><div class="row"><button class="pill" id="jSave">Save</button></div>`}</div>`:'';
+  const jr=state.journal[state.date];if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':'Add a line to your journal'}</button>`;const reflect='';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}<div class="group">${rows.join('')}</div>
     <div class="row" style="margin:0 2px 14px"><div class="dots" aria-label="This week">${weekDots()}</div><span class="muted small">${done} ${done===1?'day':'days'} showed up</span></div>
@@ -2856,6 +2857,14 @@ function submitAge(){
 /* ================= Journal, Journey, Ribbons ================= */
 const SEEN_V=40;
 let ui={editJ:false,showFind:false};
+function openMargin(){
+  const V=VECTORS[state.todayV],jr=state.journal[state.date];
+  openSheet(`<h2>In the margin</h2><p class="muted"><i>The Forge asks:</i> ${esc(V.question)}</p>
+    <label class="field" style="margin-top:10px"><span>Write one line. It stays on this device, in your Journal.</span><input id="jIn" maxlength="200" value="${esc(jr?jr.text:'')}" placeholder="Whatever comes to mind" autocomplete="off"></label>
+    <div class="stack"><button class="primary" id="jSave">Save</button></div>
+    <div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
+  setTimeout(()=>{const i=$('#jIn');if(i)i.focus({preventScroll:true});},60);
+}
 function saveJournal(text){
   const t=text.trim();
   if(!t)delete state.journal[state.date];else state.journal[state.date]={v:state.todayV,text:t};
@@ -3484,6 +3493,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspFlip')flipCard();
   else if(b.dataset.time){state.settings.nudge=b.dataset.time;save();modal.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b?'true':'false'));}
   else if(b.id==='giftKeep')giftKeep();
+  else if(b.id==='jSave'){saveJournal(($('#jIn')||{}).value||'');closeModal();renderToday();renderChronicle();checkRibbons();toast('Saved to your Journal. It stays on this device.');}
   else if(b.id==='curFire'&&b.dataset.id){state.hearth.curio=b.dataset.id;save();const cu=CURIOS.find(x=>x.id===b.dataset.id);closeModal();hf.msg=`The ${cu.name.toLowerCase()} now sits by the fire.`;renderHearth();}
   else if(b.id==='giftGo')giftSend();
   else if(b.dataset.gsw!==undefined){gs.cid=+b.dataset.gsw;modal.querySelectorAll('[data-gsw]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}
@@ -3533,6 +3543,7 @@ $('#view-today').addEventListener('click',e=>{
   else if(b.id==='btnMapGo'){tab='chronicle';ch.sub='map';renderChronicle();renderNav();window.scrollTo(0,0);}
   else if(b.id==='btnHearth'){tab='hearth';renderHearth();renderNav();window.scrollTo(0,0);}
   else if(b.id==='btnShowToday')inspect(state.todayCard);
+  else if(b.id==='btnMargin')openMargin();
   else if(b.id==='btnShowFav'){const f=homeFav();if(f)inspect(f.id);}
   else if(b.id==='btnSeeFind'){ui.showFind=true;renderToday();}
   else if(b.id==='btnFavBack'){state.findSeen=state.date;ui.showFind=false;save();renderToday();}
