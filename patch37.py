@@ -92,7 +92,7 @@ rep("  const rh=e.target.closest('.mphit');", "  if(e.target.closest('#bookRibbo
 
 # ---- styles ----
 rep('/* Nav */', """.feel{width:100%;margin-top:6px}.feel .feelq{font-weight:700;margin:0 0 2px}.feel .chips{justify-content:center}
-.card .inkwash{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 1.6em .45em rgba(90,60,190,.62),inset 0 0 .5em .12em rgba(185,166,255,.55)}
+.card .inkwash{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 0 .2em rgba(200,184,255,.85),inset 0 0 2.4em .7em rgba(96,64,205,.72),inset 0 0 .7em .2em rgba(185,166,255,.7)}
 .card .inkdrop{vertical-align:-.05em;margin-right:.35em;width:.6em;height:.8em}
 .card .cbk .binfo .inkl{color:#D9CCFF;font-style:italic}
 .bookrow{display:flex;gap:14px;align-items:center}.bookrow .book{flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25))}.bookrow h2{margin:0 0 2px}
@@ -113,5 +113,5 @@ import re
 _i=src.index('<ul class="newlist">'); _j=src.index('</ul>',_i)
 _items=re.findall(r'\s*<li>.*?</li>',src[_i+len('<ul class="newlist">'):_j],re.S)
 src=src[:_i]+'<ul class="newlist">'+''.join(_items[:8])+src[_j:]
-open('work.html.37', 'w', encoding='utf8').write(src)
+open('work.html', 'w', encoding='utf8').write(src)
 print('patched OK', len(src.encode()))
