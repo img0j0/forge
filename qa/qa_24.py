@@ -117,29 +117,13 @@ with sync_playwright() as p:
         setst(p2,ss); p2.reload(); p2.wait_for_timeout(500); closemodals(p2); texts.add(p2.inner_text("#view-today .taskface p"))
     rec("Variety","over ten days the same calling is asked in at least 3 different ways",len(texts)>=3,texts); c2.close()
 
-    # ---------- your own small thing ----------
-    s=grown(base); s["history"]=[{"date":D(s,i),"status":"done","v":i%12} for i in range(1,11)]; ready(pg,s)
-    rec("Own","nothing on Today until you add one",pg.locator("#btnOwn").count()==0)
-    tabto(pg,"settings"); pg.evaluate("document.getElementById('ownSave').click()"); pg.wait_for_timeout(300)
-    rec("Own","saving an empty one does nothing",st(pg)["own"]["text"]=="")
-    pg.fill("#ownIn","  Drink a glass of water <b>now</b>  and some more words to make this far too long for the box  "); pg.evaluate("document.getElementById('ownSave').click()"); pg.wait_for_timeout(300)
-    t=st(pg)["own"]["text"]; rec("Own","Settings saves it, trimmed to 60 characters",t.startswith("Drink a glass of water <b>now</b>") and len(t)<=60,t)
-    rec("Own","Settings then offers Save changes and Remove it",pg.inner_text("#ownSave")=="Save changes" and pg.locator("#ownClear").count()==1)
-    tabto(pg,"today"); r=pg.locator("#btnOwn")
-    rec("Own","Today shows it first in the list, unticked, with your words shown as written",r.count()==1 and pg.evaluate("document.querySelector('#view-today .group .rowl').id")=="btnOwn" and r.get_attribute("aria-pressed")=="false" and "<b>now</b>" in pg.inner_text("#btnOwn") and pg.locator("#btnOwn b b").count()==0)
-    before={k:st(pg)[k] for k in ("packs","progress","nextId")}
-    pg.evaluate("document.getElementById('btnOwn').click()"); pg.wait_for_timeout(300); s1=st(pg)
-    rec("Own","ticking it marks today",pg.get_attribute("#btnOwn","aria-pressed")=="true" and s1["own"]["days"]==[s1["date"]] and "Done today" in pg.inner_text("#btnOwn") and pg.evaluate("document.activeElement.id")=="btnOwn")
-    rec("Own","it never earns packs or Forgelings",all(s1[k]==v for k,v in before.items()),before)
-    pg.evaluate("document.getElementById('btnOwn').click()"); pg.wait_for_timeout(300)
-    rec("Own","tapping again undoes it",pg.get_attribute("#btnOwn","aria-pressed")=="false" and st(pg)["own"]["days"]==[])
-    s1=st(pg); s1["own"]["days"]=[D(s1,i) for i in (0,1,3,5,40)]; ready(pg,s1)
+    # ---------- your own small things: since 0.36 they live on the card (qa_36). The Journal still marks their days ----------
+    s=grown(base); s["history"]=[{"date":D(s,i),"status":"done","v":i%12} for i in range(1,11)]; s["owns"]=[{"id":1,"text":"Drink a glass of water","k":-1,"days":[D(s,i) for i in (0,1,3,5,40)]}]; ready(pg,s)
+    rec("Own","Today has no separate tick row any more (own small things come up on the card)",pg.locator("#btnOwn").count()==0)
     tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('#view-chronicle [data-sub=\"journal\"]');if(b)b.click()}"); pg.wait_for_timeout(500)
     own=pg.evaluate("[...document.querySelectorAll('.cal .c.own')].map(c=>c.getAttribute('aria-label'))"); txt=pg.inner_text("#view-chronicle")
-    rec("Own","the Journal calendar marks the days you did it (within five weeks)",len(own)==4 and all("your own small thing done" in a for a in own),own)
+    rec("Own","the Journal calendar marks the days you did one (within five weeks)",len(own)==4 and all("your own small thing done" in a for a in own),own)
     rec("Own","…and says how many",("You did your own small thing on 4 of these days" in txt) and "your own small thing" in pg.inner_text(".calkey"),[l for l in txt.split("\n") if "own small" in l])
-    tabto(pg,"settings"); pg.evaluate("document.getElementById('ownClear').click()"); pg.wait_for_timeout(300); tabto(pg,"today")
-    rec("Own","Remove it takes it off Today but keeps your past ticks",pg.locator("#btnOwn").count()==0 and len(st(pg)["own"]["days"])==5)
     # damaged
     for bad in ("x",None,[1],{"text":5,"days":"no"},{"text":"ok","days":["2026-01-01","2026-01-01","nope",7]}):
         s=st(pg); s["own"]=bad; s["backup"]=bad; ready(pg,s); o=st(pg)["own"]; bk=st(pg)["backup"]
