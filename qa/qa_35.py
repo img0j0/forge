@@ -104,6 +104,7 @@ with sync_playwright() as p:
     rec("Compass","with nothing left unfound on the map, the needle spins and rests","Nothing on your map is left unfound" in line,line)
     # ---------- Hearth pieces, and the keep tally ----------
     for pid in ("kettle","stand","chimes"):
+        dev(pg,"spares"); closemodals(pg)  # top up spares, so the run never depends on how many realms this save knows
         s=st(pg); s["forge"]["spent"]=0; load(pg,s)
         forge_sheet(pg); pg.tap(f"#modal [data-fmake='{pid}']"); pg.wait_for_timeout(500); closemodals(pg)
     s=st(pg); tabto(pg,"hearth")

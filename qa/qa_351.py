@@ -26,8 +26,8 @@ with sync_playwright() as p:
         if ph=="day" and scheme=="light":
             tabto(pg,"today"); pr=pg.evaluate("()=>{const b=document.querySelector('#view-today .primary');const cs=getComputedStyle(b);return {clip:cs.clipPath.slice(0,20),bg:cs.backgroundImage.slice(0,40),r:cs.borderTopLeftRadius}}")
             rec("Look","the main button is pixel-stepped gold with a press edge",pr["clip"].startswith("polygon") and "gradient" in pr["bg"] and pr["r"]=="0px",pr)
-            pn=pg.evaluate("()=>getComputedStyle(document.querySelector('#view-today .hero')).backgroundColor==='rgba(20, 15, 48, 0.9)'")
-            rec("Look","panels are dark glass over the sky",pn)
+            pn=pg.evaluate("()=>(()=>{const h=getComputedStyle(document.querySelector('#view-today .hero')),r=getComputedStyle(document.querySelector('#view-today .group'));return h.backgroundImage.includes('rgba(20, 15, 48, 0.9) 232px')&&h.borderImageSource==='none'&&r.backgroundColor==='rgba(20, 15, 48, 0.9)'&&r.clipPath.startsWith('polygon')})()")
+            rec("Look","panels are dark glass with stepped corners and no frame; Today's card stands on the sky above its glass",pn)
             ic=pg.evaluate("()=>[...document.querySelectorAll('.tab svg')].map(s=>s.getAttribute('viewBox')+'|'+s.classList.contains('pi'))")
             rec("Look","all five tabs have pixel icons",len(ic)==5 and all(x=="0 0 12 12|true" for x in ic),ic)
             h1=pg.evaluate("()=>getComputedStyle(document.getElementById('title')).fontFamily")
