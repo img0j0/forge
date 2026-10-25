@@ -32,7 +32,7 @@ with sync_playwright() as p:
             if pg._errs: fails.append((step,pg._errs[:1])); pg._errs.clear()
         except Exception as ex:
             msg=str(ex)[:90]
-            if "Timeout" in msg or "detached" in msg or "not attached" in msg or "outside" in msg or "intercept" in msg or "navigat" in msg: 
+            if "Timeout" in msg or "detached" in msg or "not attached" in msg or "outside" in msg or "intercept" in msg or "not visible" in msg or "navigat" in msg: 
                 try: closemodals(pg)
                 except Exception: pass
                 continue
