@@ -467,6 +467,7 @@ h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .taskface .band span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
 @media (prefers-reduced-motion:no-preference){.flipped .ccart .sigil,.taskface .sigil{animation:sigBob 3.2s steps(4) infinite}}
+@media (max-width:380px){.flip{width:min(268px,82vw)}}
 @keyframes sigBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}

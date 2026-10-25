@@ -76,6 +76,7 @@ rep(""".vface.vfront{transform:rotateY(180deg);background:#FFFDF8;color:#2E2A47;
 .taskface .band span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
 @media (prefers-reduced-motion:no-preference){.flipped .ccart .sigil,.taskface .sigil{animation:sigBob 3.2s steps(4) infinite}}
+@media (max-width:380px){.flip{width:min(268px,82vw)}}
 @keyframes sigBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}""")
 
 rep('<title>Forgelings (prototype 0.38.3)</title>', '<title>Forgelings (prototype 0.38.4)</title>')
