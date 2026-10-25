@@ -26,7 +26,11 @@ def closemodals(pg):
         if pg.evaluate("document.getElementById('modal').hidden"): return
         try: pg.evaluate("()=>{const b=document.querySelector('#modal [data-close]');if(b)b.click();}"); pg.wait_for_timeout(300)
         except Exception: return
-def tabto(pg,t): pg.evaluate("t=>document.querySelector('.tab[data-tab=\"'+t+'\"]').click()",t); pg.wait_for_timeout(350)
+def tabto(pg,t,fold=False):
+    pg.evaluate("t=>document.querySelector('.tab[data-tab=\"'+t+'\"]').click()",t); pg.wait_for_timeout(350)
+    if t=="settings" and not fold: opensecs(pg)
+def opensecs(pg):  # 0.38.3: Settings folds; most suites want every section open, as a person would open the one they need
+    pg.evaluate("()=>document.querySelectorAll('#view-settings details.setsec:not([open])').forEach(d=>d.open=true)"); pg.wait_for_timeout(80)
 def newpage(b,w=390,h=844,**kw):
     ctx=b.new_context(viewport={"width":w,"height":h},has_touch=True,is_mobile=w<600,permissions=["clipboard-read","clipboard-write"],**kw)
     pg=ctx.new_page(); pg._errs=[]; pg._cons=[]; pg._reqs=[]

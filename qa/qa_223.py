@@ -11,7 +11,7 @@ with sync_playwright() as p:
         hero=[c for c in css if "hero" in c[0]]
         rec("Panels",f"{scheme}: the Forgeling stands on a pedestal in firelight",hero and hero[0][3].count("svg")>=2 and "radial-gradient" in hero[0][3],hero[:1])
         tabto(pg,"settings"); n=pg.evaluate("[...document.querySelectorAll('#view-settings .setblock')].filter(e=>{const s=getComputedStyle(e);return e.offsetParent&&(s.borderImageSource.includes('svg')||(s.clipPath.startsWith('polygon')&&s.backgroundImage.includes('rgb(255, 211, 107)')))}).length")
-        rec("Panels",f"{scheme}: Settings blocks share the same frame",n>=8,n)
+        rec("Panels",f"{scheme}: Settings sections share the same frame",n>=6,n)
         hs=pg.evaluate("document.documentElement.scrollWidth>document.documentElement.clientWidth")
         rec("Panels",f"{scheme}: no sideways scrolling with the thicker frames",not hs)
         rec("All",f"{scheme}: no page errors",not pg._errs,pg._errs[:1]); ctx.close()

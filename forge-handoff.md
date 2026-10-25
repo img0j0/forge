@@ -1,11 +1,11 @@
 # Forge handoff (start of a new chat)
 
-Last updated October 22, 2026, at prototype **0.38.2**. This replaces the 0.16.0 handoff PDF.
+Last updated October 24, 2026, at prototype **0.38.3**. This replaces the 0.16.0 handoff PDF.
 
 ## Starting a new session
 
 1. Attach the repo with push access: owner `img0j0`, repo `forge`.
-2. Clone the **`dev` branch**. It holds the whole build workspace: the current build (`work.html` = `base382.html`), every patch script, `pwa.py`, the legal pages, curio art, tools and the full QA suite. Its README has the setup commands and the step-by-step for a new version. Nothing needs to be attached.
+2. Clone the **`dev` branch**. It holds the whole build workspace: the current build (`work.html` = `base383.html`), every patch script, `pwa.py`, the legal pages, curio art, tools and the full QA suite. Its README has the setup commands and the step-by-step for a new version. Nothing needs to be attached.
 3. Clone the **`ios-app`** branch separately when shipping, and copy each new build there.
 4. **Next job:** finish the Your small things and Ink plan (https://claude.ai/artifact/Kt3TnuTRS44Ax69aMDsmy4): 0.36, 0.37 and 0.38 shipped, so that plan is done. **Next: 0.39 the other side** from the Forge design doc (https://claude.ai/artifact/WvF6qntNFo6CfAbRyji9Wj): the lantern (1 spare from each of 3 realms, 6 embers), turning a fully charted realm's map over, five Shade realms with 25 places, 20 Shade curios with their own pixel art (`curios/sprites.py`), five Shade tales and Shade wards. The map's front keeps the bright names; the back shows the Shade names. The app is about 611 KB after 0.38, so trim the release build (prototype tools and JS comments, in `pwa.py`) before the Shade side.
 5. After shipping, push the updated `dev` branch and handoff, swap the project's `claude/Forge (prototype X).html` copy, and republish the Claude page.
@@ -16,8 +16,8 @@ Last updated October 22, 2026, at prototype **0.38.2**. This replaces the 0.16.0
 
 - **Live app:** https://img0j0.github.io/forge/. It's installable (Add to Home Screen) and works offline. Hunter uses it daily on his iPhone, and it also works in Edge.
 - **Testing:** Hunter uses it himself, then friends and family. The invite text asks testers to send feedback with **Settings → Send my report**.
-- **Claude copy:** the Forge page at https://claude.ai/artifact/QgLcL9SXJ3BWaWHzJSQo5w (version 63 = 0.38.2). This copy still shows the prototype tools, so use it for testing and demos. The Claude page can't save files, so Save picture and the backup file do nothing there; they work on the live link. A separate artifact (7Dwvf5MirwuPuAGLm3aypU) is stuck at 0.21.0 and can be ignored or deleted.
-- **Project copy:** `claude/Forge (prototype 0.38.2).html`.
+- **Claude copy:** the Forge page at https://claude.ai/artifact/QgLcL9SXJ3BWaWHzJSQo5w (version 64 = 0.38.3). This copy still shows the prototype tools, so use it for testing and demos. The Claude page can't save files, so Save picture and the backup file do nothing there; they work on the live link. A separate artifact (7Dwvf5MirwuPuAGLm3aypU) is stuck at 0.21.0 and can be ignored or deleted.
+- **Project copy:** `claude/Forge (prototype 0.38.3).html`.
 
 ## Design rules
 
@@ -72,6 +72,7 @@ Last updated October 22, 2026, at prototype **0.38.2**. This replaces the 0.16.0
 | 0.38.0 | **The Scribe** (finishes the Your small things and Ink plan). `SCRIBE_AT=60` lines in total (`scribeHere()`): an owl-like companion (`SCRIBE_SPR` 9x12, colours from the save via `scribePal()`) stands in the firelight in front of the fire, right of the rug (99,60), with a little shadow; it bobs and blinks unless motion is reduced. It never plays or wanders and is not a card. `scribeRead()`: once a day (`state.scribeDay`), when the Hearth opens with nothing else to say, it reads an older line (7+ days, 14+ preferred) with how many days ago. Arrival: the sixtieth line sets the Hearth line and the save toast says 'Sixty lines. The Scribe has come to your Hearth.' (`ui.scribeArr`). Hearth lines about your own things: `compNotice` uses `OWN_L` on own-thing days (first time: 'saw you do “…” today'). Ribbon `scribe` The Scribe (60 lines). Report: Scribe. SEEN_V=43. About 611 KB |
 | 0.38.1 | **A chosen realm lights up along its own outline** (Hunter: tapping a realm drew a box that didn't match its shape; it was Safari's focus rectangle around the tap target, since the realm is refocused after a tap for keyboard users). The selection is `g.mp-selg`: a gold glow (`.mp-selglow`, stroke 7, filter `mpGlow`, breathes twice with `mpBreath`, finite so animation waits still end) under a gold ink line (`.mp-gold.mp-sel`, filter `mpInk`, the map's pen wobble). `.mphit` has no outline; keyboard focus draws a dashed stroke along the realm's own edge. No SEEN_V bump |
 | 0.38.2 | **Solid chips on the sky** (Hunter saw the moon through the Binder's Sort chip). In Living Sky, chips/pills paint `--chip` over `--chipbase`: night glass when the sky ink is light, `#EEF3F8` when it is dark (day), `transparent` inside panels and card-like boxes (unchanged there). No SEEN_V bump |
+| 0.38.3 | **Settings folds** (Hunter: too much to scroll). Fourteen open blocks are now six folding `details.setblock.setsec` sections (seven in the iPhone app), built by `setSec(id,title,summary,body,elId)`: Your cards (`#yourCards`, open by default until a want or own thing is set), Sound, Look and feel (mood, comfort, appearance, sky), Reminders (native), Your collection (numbers, backup), About (fair odds, privacy, terms, age), Feedback (questions, report). Each folded row shows its current choice. Open sections are remembered in `setOpen` for the session (a capturing `toggle` listener); `fbGo` opens Feedback. Erase sits alone at the bottom (`.erase`). All control ids are unchanged. QA: `tabto(pg,'settings')` now opens every section (pass `fold=True` to keep them folded); qa_383 (25) tests the folds; qa_223 expects ≥6 framed blocks. |
 
 ## Key technical facts
 
