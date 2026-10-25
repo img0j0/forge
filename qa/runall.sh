@@ -2,7 +2,7 @@
 # Runs every Forge regression suite in turn and writes a one-line summary per suite to full_summary.txt.
 # Needs: python3 with playwright (and its chromium), node, and `npm i axe-core` run once inside this folder.
 cd "$(dirname "$0")"; rm -f full_summary.txt
-for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_17 qa_18 qa_181 qa_19 qa_20 qa_21 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_fit mo qa_odds qa_time qa_clock qa_mig; do
+for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_17 qa_18 qa_181 qa_19 qa_20 qa_21 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_fit mo qa_odds qa_time qa_clock qa_mig; do
   timeout 400 python3 $t.py > full_$t.log 2>&1
   echo "$t pass=$(grep -c '^PASS' full_$t.log) fail=$(grep -c '^FAIL' full_$t.log) $(tail -1 full_$t.log | cut -c1-90)" >> full_summary.txt
 done
