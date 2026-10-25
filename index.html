@@ -129,9 +129,7 @@ details.dev summary{min-height:44px;display:flex;align-items:center}
 @media (prefers-reduced-motion:no-preference){.heroback{animation:heroBob 3.4s ease-in-out infinite}}
 html.reduce .heroback{animation:none}
 @keyframes heroBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.taskface{width:100%;text-align:left;border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#FFFDF8;color:#2E2A47}
-.taskface .band{padding:10px 14px;font:600 22px var(--display);border-bottom:2px solid #2E2A47}
-.taskface p{padding:12px 14px 14px;font-size:17px;line-height:1.4}
+
 .herocard{background:none;border:0;padding:0}
 .group{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:16px}
 .rowl{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 14px;min-height:60px;color:inherit}
@@ -196,12 +194,9 @@ body.arrive .app section:not([hidden])>*:nth-child(n+4){animation-delay:.38s}
 .vface.vback svg{display:none}
 .cover{background:var(--cbP) 0 0/100% 100% no-repeat !important;box-shadow:none !important}
 .cover svg{display:none}
-.vface.vfront,.taskface{background:var(--paper) 0 0/32px 32px repeat,#FBF5E6 !important;color:#2E2A47}
-.vface.vfront{border:3px solid #2E2A47 !important;border-radius:6px !important;box-shadow:0 0 0 3px #FBF5E6 inset,0 10px 0 rgba(46,42,71,.22)}
+
 .vface.vback{box-shadow:0 10px 0 rgba(46,42,71,.22)}
-.vband,.taskface .band{position:relative;border-bottom:0 !important;background-image:linear-gradient(90deg,#2E2A47 50%,transparent 50%);background-size:6px 3px;background-repeat:repeat-x;background-position:0 100%;padding-bottom:16px !important}
-.vbody strong,.taskface strong{font:600 15px var(--display);letter-spacing:.01em}
-.taskface{border-width:3px !important;border-radius:6px !important}
+
 /* ---- 0.22: the reveal and packs, at night by the fire ---- */
 .scrim.dark{background:#0E0B24}
 .stageCv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;z-index:0}
@@ -450,11 +445,32 @@ h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .vface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;overflow:hidden;box-shadow:0 10px 0 rgba(46,42,71,.22)}
 .vface.vback{border:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;background:radial-gradient(circle,rgba(255,255,255,.2) 0 1.8px,transparent 2.6px) 0 0/18px 18px,#5B4A9E}
 .vface.vback span{font:600 24px var(--display)} .vface.vback small{opacity:.85;font-size:14px}
-.vface.vfront{transform:rotateY(180deg);background:#FFFDF8;color:#2E2A47;display:flex;flex-direction:column;border:2px solid #2E2A47}
-.vband{flex:none;display:flex;align-items:center;gap:10px;padding:14px;border-bottom:2px solid #2E2A47}
-.vband b{font:600 30px/1 var(--display)}
-.vbody{padding:12px 14px;display:grid;gap:10px;font-size:clamp(13px,3.5vw,15px);line-height:1.4}
-.vbody strong{display:block;font-weight:700}
+/* 0.38.4: today's card, from the same deck as its back */
+.vface.vfront{transform:rotateY(180deg);display:flex;flex-direction:column;color:#FFF7EC;border-radius:6px;padding:12px;background:url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 shape-rendering=%22crispEdges%22><path fill=%22%23ffffff%22 fill-opacity=%22.07%22 d=%22M11 9h2v2h2v2h-2v2h-2v-2H9v-2h2z%22/></svg>") 0 0/24px 24px,radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--cc) 34%,#2B2152),#2B2152 70%);box-shadow:0 10px 0 rgba(46,42,71,.22)}
+.cc::before,.taskface::before{content:'';position:absolute;inset:6px;border:3px dashed #F2C14E;pointer-events:none;z-index:2}
+.ccart{flex:1 1 0;min-height:44px;display:grid;place-items:center;position:relative;margin:4px 4px 0;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 55%,transparent),transparent)}
+.ccart .sigil{height:min(100%,112px);width:auto;max-width:112px;image-rendering:pixelated;filter:drop-shadow(0 4px 0 rgba(10,6,28,.45))}
+.vband{flex:none;position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 8px;margin:6px -4px 0;padding:6px 16px 4px;background:var(--cc);color:#2E2A47;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 50%,100% 100%,0 100%,8px 50%);box-shadow:inset 0 -3px 0 rgba(46,42,71,.22)}
+.vband b{font:400 34px/1 'VT323',monospace;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.vband b.n2{font-size:30px}.vband b.n3{font-size:26px}
+.vband small{font:700 16px/1 inherit;letter-spacing:.08em;font-variant-caps:all-small-caps;opacity:.85;flex:none}
+.vbody{flex:none;padding:8px 8px 20px;display:grid;gap:8px;font-size:clamp(13px,3.5vw,14.5px);line-height:1.38;position:relative;z-index:3}
+.vbody strong{display:block;font:600 17px/1.15 var(--display);letter-spacing:.05em;font-variant-caps:all-small-caps;margin-bottom:1px}
+.ccblurb{color:#D2C9EE;font-style:italic;text-align:center;margin:0}
+.ccplate{margin:0;background:#FBF5E6;color:#2E2A47;padding:8px 10px 9px;clip-path:polygon(0 3px,3px 3px,3px 0,calc(100% - 3px) 0,calc(100% - 3px) 3px,100% 3px,100% calc(100% - 3px),calc(100% - 3px) calc(100% - 3px),calc(100% - 3px) 100%,3px 100%,3px calc(100% - 3px),0 calc(100% - 3px));font-size:clamp(14px,3.8vw,15.5px)}
+.ccplate strong{color:#5A4A9E}
+.ccask{margin:0}.ccask strong{color:#FFD36B}
+.ccno{position:absolute;right:16px;bottom:11px;z-index:3;font:400 15px/1 'VT323',monospace;color:#F2C14E;letter-spacing:.04em}
+.taskface{position:relative;width:100%;display:flex;align-items:stretch;gap:12px;text-align:left;padding:16px 14px;border-radius:4px;color:#FFF7EC;background:url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 shape-rendering=%22crispEdges%22><path fill=%22%23ffffff%22 fill-opacity=%22.07%22 d=%22M11 9h2v2h2v2h-2v2h-2v-2H9v-2h2z%22/></svg>") 0 0/24px 24px,linear-gradient(90deg,color-mix(in srgb,var(--cc) 30%,#2B2152),#2B2152 55%);box-shadow:0 6px 0 rgba(10,6,28,.35)}
+.tfart{flex:none;width:72px;display:grid;place-items:center;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 60%,transparent),transparent)}
+.tfart .sigil{width:60px;height:60px;image-rendering:pixelated;filter:drop-shadow(0 3px 0 rgba(10,6,28,.45))}
+.tfmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative;z-index:3;padding:2px 4px 2px 0}
+.taskface .band{align-self:flex-start;max-width:100%;padding:3px 14px 2px 10px;background:var(--cc);color:#2E2A47;font:400 26px/1 'VT323',monospace;letter-spacing:.02em;clip-path:polygon(0 0,100% 0,calc(100% - 7px) 50%,100% 100%,0 100%);box-shadow:inset 0 -3px 0 rgba(46,42,71,.22)}
+.taskface .band span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
+@media (prefers-reduced-motion:no-preference){.flipped .ccart .sigil,.taskface .sigil{animation:sigBob 3.2s steps(4) infinite}}
+@media (max-width:380px){.flip{width:min(268px,82vw)}}
+@keyframes sigBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -1113,7 +1129,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.3',APPVER='1.0.0';
+const VERSION='prototype 0.38.4',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1204,6 +1220,18 @@ function pickToday(avoid){
 }
 function todayTask(){const o=todayOwnObj();return o?o.text:taskFor(state.todayV,state.date);}
 function todayBand(){const o=todayOwnObj();return o?(o.k>=0?'Yours · '+WANTS[o.k].n:'Yours'):VECTORS[state.todayV].name;}
+const SIGIL=["...######.../..#++#####../.#++#######./############/.##########./..########../...######.../....####..../.....##.....", ".........##./........####/........####/.........##./......###.../....####..../..####....../####......../#...##....../...####...../..######....", ".....##...../....#..#..../.....##...../..########../.....##...../.....##...../.....##...../#....##....#/##...##...##/.##..##..##./..########../....####....", ".......####./......#+##../.....#+##.../....####..../...########./.......###../......###.../.....###..../....###...../...##......./..#.........", ".###....###./#++##..#####/#+##########/############/############/.##########./..########../...######.../....####..../.....##.....", ".....##...../.....###..../.....#....../....###...../...#+###..../...#+####.../..#+######../..#+#######./.#+#########/############", ".....##...../.....##...../....#+##..../############/.##+#######./..########../...######.../..########../..###..###../.##......##.", "..######..../.##+#######./.##+########/.#######..../....##....../....##....../....##....../....##....../....##....../....##....../...####.....", ".....#....../...##......./..##......../.###......../.###......../####......../#####......./.####......./.######...../..########../...######.../.....##.....", "############/#++#########/#+##########/#+##########/############/.##########./.##########./..########../...######.../....####..../.....##.....", "............/..###..###../...######.../...######.../..###..###../####....####/####....####/..###..###../...######.../...######.../..###..###../............", "............/....####..../.###++#####./###++..#####/####....####/#####..#####/.##########./....####..../............", "..........##/........####/.......#+##./......#+##../.....####.../....####..../...####...../...###....../..##......../.#........../#..........."];
+const sigCache={};
+function sigDark(c){const n=parseInt(c.slice(1),16);return '#'+[16,8,0].map(s=>Math.round(((n>>s)&255)*.68).toString(16).padStart(2,'0')).join('');}
+/* a 12x12 pixel emblem: fill, a shaded lower-right edge, white glints, and a dark outline, all in one small SVG */
+function sigilSVG(i,c){const k=i+c;if(sigCache[k])return sigCache[k];const rows=SIGIL[i].split('/'),off=(12-rows.length)>>1,g=new Map(),P={ol:'',hi:'',fi:'',sh:''};
+  rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.')g.set((x+1)+','+(y+1+off),ch);}));
+  const at=(x,y,t)=>{P[t]+=`M${x} ${y}h1v1h-1z`;};
+  g.forEach((ch,key)=>{const [x,y]=key.split(',').map(Number);at(x,y,ch==='+'?'hi':(!g.has(x+','+(y+1))||!g.has((x+1)+','+y))?'sh':'fi');});
+  const ol=new Set();g.forEach((ch,key)=>{const [x,y]=key.split(',').map(Number);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const q=(x+dx)+','+(y+dy);if(!g.has(q)&&!ol.has(q)){ol.add(q);at(x+dx,y+dy,'ol');}});});
+  return sigCache[k]=`<svg class="sigil" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><path fill="#1A1433" d="${P.ol}"/><path fill="${c}" d="${P.fi}"/><path fill="${sigDark(c)}" d="${P.sh}"/><path fill="#fff" d="${P.hi}"/></svg>`;}
+/* the look of today's card: its colour, emblem, ability line and number */
+function todayLook(){const o=todayOwnObj(),i=state.todayV,V=VECTORS[i];const n=todayBand().length,nc=n>12?'n3':n>7?'n2':'';return o?{c:'#FFD36B',sig:sigilSVG(12,'#FFD36B'),ab:'',nc,no:'Yours'}:{c:V.color,sig:sigilSVG(i,V.color),ab:V.ability,nc,no:'No. '+String(i+1).padStart(2,'0')};}
 const PEN='<svg class="pi pen" viewBox="0 0 12 12" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M9 1h2v2h-2zM8 3h2v1h-2zM7 4h2v1h-2zM6 5h2v1h-2zM5 6h2v1h-2zM4 7h2v1h-2zM3 8h2v1h-2zM2 9h2v1h-2zM1 10h2v1h-2z"/></svg>';
 function pickVector(avoid){const pool=VECTORS.map((_,i)=>i).filter(i=>!avoid.includes(i));return pool[rand(pool.length)];}
 function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDate:k,date:k,offset:0,onboarded:false,ageBand:null,todayV:pickVector([]),status:'fresh',todayCard:null,cards:[],history:[],nextId:1,progress:0,packs:0,packsOpened:0,pity:{since:0},settings:{mood:'mix',sound:true,reduce:false,nudge:null,lore:true,sky:'auto',ownMix:'mix'},hearth:{slots:[],visits:{date:k,used:0},total:0,bd:'',fseen:[]},journal:{},ribbons:[],seen:SEEN_V,feedback:{},opens:[k],moodAsked:false,nudgeAsked:false,feedbackAsked:false,wander:null,curios:{},wstat:{sent:0,back:0},request:null,reqLast:'',reqDone:0,keepsR:[],games:{best:{},played:0,curioDay:''},own:{text:'',days:[]},backup:{at:'',ask:''},explore:{},want:[],wantAsked:false,owns:[],todayOwn:null,feel:{},forge:{spent:0,made:[],log:{},bell:'',comp:'',compTo:-1}};}
@@ -1450,11 +1478,11 @@ let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add
 
 /* Today's Vector card */
 function openVector(){
-  const V=VECTORS[state.todayV],isFresh=state.status==='fresh',first=!state.onboarded;
+  const L=todayLook(),V=VECTORS[state.todayV],isFresh=state.status==='fresh',first=!state.onboarded;
   openSheet(`<p class="muted center small">Day ${dayN()}, ${dateLabel(todayKey())}</p>
     <div class="flip${isFresh?'':' flipped'}" id="vflip"><div class="flip-in">
       <button class="vface vback" id="vBack"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg><span>Today's card</span><small>Tap to turn it over</small></button>
-      <div class="vface vfront"><div class="vband" style="background:${V.color}"><b>${esc(todayBand())}</b></div><div class="vbody"><p>${todayOwnObj()?'Something you chose for yourself.':V.blurb}</p><p><strong>${todayOwnObj()?PEN+'Your small thing':'Today\'s small thing'}</strong>${esc(todayTask())}</p><p><strong>The Forge asks</strong>${V.question}</p></div></div>
+      <div class="vface vfront cc" style="--cc:${L.c}"><div class="ccart">${L.sig}</div><div class="vband"><b class="${L.nc}">${esc(todayBand())}</b>${L.ab?`<small>${L.ab}</small>`:''}</div><div class="vbody"><p class="ccblurb">${todayOwnObj()?'Something you chose for yourself.':V.blurb}</p><p class="ccplate"><strong>${todayOwnObj()?PEN+'Your small thing':'Today\'s small thing'}</strong>${esc(todayTask())}</p><p class="ccask"><strong>The Forge asks</strong>${V.question}</p></div><span class="ccno" aria-hidden="true">${L.no}</span></div>
     </div></div>
     ${first?`<button class="primary" id="vDoneNow" ${isFresh?'hidden':''}>I did it. Find my Forgeling</button><button class="ghost" id="vOk" ${isFresh?'hidden':''}>I'll do it in a bit</button>`:`<button class="primary" id="vOk" ${isFresh?'hidden':''}>Got it</button>`}
     ${first?'<p class="muted small center" style="margin-top:10px">No account needed. Do the small thing, then tap to find your first Forgeling.</p>':''}`,!isFresh);
@@ -1629,7 +1657,7 @@ function renderToday(){
     save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>'};
   let hero='';
   if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
-  else if(s==='revealed')hero=`<div class="taskface"><div class="band" style="background:${V.color}">${esc(todayBand())}</div><p>${todayOwnObj()?PEN:''}${esc(todayTask())}</p></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
+  else if(s==='revealed')hero=`<div class="taskface" style="--cc:${todayLook().c}"><div class="tfart">${todayLook().sig}</div><div class="tfmain"><div class="band"><span>${esc(todayBand())}</span></div><p>${todayOwnObj()?PEN:''}${esc(todayTask())}</p></div></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
   else if(s==='done'&&favShows()){const c=cardById(state.todayCard),f=homeFav(),fn=esc(f.nick||f.name);hero=`<button class="herocard" id="btnShowFav" aria-label="Look at ${fn}">${cardHTML(f,{w:136,mini:true})}</button><h2>${fn} is keeping you company</h2><p class="muted">${c?'Today’s find, '+esc(c.nick||c.name)+', is in your binder. ':''}${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${c?'<button class="ghost favswap" id="btnSeeFind">See today’s find</button>':''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else if(s==='done'){const c=cardById(state.todayCard),f=homeFav();hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${f&&c&&f.id!==c.id?`<button class="ghost favswap" id="btnFavBack">Show ${esc(f.nick||f.name)} here</button>`:''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else hero=`${homeFav()?`<button class="herocard" id="btnShowFav" aria-label="Look at ${esc(homeFav().nick||homeFav().name)}">${cardHTML(homeFav(),{w:136,mini:true})}</button>`:''}<h2>Resting today</h2><p class="muted">Your progress is safe and nothing is lost. A new card arrives tomorrow.</p><button class="ghost" id="btnUnrest">Actually, show me today's card</button><div style="width:100%;text-align:left">${echoHTML()}</div>`;
