@@ -53,7 +53,7 @@ with sync_playwright() as p:
     rec("Saves","when the web copy is newer, it wins and is copied to the phone",st(pg)["cards"][0]["nick"]=="FromWeb" and "FromWeb" in prefs(pg).get("forge-app-v1",""))
     # store edition
     tabto(pg,"settings"); t=pg.inner_text("#view-settings")
-    rec("Store","tester-only pieces are hidden: feedback questions, pilot report, prototype tools","Share your thoughts" not in t and "My report" not in t and pg.locator("details.dev").count()==0,t[-200:])
+    rec("Store","tester-only pieces are hidden: feedback questions, pilot report, prototype tools","Feedback" not in t and "My report" not in t and pg.locator("details.dev").count()==0,t[-200:])
     rec("Store","the version reads as a plain app version","Forgelings 1.0.0" in t and "prototype" not in t)
     rec("Store","no 'add to home screen' tip inside the app","Put Forgelings on your home screen" not in t)
     tabto(pg,"binder"); pg.evaluate("()=>{const c=document.querySelector('#view-binder .card');c&&c.click()}"); pg.wait_for_timeout(500)
@@ -105,7 +105,7 @@ with sync_playwright() as p:
     ctx.close()
     # the web is untouched
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"settings"); t=pg.inner_text("#view-settings")
-    rec("Web","on the web nothing changes: no reminders block, tester tools still there","Reminders" not in t and "Share your thoughts" in t and pg.locator("details.dev").count()==1 and re.search(r"prototype 0\.\d+\.\d+",t))
+    rec("Web","on the web nothing changes: no reminders block, tester tools still there","Reminders" not in t and "Feedback" in t and "My report" in t and pg.locator("details.dev").count()==1 and re.search(r"prototype 0\.\d+\.\d+",t))
     rec("Web","no page errors on the web",not pg._errs,pg._errs[:1]); ctx.close()
     b.close()
 save_results("qa_32"); print(sum(r["ok"] for r in RES),"/",len(RES))
