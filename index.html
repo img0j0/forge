@@ -94,6 +94,14 @@ h3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .setblock{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:12px}
 .setblock b{font:600 17px var(--display)}
 .setblock .muted{margin:2px 0 8px}
+.setsec{padding:0 16px}.setsec>summary{min-height:60px;display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none;padding:10px 0}
+.setsec>summary::-webkit-details-marker{display:none}
+.setsec>summary::after{content:'+';margin-left:auto;flex:none;width:24px;text-align:center;font:400 30px/1 'VT323',monospace;color:var(--plum)}
+.setsec[open]>summary::after{content:'\2013'}
+.setsec>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--plum)}
+.sst{display:flex;flex-direction:column;min-width:0;gap:2px}.ssum{color:var(--muted);font-size:13px;line-height:1.35}
+.setsec[open]>summary{border-bottom:1px solid var(--line);margin-bottom:6px}.setin{padding-bottom:14px}.setin>.lbl2:first-child{margin-top:6px}
+.erase{text-align:center;margin:18px 0 4px}
 .numgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .num{background:var(--chip);border-radius:14px;padding:10px 12px}
 .num b{display:block;font:600 22px var(--display)} .num span{font-size:13px;color:var(--muted)}
@@ -691,7 +699,7 @@ html.ls:not(.reduce) main>section.enter>*:nth-child(n+5){animation-delay:.16s}
 html.ls .panel-box,html.ls .group,html.ls .hero,html.ls .setblock{border:0 !important;border-image:none !important;border-radius:0 !important;clip-path:var(--step) !important;background:linear-gradient(#FFD36B,#FFD36B) left 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) left 8px bottom 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px bottom 8px/4px 4px no-repeat,var(--dot) 0 0/8px 8px repeat,var(--glass) !important}
 html.ls .panel-box{padding:18px 18px 16px !important}
 html.ls .group{padding:6px 4px !important}
-html.ls .setblock{padding:20px 20px 18px !important}
+html.ls .setblock{padding:20px 20px 18px !important}html.ls .setsec{padding:8px 20px !important}
 html.ls .hero{padding:24px 16px 20px !important}
 html.ls .hero:is(:has(#btnShowToday),:has(#btnTurn),:has(#btnShowFav)){clip-path:none !important;background:linear-gradient(#FFD36B,#FFD36B) left 8px top 240px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px top 240px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) left 8px bottom 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px bottom 8px/4px 4px no-repeat,var(--ped) center 204px/176px 22px no-repeat,radial-gradient(circle at 50% 116px,var(--glow) 0,transparent 128px),linear-gradient(to bottom,transparent 0 232px,var(--glass) 232px) !important}
 html.ls .hero:is(:has(#btnShowToday),:has(#btnTurn),:has(#btnShowFav)) h2{margin-top:16px}
@@ -1105,7 +1113,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.2',APPVER='1.0.0';
+const VERSION='prototype 0.38.3',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1680,38 +1688,34 @@ function pilotReport(){
   const H=state.history,done=H.filter(h=>h.status==='done').length,rest=H.filter(h=>h.status==='rest').length,miss=H.filter(h=>h.status==='skipped').length;
   return `Forgelings pilot report (${VERSION})\nStarted: ${state.startDate}, now day ${dayN()}\nDays opened: ${new Set(state.opens).size}\nDays done: ${done}\nRest days: ${rest}\nMissed days: ${miss}\nForgelings: ${state.cards.length} (rare or better: ${state.cards.filter(c=>c.rarity>=2).length})\nPacks opened: ${state.packsOpened}\nForgeling mood: ${state.settings.mood}\nJournal entries: ${Object.keys(state.journal||{}).length}\nRibbons: ${earnedIds().length} of ${RIBBONS.length}\nFavorites: ${state.cards.filter(c=>c.fav).length}\nAge band: ${state.ageBand||'unknown'}\nHearth visits: ${(state.hearth&&state.hearth.total)||0}\nBonded (level 3 or higher): ${state.cards.filter(c=>bondLevel(c)>=3).length}\nNamed Forgelings: ${state.cards.filter(c=>c.nick).length}\nTales written: ${state.cards.filter(c=>c.tale).length}\nWanders sent: ${state.wstat.sent}, collected: ${state.wstat.back}\nCurios found: ${Object.keys(state.curios).length} of ${CURIOS.length}\nEmbers: ${embers()} (${(state.forge&&state.forge.spent)||0} spent)\nForged: ${(state.forge&&state.forge.made.length)||0} of ${FORGE_R.length}\nReturn scenes seen: ${(state.hearth&&state.hearth.welcomes)||0}\nQuiet blooms: ${(state.hearth&&state.hearth.quiet&&state.hearth.quiet.b)||0} (sprout stage ${state.hearth&&state.hearth.quiet?quietStage(state.hearth.quiet.g):0} of 5)\nCards with news from away: ${state.cards.filter(c=>c.gossip).length}\nRealms inked on the map: ${THEMES.filter((T,ti)=>state.cards.filter(c=>c.theme===ti).length>=6).length}\nWants: ${(state.want||[]).map(k=>WANTS[k].n).join(', ')||'none'}\nOwn small things: ${(state.owns||[]).length} (${(state.owns||[]).reduce((n,o)=>n+o.days.length,0)} days done)\nCard mix: ${state.settings.ownMix||'mix'}\nLines written: ${linesWritten()}\nFeelings noted: ${Object.keys(state.feel||{}).length}\nInk-touched Forgelings: ${state.cards.filter(c=>c.ink).length}\nScribe: ${scribeHere()?'by the fire':'not yet'}\nNudge: ${state.settings.nudge||'off'}`+feedbackForReport();
 }
+let setOpen=null;
+function setSec(id,title,sum,body,el){const o=setOpen&&setOpen.has(id);return `<details class="setblock setsec" data-sec="${id}"${el?` id="${el}"`:''}${o?' open':''}><summary><span class="sst"><b>${title}</b><small class="ssum">${sum}</small></span></summary><div class="setin">${body}</div></details>`;}
 function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
+  if(!setOpen)setOpen=new Set(state.want.length||state.owns.length?[]:['cards']);
+  const ML={cute:'Cute only',mix:'A mix',dark:'Dark only'},SK={auto:'Follows your day',day:'Always day',night:'Always night',plain:'Plain'},TH={light:'Light',dark:'Dark'};
   $('#view-settings').innerHTML=`
-    <div class="setblock"><b>Forgeling mood</b><p class="muted small">Which Forgelings you find from now on. The ones you already have stay.</p>
-      <div class="chips" role="group" aria-label="Forgeling mood">${[['cute','Cute only'],['mix','A mix'],['dark','Dark only']].map(a=>`<button class="chip" data-setmood="${a[0]}" aria-pressed="${S.mood===a[0]}">${a[1]}</button>`).join('')}</div></div>
-    <div class="setblock"><b>Sound</b><p class="muted small">Soft pixel-style sounds, all made on your device.</p>
+    ${setSec('cards','Your cards',(state.want.length?state.want.map(i=>WANTS[i].n).join(', '):'Nothing picked yet')+(state.owns.length?' \u00B7 '+state.owns.length+' of your own':''),`<p class="muted small">What do you want more of? Pick up to three, and your daily card leans toward them.</p>
+      <div class="chips" role="group" aria-label="What you want more of">${WANTS.map((w,i)=>`<button class="chip" data-swant="${i}" aria-pressed="${state.want.includes(i)}">${w.n}</button>`).join('')}</div>
+      <div class="lbl2">Your own small things</div><p class="muted small">Up to three. Some days the card you turn over is one of yours, and doing it finds a Forgeling like any other day.</p>
+      ${state.owns.map(o=>`<div class="ownitem"><span class="ot">${PEN}<b>${esc(o.text)}</b><small>${o.k>=0?WANTS[o.k].n:'Any kind'}</small></span><button class="pill" data-ownrm="${o.id}" aria-label="Remove ${esc(o.text)}">Remove</button></div>`).join('')}
+      ${state.owns.length<3?`<label class="field"><span>A new small thing</span><input id="ownIn" maxlength="60" placeholder="For example: walk for ten minutes" autocomplete="off"></label><div class="lbl2">What kind of thing is it?</div><div class="chips" role="group" aria-label="What kind of thing is it">${WANTS.map((w,i)=>`<button class="chip" data-ownk="${i}" aria-pressed="${ownK()===i}">${w.n}</button>`).join('')}</div><div class="chips"><button class="pill" id="ownAdd">Add it</button></div>`:''}
+      ${state.owns.length?`<div class="lbl2">How often yours come up</div><div class="chips" role="group" aria-label="How often yours come up">${[['mix','Every other day or so'],['mine','Most days'],['surprise','Only the world’s cards']].map(a=>`<button class="chip" data-ownmix="${a[0]}" aria-pressed="${(S.ownMix||'mix')===a[0]}">${a[1]}</button>`).join('')}</div>`:''}`,'yourCards')}
+    ${setSec('sound','Sound',S.sound===false?'Off':['On',S.music!==false?'soft music':'no music',(S.vol||'normal')+' volume'].join(' \u00B7 '),`<p class="muted small">Soft pixel-style sounds, all made on your device.</p>
       <div class="chips"><button class="chip" id="setSound" aria-pressed="${S.sound!==false}">Sound ${S.sound!==false?'on':'off'}</button><button class="chip" id="setSfx" aria-pressed="${S.sfx!==false}">Sound effects ${S.sfx!==false?'on':'off'}</button><button class="chip" id="setAmb" aria-pressed="${S.amb!==false}">Fire crackle ${S.amb!==false?'on':'off'}</button><button class="chip" id="setNature" aria-pressed="${S.nature!==false}">Nature sounds ${S.nature!==false?'on':'off'}</button><button class="chip" id="setMusic" aria-pressed="${S.music!==false}">Soft music ${S.music!==false?'on':'off'}</button></div>
       <div class="lbl2">Volume</div><div class="chips" role="group" aria-label="Volume">${[['quiet','Quiet'],['normal','Normal'],['loud','Loud']].map(a=>`<button class="chip" data-vol="${a[0]}" aria-pressed="${(S.vol||'normal')===a[0]}">${a[1]}</button>`).join('')}</div>
       <div class="lbl2">Sound method</div><div class="chips" role="group" aria-label="Sound method">${[['std','Standard'],['media','Compatibility']].map(a=>`<button class="chip" data-eng="${a[0]}" aria-pressed="${(S.engine==='media'?'media':'std')===a[0]}">${a[1]}</button>`).join('')}</div>
       <p class="muted small" id="auStatus" style="margin-top:6px">${auStatusText()}</p>
       <button class="pill" id="soundCheck" style="margin-top:8px">Run a sound check</button>
-      ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}</div>
-    <div class="setblock"><b>Comfort</b><p class="muted small">Motion, lore, and appearance.</p>
-      <div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and tales ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app follows your day, from dawn to night, and the app’s colours follow the sky. Light and Dark set how bright it is. Plain keeps a quiet, flat look.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div></div>
-    <div class="setblock" id="yourCards"><b>Your cards</b><p class="muted small">What do you want more of? Pick up to three, and your daily card leans toward them.</p>
-      <div class="chips" role="group" aria-label="What you want more of">${WANTS.map((w,i)=>`<button class="chip" data-swant="${i}" aria-pressed="${state.want.includes(i)}">${w.n}</button>`).join('')}</div>
-      <div class="lbl2">Your own small things</div><p class="muted small">Up to three. Some days the card you turn over is one of yours, and doing it finds a Forgeling like any other day.</p>
-      ${state.owns.map(o=>`<div class="ownitem"><span class="ot">${PEN}<b>${esc(o.text)}</b><small>${o.k>=0?WANTS[o.k].n:'Any kind'}</small></span><button class="pill" data-ownrm="${o.id}" aria-label="Remove ${esc(o.text)}">Remove</button></div>`).join('')}
-      ${state.owns.length<3?`<label class="field"><span>A new small thing</span><input id="ownIn" maxlength="60" placeholder="For example: walk for ten minutes" autocomplete="off"></label><div class="lbl2">What kind of thing is it?</div><div class="chips" role="group" aria-label="What kind of thing is it">${WANTS.map((w,i)=>`<button class="chip" data-ownk="${i}" aria-pressed="${ownK()===i}">${w.n}</button>`).join('')}</div><div class="chips"><button class="pill" id="ownAdd">Add it</button></div>`:''}
-      ${state.owns.length?`<div class="lbl2">How often yours come up</div><div class="chips" role="group" aria-label="How often yours come up">${[['mix','Every other day or so'],['mine','Most days'],['surprise','Only the world’s cards']].map(a=>`<button class="chip" data-ownmix="${a[0]}" aria-pressed="${(S.ownMix||'mix')===a[0]}">${a[1]}</button>`).join('')}</div>`:''}</div>
-    ${remindHTML()}${installTipHTML()}
-    <div class="setblock"><b>Fair odds</b><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button></div>
-    <div class="setblock"><b>Privacy</b><p class="muted small">Everything you do in Forgelings stays on this device. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p>
-      <div class="chips"><button class="pill" id="btnPrivacy">How Forgelings handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div>
-      <button class="pill" id="btnErase" style="margin-top:8px">Erase everything on this device</button><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p></div>
-    <div class="setblock"><b>Your numbers</b>
-      <div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div></div>
-    <div class="setblock"><b>Backup</b><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p>
-      <div class="chips"><button class="pill" id="btnExport">Save a copy</button><button class="pill" id="btnRestore">Restore a copy</button></div></div>
-    ${STORE?'':`<div class="setblock"><b>Share your thoughts</b><p class="muted small">A few quick questions. Answer as many as you like, whenever you like.</p>${feedbackHTML()}</div>
-    <div class="setblock"><b>My report</b><p class="muted small">A short summary, plus anything you wrote above, that you can send to whoever is gathering feedback.</p><button class="pill" id="btnReport">${navigator.share&&(RELEASE||STANDALONE())?'Send my report':'Copy my report'}</button></div>
-    <details class="dev"><summary>Prototype tools</summary><div class="stack">
+      ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}`)}
+    ${setSec('look','Look and feel',[ML[S.mood]||'A mix',SK[S.sky||'auto'],TH[S.theme],S.reduce?'less motion':''].filter(Boolean).join(' \u00B7 '),`<div class="lbl2">Forgeling mood</div><p class="muted small">Which Forgelings you find from now on. The ones you already have stay.</p><div class="chips" role="group" aria-label="Forgeling mood">${[['cute','Cute only'],['mix','A mix'],['dark','Dark only']].map(a=>`<button class="chip" data-setmood="${a[0]}" aria-pressed="${S.mood===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Comfort</div><div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and tales ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Sky</div><p class="muted small" style="margin:2px 0 6px">The sky behind the app follows your day, from dawn to night, and the app’s colours follow the sky. Light and Dark set how bright it is. Plain keeps a quiet, flat look.</p><div class="chips" role="group" aria-label="Sky">${[['auto','Follows your day'],['day','Always day'],['night','Always night'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div>`)}
+    ${remindHTML()}
+    ${setSec('coll','Your collection',state.cards.length+' Forgeling'+(state.cards.length===1?'':'s')+' \u00B7 save or restore a copy',`<div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div><div class="lbl2">Backup</div><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p><div class="chips"><button class="pill" id="btnExport">Save a copy</button><button class="pill" id="btnRestore">Restore a copy</button></div>`)}
+    ${setSec('about','About',`Fair odds, privacy and terms`,`<div class="lbl2">Fair odds</div><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button><div class="lbl2">Privacy</div><p class="muted small">Everything you do in Forgelings stays on this device. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p><div class="chips"><button class="pill" id="btnPrivacy">How Forgelings handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p>`)}
+    ${STORE?'':setSec('feedback','Feedback','A few quick questions, and your report',`<p class="muted small">Answer as many as you like, whenever you like.</p>${feedbackHTML()}<div class="lbl2">My report</div><p class="muted small">A short summary, plus anything you wrote above, that you can send to whoever is gathering feedback.</p><button class="pill" id="btnReport">${navigator.share&&(RELEASE||STANDALONE())?'Send my report':'Copy my report'}</button>`)}
+    ${installTipHTML()}
+    <div class="erase"><button class="pill" id="btnErase">Erase everything on this device</button></div>
+    ${STORE?'':`    <details class="dev"><summary>Prototype tools</summary><div class="stack">
       <button class="tool" data-tool="next"><b>Skip to tomorrow</b><span>Skipping a day never breaks anything.</span></button>
       <button class="tool" data-tool="week"><b>Simulate 6 days</b><span>Earns 5 Forgelings (one rest day) and unlocks a pack.</span></button>
       <button class="tool" data-tool="pack"><b>Give me a pack</b><span>Jump straight to the pack opening.</span></button>
@@ -3584,7 +3588,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='vOk'){state.onboarded=true;save();closeModal();render();}
   else if(b.id==='vDoneNow'){state.onboarded=true;save();closeModal();render();startDone(false);}
   else if(b.dataset.mood){state.settings.mood=b.dataset.mood;state.moodAsked=true;save();closeModal();startDone(pendingAllIn);}
-  else if(b.id==='fbGo'){closeModal();tab='settings';render();setTimeout(()=>{const el=$('#fb_confuse');if(el){el.focus({preventScroll:false});el.scrollIntoView({block:'center'});}},250);}
+  else if(b.id==='fbGo'){closeModal();tab='settings';if(!setOpen)setOpen=new Set();setOpen.add('feedback');render();setTimeout(()=>{const el=$('#fb_confuse');if(el){el.focus({preventScroll:false});el.scrollIntoView({block:'center'});}},250);}
   else if(b.id==='rvName')drawName();
   else if(b.id==='rvSkip'||b.id==='skipNames')finishReveal();
   else if(b.id==='saveNames'){readForm(cardById(form.id));finishReveal();}
@@ -3696,6 +3700,7 @@ $('#view-chronicle').addEventListener('click',e=>{
   else if(b.id==='chMore'){ch.more++;renderChronicle();}
   else if(b.dataset.edit)openEdit(+b.dataset.edit,'none');
 });
+$('#view-settings').addEventListener('toggle',e=>{const d=e.target;if(!d.matches||!d.matches('details.setsec'))return;if(!setOpen)setOpen=new Set();if(d.open)setOpen.add(d.dataset.sec);else setOpen.delete(d.dataset.sec);},true);
 $('#view-settings').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.setmood){state.settings.mood=b.dataset.setmood;state.moodAsked=true;save();renderSettings();toast('Saved. New finds will follow this.');}
@@ -4436,9 +4441,9 @@ async function remindSync(ask){
 }
 function remindHTML(){
   if(!NATIVE)return '';const S=state.settings;
-  return `<div class="setblock"><b>Reminders</b><p class="muted small">One gentle nudge on days today’s card is still waiting. Never more than one, and missing a day never costs anything.</p>
+  return setSec('remind','Reminders',S.nudge?'Each day at '+S.nudge:'Off',`<p class="muted small">One gentle nudge on days today’s card is still waiting. Never more than one, and missing a day never costs anything.</p>
     <div class="chips" role="group" aria-label="Daily reminder">${[[null,'Off'],['8:00 am','8:00 am'],['12:00 pm','12:00 pm'],['6:00 pm','6:00 pm']].map(a=>`<button class="chip" data-setnudge="${a[0]||''}" aria-pressed="${(S.nudge||null)===a[0]}">${a[1]}</button>`).join('')}</div>
-    <div class="chips"><button class="chip" id="setWnote" aria-pressed="${S.wnote!==false}">Tell me when a wanderer is back ${S.wnote!==false?'on':'off'}</button><button class="chip" id="setHaptic" aria-pressed="${S.haptics!==false}">Haptics ${S.haptics!==false?'on':'off'}</button></div></div>`;
+    <div class="chips"><button class="chip" id="setWnote" aria-pressed="${S.wnote!==false}">Tell me when a wanderer is back ${S.wnote!==false?'on':'off'}</button><button class="chip" id="setHaptic" aria-pressed="${S.haptics!==false}">Haptics ${S.haptics!==false?'on':'off'}</button></div>`);
 }
 /* ---- 0.32: haptics ---- */
 function buzz(k){if(!NATIVE||!PL.Haptics||(state&&state.settings.haptics===false))return;try{const p=k==='success'?PL.Haptics.notification({type:'SUCCESS'}):PL.Haptics.impact({style:k||'LIGHT'});if(p&&p.catch)p.catch(()=>{});}catch(e){}}
