@@ -58,11 +58,11 @@ rep(""".vface.vfront{transform:rotateY(180deg);background:#FFFDF8;color:#2E2A47;
 .ccart{flex:1 1 0;min-height:44px;display:grid;place-items:center;position:relative;margin:4px 4px 0;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 55%,transparent),transparent)}
 .ccart .sigil{height:min(100%,112px);width:auto;max-width:112px;image-rendering:pixelated;filter:drop-shadow(0 4px 0 rgba(10,6,28,.45))}
 .vband{flex:none;position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 8px;margin:6px -4px 0;padding:6px 16px 4px;background:var(--cc);color:#2E2A47;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 50%,100% 100%,0 100%,8px 50%);box-shadow:inset 0 -3px 0 rgba(46,42,71,.22)}
-.vband b{font:400 32px/1 'VT323',monospace;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.vband b.n2{font-size:26px}.vband b.n3{font-size:22px}
-.vband small{font:700 11px/1 inherit;letter-spacing:.08em;text-transform:uppercase;opacity:.85;flex:none}
+.vband b{font:400 34px/1 'VT323',monospace;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.vband b.n2{font-size:30px}.vband b.n3{font-size:26px}
+.vband small{font:700 16px/1 inherit;letter-spacing:.08em;font-variant-caps:all-small-caps;opacity:.85;flex:none}
 .vbody{flex:none;padding:8px 8px 20px;display:grid;gap:8px;font-size:clamp(13px,3.5vw,14.5px);line-height:1.38;position:relative;z-index:3}
-.vbody strong{display:block;font:600 13px var(--display);letter-spacing:.04em;text-transform:uppercase;margin-bottom:1px}
+.vbody strong{display:block;font:600 17px/1.15 var(--display);letter-spacing:.05em;font-variant-caps:all-small-caps;margin-bottom:1px}
 .ccblurb{color:#D2C9EE;font-style:italic;text-align:center;margin:0}
 .ccplate{margin:0;background:#FBF5E6;color:#2E2A47;padding:8px 10px 9px;clip-path:polygon(0 3px,3px 3px,3px 0,calc(100% - 3px) 0,calc(100% - 3px) 3px,100% 3px,100% calc(100% - 3px),calc(100% - 3px) calc(100% - 3px),calc(100% - 3px) 100%,3px 100%,3px calc(100% - 3px),0 calc(100% - 3px));font-size:clamp(14px,3.8vw,15.5px)}
 .ccplate strong{color:#5A4A9E}
@@ -72,7 +72,7 @@ rep(""".vface.vfront{transform:rotateY(180deg);background:#FFFDF8;color:#2E2A47;
 .tfart{flex:none;width:72px;display:grid;place-items:center;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 60%,transparent),transparent)}
 .tfart .sigil{width:60px;height:60px;image-rendering:pixelated;filter:drop-shadow(0 3px 0 rgba(10,6,28,.45))}
 .tfmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative;z-index:3;padding:2px 4px 2px 0}
-.taskface .band{align-self:flex-start;max-width:100%;padding:3px 14px 2px 10px;background:var(--cc);color:#2E2A47;font:400 24px/1 'VT323',monospace;letter-spacing:.02em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 7px) 50%,100% 100%,0 100%);box-shadow:inset 0 -3px 0 rgba(46,42,71,.22)}
+.taskface .band{align-self:flex-start;max-width:100%;padding:3px 14px 2px 10px;background:var(--cc);color:#2E2A47;font:400 26px/1 'VT323',monospace;letter-spacing:.02em;clip-path:polygon(0 0,100% 0,calc(100% - 7px) 50%,100% 100%,0 100%);box-shadow:inset 0 -3px 0 rgba(46,42,71,.22)}
 .taskface .band span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
 @media (prefers-reduced-motion:no-preference){.flipped .ccart .sigil,.taskface .sigil{animation:sigBob 3.2s steps(4) infinite}}
