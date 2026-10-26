@@ -1,6 +1,8 @@
 # Release audit and working procedure
 Audited 2026-10-26.
 
+Update: 0.38.7 addresses the save-write warning, cache cleanup, HTTP fallback/cache-write lifetime and QA runner exit-status findings below. See RELEASE_0.38.7.md for validation and remaining limits; the audit bullets below describe the pre-fix state. Browser regression remains outstanding.
+
 ## Branch ownership
 - dev/work.html is the editable source. dev includes pwa.py, historical builds, legal pages, art tooling, and qa/.
 - main is the generated website mirror, NOT the publishing trigger.
@@ -19,7 +21,7 @@ Do not run a historical patch against base386 and replace work.html without reta
 1. Read this file, forge-handoff.md, and current branch heads. Fetch fresh source; do not reuse a prior chat's cached file.
 2. Work from dev/work.html. Use a focused branch/commit. Preserve local-storage key forge-app-v1, origin, and /forge/ path.
 3. Increment VERSION and title together. Update user-facing What's New/SEEN_V when appropriate. pwa.py derives its cache version from VERSION.
-4. Run JavaScript syntax checks, the new feature checks, and relevant existing QA suites. Before a broad release run qa/runall.sh and inspect both individual process exit codes and logs. The current runner does NOT reliably fail its own exit status for child failures/timeouts; DONE is not a passing result.
+4. Run JavaScript syntax checks, the new feature checks, and relevant existing QA suites. Before a broad release run qa/runall.sh and inspect both individual process exit codes and logs. The 0.38.7 runner returns nonzero for failed, crashed, empty or timed-out suites; still inspect individual logs.
 5. Exercise an existing save, a new player, save/reload, export/restore, reward caps, narrow layout, reduced motion, and offline navigation. Include real iPhone checks for native/browser behavior; Chromium cannot establish Safari equivalence.
 6. Run python3 pwa.py. Inspect generated changes, legal pages, manifest and assets. Ensure index.html is exactly the expected transformation of work.html.
 7. Commit generated output to main. Compare gh-pages...main: proceed with a non-forced fast-forward only when gh-pages has no independent commits. Use expected SHA to reject concurrent edits. Investigate divergence instead of overwriting it.
