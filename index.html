@@ -71,8 +71,25 @@ h3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .row{display:flex;justify-content:space-between;gap:10px;margin-top:6px;align-items:center}
 .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dots{display:flex;gap:9px;align-items:center}
-.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--plum)}
-.dot.done{background:var(--plum)} .dot.rest{border-style:dashed;opacity:.55} .dot.skipped{opacity:.25} .dot.now{box-shadow:0 0 0 3px var(--butter)}
+/* 0.38.5: the week as pixel tiles */
+.weekbox .dots{justify-content:space-between;gap:4px;margin:4px 0 28px}
+.weekhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.weekhead h2.sub3{margin:0 0 8px}
+.dot{position:relative;flex:none;width:34px;height:34px;background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.dot::after{content:attr(data-d);position:absolute;left:0;right:0;top:calc(100% + 3px);text-align:center;font:400 15px/1 'VT323',monospace;color:var(--muted)}
+.dot.done{background:var(--stF) 50% 55%/66% auto no-repeat,var(--stamp);box-shadow:inset 0 0 0 2px var(--stampEdge),0 3px 0 rgba(10,6,28,.35)}
+.dot.rest{background:var(--stM) 50% 52%/58% auto no-repeat,transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.dot.skipped{opacity:.45}
+.dot.now{outline:3px solid var(--butter);outline-offset:2px}.dot.now::after{color:var(--butter)}
+.shelf{position:relative;padding:4px 6px 22px;gap:12px;background:linear-gradient(#C68A4E,#C68A4E) 0 calc(100% - 10px)/100% 3px no-repeat,linear-gradient(#8A5A32,#8A5A32) 0 calc(100% - 4px)/100% 7px no-repeat,linear-gradient(rgba(10,6,28,.35),rgba(10,6,28,.35)) 0 100%/100% 4px no-repeat}
+.shelf button{flex:none}
+.feel .chips{gap:10px;justify-content:center}
+.facebtn{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:64px;min-height:44px;padding:8px 8px 6px;border:0;background:var(--chip);color:var(--ink);font:600 14px inherit;cursor:pointer;clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px))}
+.facebtn .feelface{width:36px;height:36px;image-rendering:pixelated;filter:saturate(.8);transition:transform .15s,filter .15s}
+.facebtn[aria-pressed=true]{background:rgba(255,211,107,.18);box-shadow:inset 0 0 0 2px #FFD36B;color:var(--ink)}
+.facebtn[aria-pressed=true] .feelface{filter:none;transform:translateY(-2px)}
+.facebtn:focus-visible{outline:none;box-shadow:inset 0 0 0 3px #FFD36B}
+@media (hover:hover){.facebtn:hover .feelface{filter:none}}
+@media (prefers-reduced-motion:reduce){.facebtn .feelface{transition:none}.facebtn[aria-pressed=true] .feelface{transform:none}}
 .pips{display:flex;gap:8px;margin:10px 0 4px}
 .pip{flex:1;height:10px;border-radius:999px;background:var(--chip);border:1.5px solid var(--line)}
 .pip.on{background:var(--plum);border-color:var(--plum)}
@@ -173,7 +190,7 @@ ul.furn li:not(.on) b{color:var(--muted)}
 .title-bottom .primary{max-width:340px;box-shadow:0 6px 0 rgba(10,8,30,.25)}
 .tsmall{font-size:14px;color:#EDE6FF;text-align:center;margin:0;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .titlemode.lite .tsmall{color:#2E2A47;text-shadow:0 1px 2px rgba(255,255,255,.7)}
-.title-card{width:100%;max-width:400px;background:rgba(22,18,46,.9);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:18px 18px 16px;display:grid;gap:10px;justify-items:center;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:rise .35s ease-out}
+.title-card{width:100%;max-width:400px;background:linear-gradient(#FFD36B,#FFD36B) left 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px top 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) left 8px bottom 8px/4px 4px no-repeat,linear-gradient(#FFD36B,#FFD36B) right 8px bottom 8px/4px 4px no-repeat,rgba(20,15,48,.94);border:0;border-radius:0;clip-path:var(--step);padding:18px 18px 16px;display:grid;gap:10px;justify-items:center;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:rise .35s ease-out}
 .title-card .rv-title{margin:0}.title-card .rv-hint{margin:0}
 @keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion: reduce){.title-card{animation:none}#titleCv{transition:none}}
@@ -578,6 +595,11 @@ html.reduce .mk-ring{animation:none}
 
 /* Age screen */
 .field select{width:100%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:11px 12px;font:inherit}
+/* 0.38.5: fields share the pixel corners */
+.field :is(input,textarea,select){border-radius:0 !important;border-width:2px !important;clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px))}
+.field :is(input,textarea,select):focus{outline:none !important;box-shadow:inset 0 0 0 3px #FFD36B !important}
+.field select{appearance:none;-webkit-appearance:none;padding-right:40px !important;background-image:url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 7 4%22 shape-rendering=%22crispEdges%22><path fill=%22%23FFD36B%22 d=%22M0 0h7v1H6v1H5v1H4v1H3V3H2V2H1V1H0z%22/></svg>") !important;background-repeat:no-repeat !important;background-position:right 14px center !important;background-size:14px 8px !important;cursor:pointer}
+.field select option{color:#2E2A47;background:#FBF5E6}
 .ov .field select{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff}
 .ov .field select option{color:#2E2A47}
 
@@ -703,6 +725,12 @@ html.ls .tab{color:var(--muted)}
 html.ls .tab[aria-current="page"]{color:var(--plum)}
 html.ls .tab[aria-current="page"]::before{content:'';position:absolute;top:-3px;left:50%;width:24px;height:3px;margin-left:-12px;background:var(--plum)}
 html.ls .toast{border-radius:0;clip-path:var(--step);bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+/* 0.38.5: toasts are pixel banners; a new ribbon gets gold and a medal */
+.toast{border-radius:0;clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px));background:#1E1740;color:#FFF7EC;box-shadow:inset 0 0 0 2px #F2C14E,inset 0 -4px 0 rgba(0,0,0,.25);padding:12px 18px 13px}
+.toast.medal{background:#FFD36B;color:#2E2A47;box-shadow:inset 0 0 0 2px #8A5A32,inset 0 -4px 0 rgba(138,90,50,.35);padding-left:46px;text-align:left}
+.toast.medal::before{content:'';position:absolute;left:14px;top:50%;width:20px;height:24px;margin-top:-12px;background:url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 10 12%22 shape-rendering=%22crispEdges%22><path fill=%22%23C0392B%22 d=%22M2 0h2v4H2zM6 0h2v4H6z%22/><path fill=%22%231A1433%22 d=%22M3 4h4v1h1v1h1v4H8v1H7v1H3v-1H2v-1H1V6h1V5h1z%22/><path fill=%22%23FFD36B%22 d=%22M3 5h4v1h1v4H7v1H3v-1H2V6h1z%22/><path fill=%22%23fff%22 d=%22M3 6h1v2H3z%22/></svg>") center/contain no-repeat;image-rendering:pixelated}
+@media (prefers-reduced-motion:no-preference){.toast.medal.show::before{animation:medalDrop .6s steps(3) 1}}
+@keyframes medalDrop{0%{transform:translateY(-6px)}100%{transform:none}}
 html.ls .app{padding-bottom:116px}
 html.ls:not(.reduce) main>section.enter>*{animation:lsRise .26s cubic-bezier(.2,.9,.3,1) both}
 html.ls:not(.reduce) main>section.enter>*:nth-child(2){animation-delay:.04s}
@@ -1129,7 +1157,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.4',APPVER='1.0.0';
+const VERSION='prototype 0.38.5',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1224,12 +1252,13 @@ const SIGIL=["...######.../..#++#####../.#++#######./############/.##########./.
 const sigCache={};
 function sigDark(c){const n=parseInt(c.slice(1),16);return '#'+[16,8,0].map(s=>Math.round(((n>>s)&255)*.68).toString(16).padStart(2,'0')).join('');}
 /* a 12x12 pixel emblem: fill, a shaded lower-right edge, white glints, and a dark outline, all in one small SVG */
-function sigilSVG(i,c){const k=i+c;if(sigCache[k])return sigCache[k];const rows=SIGIL[i].split('/'),off=(12-rows.length)>>1,g=new Map(),P={ol:'',hi:'',fi:'',sh:''};
+function sigilSVG(i,c){return pixSVG(SIGIL[i],c,'sigil');}
+function pixSVG(src,c,cls){const k=src+c;if(sigCache[k])return sigCache[k];const rows=src.split('/'),off=(12-rows.length)>>1,g=new Map(),P={ol:'',hi:'',fi:'',sh:''};
   rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.')g.set((x+1)+','+(y+1+off),ch);}));
   const at=(x,y,t)=>{P[t]+=`M${x} ${y}h1v1h-1z`;};
-  g.forEach((ch,key)=>{const [x,y]=key.split(',').map(Number);at(x,y,ch==='+'?'hi':(!g.has(x+','+(y+1))||!g.has((x+1)+','+y))?'sh':'fi');});
+  g.forEach((ch,key)=>{const [x,y]=key.split(',').map(Number);at(x,y,ch==='o'?'ol':ch==='+'?'hi':(!g.has(x+','+(y+1))||!g.has((x+1)+','+y))?'sh':'fi');});
   const ol=new Set();g.forEach((ch,key)=>{const [x,y]=key.split(',').map(Number);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const q=(x+dx)+','+(y+dy);if(!g.has(q)&&!ol.has(q)){ol.add(q);at(x+dx,y+dy,'ol');}});});
-  return sigCache[k]=`<svg class="sigil" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><path fill="#1A1433" d="${P.ol}"/><path fill="${c}" d="${P.fi}"/><path fill="${sigDark(c)}" d="${P.sh}"/><path fill="#fff" d="${P.hi}"/></svg>`;}
+  return sigCache[k]=`<svg class="${cls}" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><path fill="#1A1433" d="${P.ol}"/><path fill="${c}" d="${P.fi}"/><path fill="${sigDark(c)}" d="${P.sh}"/><path fill="#fff" d="${P.hi}"/></svg>`;}
 /* the look of today's card: its colour, emblem, ability line and number */
 function todayLook(){const o=todayOwnObj(),i=state.todayV,V=VECTORS[i];const n=todayBand().length,nc=n>12?'n3':n>7?'n2':'';return o?{c:'#FFD36B',sig:sigilSVG(12,'#FFD36B'),ab:'',nc,no:'Yours'}:{c:V.color,sig:sigilSVG(i,V.color),ab:V.ability,nc,no:'No. '+String(i+1).padStart(2,'0')};}
 const PEN='<svg class="pi pen" viewBox="0 0 12 12" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M9 1h2v2h-2zM8 3h2v1h-2zM7 4h2v1h-2zM6 5h2v1h-2zM5 6h2v1h-2zM4 7h2v1h-2zM3 8h2v1h-2zM2 9h2v1h-2zM1 10h2v1h-2z"/></svg>';
@@ -1474,7 +1503,7 @@ function openOverlay(html,dismiss){
   modal.innerHTML=`<div class="scrim dark" data-dismiss="${!!dismiss}"><div class="ov" role="dialog" aria-modal="true">${html}</div></div>`;modal.hidden=false;nameDialog();setTimeout(stageOn,0);
 }
 function closeModal(){if(pgT){pgT.stop();pgT=null;}if(!modal.hidden&&ovMode==='sheet')sfx('close');modal.hidden=true;modal.innerHTML='';ovMode=null;pk=null;rv=null;if(lastFocus&&lastFocus.focus){try{lastFocus.focus();}catch(e){}}lastFocus=null;setTimeout(()=>{if(state&&state.ageBand){checkRibbons();giftMaybe();}},350);}
-let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3400);}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.toggle('medal',/^New ribbon/.test(m));t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3400);}
 
 /* Today's Vector card */
 function openVector(){
@@ -1632,7 +1661,7 @@ function weekDots(){
     const h=state.history.find(x=>x.date===k);let cls='dot',label='not done yet';
     if(h){cls+=' '+h.status;label=h.status==='done'?'did it':h.status==='rest'?'rested':'missed, no penalty';}
     if(i===0)cls+=' now';
-    out+=`<span class="${cls}" role="img" aria-label="${dateLabel(k)}: ${label}"></span>`;
+    out+=`<span class="${cls}" role="img" aria-label="${dateLabel(k)}: ${label}" data-d="${'SMTWTFS'[d.getDay()]}"></span>`;
   }
   return out;
 }
@@ -1670,11 +1699,11 @@ function renderToday(){
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
   if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
-  const jr=state.journal[state.date],fl=(state.feel||{})[state.date];if(s==='done')hero+=`<div class="feel"><p class="feelq">${fl?'Today felt '+fl+'.':'How did it feel?'}</p><div class="chips" role="group" aria-label="How did it feel?">${FEELS.map(f=>`<button class="chip" data-feel="${f}" aria-pressed="${fl===f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}</div></div>`;if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':s==='done'&&state.todayCard?'Add a line, and ink today’s Forgeling':'Add a line to your journal'}</button>`;const reflect='';
+  const jr=state.journal[state.date],fl=(state.feel||{})[state.date];if(s==='done')hero+=`<div class="feel"><p class="feelq">${fl?'Today felt '+fl+'.':'How did it feel?'}</p><div class="chips" role="group" aria-label="How did it feel?">${FEELS.map(f=>`<button class="facebtn" data-feel="${f}" aria-pressed="${fl===f}">${pixSVG(FACE[f][1],FACE[f][0],'feelface')}<span>${f[0].toUpperCase()+f.slice(1)}</span></button>`).join('')}</div></div>`;if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':s==='done'&&state.todayCard?'Add a line, and ink today’s Forgeling':'Add a line to your journal'}</button>`;const reflect='';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}<div class="group">${rows.join('')}</div>
-    <div class="row" style="margin:0 2px 14px"><div class="dots" aria-label="This week">${weekDots()}</div><span class="muted small">${done} ${done===1?'day':'days'} showed up</span></div>
-    ${latest.length?`<h2 class="sub3">Latest finds</h2><div class="latest">${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:92,mini:true})}</button>`).join('')}</div>`:''}`;
+    <div class="panel-box weekbox"><div class="weekhead"><h2 class="sub3">This week</h2><span class="muted small">${done} ${done===1?'day':'days'} showed up</span></div><div class="dots" role="group" aria-label="This week">${weekDots()}</div>
+    ${latest.length?`<h2 class="sub3">Latest finds</h2><div class="latest shelf">${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:92,mini:true})}</button>`).join('')}</div>`:''}</div>`;
   hydrate(el);
 }
 function renderBinder(){
@@ -2977,6 +3006,8 @@ function saveJournal(text){
   save();
 }
 const FEELS=['easy','good','hard'];
+/* 0.38.5: three pixel faces for How did it feel? */
+const FACE={easy:['#B5DDB5','....####..../..########../.##########./.#+########./##+#o####o##/#+#o#o##o#o#/############/###o####o###/.###oooo###./.##########./..########../....####....'],good:['#FFD36B','....####..../..########../.##########./.#+########./##+#o####o##/#+##o####o##/############/##o######o##/.##oooooo##./.###oooo###./..########../....####....'],hard:['#F5A5AA','....####..+./..#######.++/.##########./.#+oo##oo##./##+#########/#+##o####o##/############/############/.##oooooo##./.##########./..########../....####....']};
 const INKDROP='<svg class="pi inkdrop" viewBox="0 0 6 8" width="6" height="8" aria-label="Ink-touched" role="img"><path fill="#B9A6FF" d="M2 0h2v2h-2zM1 2h4v2h-4zM0 4h6v3h-6zM1 7h4v1h-4z"/></svg>';
 const linesWritten=()=>Object.values(state.journal||{}).filter(j=>j&&j.text).length;
 const BOOK_AT=[1,10,30,60,100];
