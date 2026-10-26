@@ -1281,6 +1281,8 @@ function sanitize(s){
     c.seed=Number.isFinite(c.seed)?c.seed:Math.abs(Math.round(c.id*2654435761))%2147483647;
     c.v=int(c.v,0,VECTORS.length-1,0);c.theme=int(c.theme,0,THEMES.length-1,0);c.rarity=int(c.rarity,0,4,0);c.dark=!!c.dark;
     c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}
+    c.snackKnown=c.snackKnown===true;
+    if(c.firstFind&&(!CURIOS.some(x=>x.id===c.firstFind.id)||typeof c.firstFind.at!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(c.firstFind.at)))delete c.firstFind;
     c.bond=Math.max(0,num(c.bond,0));c.wi=num(c.wi,Math.abs(c.seed)%1000);c.serial=num(c.serial,1);c.dayN=num(c.dayN,1);
     c.date=str(c.date,dkey(new Date()));c.dateLabel=str(c.dateLabel,'');c.source=str(c.source,'daily');
     if(!Array.isArray(c.stats)||c.stats.length!==3||c.stats.some(x=>typeof x!=='number'))c.stats=statsFor(c.seed,c.rarity);
@@ -1701,7 +1703,7 @@ function renderToday(){
   const rows=[];
   if(state.packs>0&&s!=='done')rows.push(row('btnPack',IC.pack,'A pack is ready','Five new Forgelings, earned by showing up.','',true));
   else if(state.packs===0)rows.push(row('',IC.pack,'Next pack',`${5-state.progress} more ${5-state.progress===1?'day':'days'} to go. Rest days and missed days never reset this.`,`<div class="pips" role="img" aria-label="${state.progress} of 5 days toward your next pack">${pips}</div>`));
-  if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();rows.push(row('btnHearth',IC.hearth,'The Hearth',(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'The fire is low for today.'))+(wl?' '+wl:''),'',nf.length>0));}
+  if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();rows.push(row('btnHearth',IC.hearth,'The Hearth',(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'Your companions are here for company.'))+(wl?' '+wl:''),'',nf.length>0));}
   if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
   if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
@@ -2740,6 +2742,7 @@ function wanderCollect(){
   const fresh=state.disc!==todayKey(),to=Number.isInteger(w.realm)&&w.realm>=0?w.realm:-1,base=to>=0?rCurios(to):CURIOS,unfound=fresh?base.filter(x=>!state.curios[x.id]):[],owned=base.filter(x=>state.curios[x.id]),anyOwned=CURIOS.filter(x=>state.curios[x.id]);
   const pool=unfound.length?unfound:owned.length?owned:fresh||!anyOwned.length?base:anyOwned,cu=pool[Math.floor(r()*pool.length)];
   const isNew=!state.curios[cu.id],cur=state.curios[cu.id]||{n:0,cid:w.id,at:todayKey()};cur.n++;state.curios[cu.id]=cur;
+  rememberFind(c,cu.id);
   state.wstat.back++;state.wander=null;
   if(isNew)state.disc=todayKey();
   let place='';if(fresh){const open=[0,1,2,3,4].filter(t=>rKnownTi(t)&&placesFound(t)<5),dto=to>=0?(open.includes(to)?to:-1):(open.length?open[Math.floor(r()*open.length)]:-1);
@@ -2871,7 +2874,7 @@ function renderHearth(){
   const unl=earnedIds(),bds=[{id:'',name:'Auto',ribbon:null}].concat(BACKDROPS).map(b=>{const ok=!b.id||unl.includes(b.ribbon),rb=b.ribbon?RIBBONS.find(r=>r.id===b.ribbon).name:'';return `<button class="chip" data-bd="${b.id}" ${ok?'':'disabled style="opacity:.45"'} aria-pressed="${(state.hearth.bd||'')===b.id}">${b.name}${ok?'':' (ribbon: '+rb+')'}</button>`;}).join('');
   el.innerHTML=`<p class="muted small" style="margin-bottom:8px">The Forge leaves a small fire burning in your corner of the world. Forgelings you trust come to sit by it.</p>
     <div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
-    <p class="hmsg" id="hmsg">${esc(hf.msg||'The fire crackles. Everyone is settling in.')}</p>
+    <p class="hmsg" id="hmsg">${esc(hf.msg||(!away&&memoryLine(c))||'The fire crackles. Everyone is settling in.')}</p>
     <div class="chips" role="group" aria-label="Companions">${cs.map((x,i)=>`<button class="chip" data-hslot="${i}" aria-pressed="${i===hf.sel}">${esc(x.nick||x.name)}</button>`).join('')}<button class="chip" id="hChange">Change who is here</button></div>
     ${away?'':mEchoHTML(c)}${wPanelHTML(c,n)}
     <div class="panel-box" style="margin-top:8px">
@@ -2879,17 +2882,43 @@ function renderHearth(){
       <div class="bondbar" role="img" aria-label="Bond progress"><i style="width:${pct}%"></i></div>
       <p class="muted small">${nx?`${nx-(c.bond||0)} more ${nx-(c.bond||0)===1?'point':'points'} to ${BOND_NAMES[lv]}. Bond never fades.`:'Forgebound. A golden glow outlines '+esc(n)+'.'}</p>
       <button class="rowl" data-tale="${c.id}" style="border-top:0;padding:6px 0;min-height:48px"><span class="rt"><b>${esc(n)}’s story</b><span class="rs">${lv} of 5 chapters${lv<5?'. The next opens at '+BOND_NAMES[lv]+'.':'. All told.'}</span></span><span class="chev" aria-hidden="true">›</span></button>
+      ${memoryHTML(c)}
+      <button class="outline" id="hAffection" ${away?'disabled':''}>Sit together<small> · Just for company</small></button>
       <div class="actions">
         <button class="act" id="hSnack" ${left&&!away?'':'disabled'}>Snack<small>+1 or +2</small></button>
         <button class="act" id="hStory" ${left&&!away?'':'disabled'}>Story<small>+2</small></button>
         <button class="act" id="hPlay" ${!away?'':'disabled'}>Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       </div>
-      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`The fire is low for today. You can still play the games just for fun.`}</p>
+      <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>
       <details class="more"><summary>Keepsakes and backdrops</summary><div class="lbl2">Keepsake</div><div class="chips" role="group" aria-label="Keepsake">${keeps}</div>${state.keepsR.length<KEEPR.length?'<p class="muted small" style="margin-top:4px">More keepsakes come as thank-yous when you answer a request.</p>':''}<div class="lbl2">Backdrop</div><div class="chips" role="group" aria-label="Backdrop">${bds}</div></details>${furnListHTML()}</div>`;
   drawHearth(performance.now());
   bloomCheck();
 }
 function fxAdd(i,k){hfx.push({i,k,t0:performance.now()});}
+/* They Remember: optional per-creature memories preserve older saves. */
+function rememberFind(c,id){
+  if(c&&!c.firstFind)c.firstFind={id,at:todayKey()};
+}
+function memoryLine(c){
+  const n=c.nick||c.name,cu=c.firstFind&&CURIOS.find(x=>x.id===c.firstFind.id);
+  if(cu&&dnum(todayKey())%2===0)return n+' turns '+cu.name.toLowerCase()+' over carefully. The first treasure they brought home.';
+  if(c.source==='daily'&&dayDiff(c.date,todayKey())>0){
+    if(c.own)return n+' remembers the day you chose “'+c.own+'”. That was the day you met.';
+    return n+' remembers the day you had '+(DID[c.v]||'shown up')+'. That was the day you met.';
+  }
+  return cu?n+' keeps their first '+cu.name.toLowerCase()+' close beside the fire.':'';
+}
+function memoryHTML(c){
+  const cu=c.firstFind&&CURIOS.find(x=>x.id===c.firstFind.id);
+  if(!cu)return '';
+  return '<div class="tale"><b>First treasure</b><p>'+esc(c.nick||c.name)+' brought home '+esc(cu.name.toLowerCase())+' on '+esc(dateLabel(c.firstFind.at))+'.</p>'+cImg(cu.id,40)+'</div>';
+}
+function affection(c){
+  if(!c||state.hearth.sleep||(wOut()&&state.wander.id===c.id))return;
+  hf.msg=memoryLine(c)||lineFor(c,'sit','');
+  renderHearth();const i=state.hearth.slots.indexOf(c.id);if(i>=0)fxAdd(i,'love');chime(0);
+}
+
 function lineFor(c,key,extra){
   const n=c.nick||c.name,D=c.dark;
   const L={snackFav:D?'{n} goes very still. Then smiles, just slightly.':'{n} lights up. That is exactly the one!',snack:D?'{n} accepts it gravely, then eats it very quickly.':'{n} munches happily.',
@@ -2914,7 +2943,7 @@ function openBondUp(c,lv){
 function openSnack(c){
   const fav=c.seed%4,n=c.nick||c.name;
   openSheet(`<h2>What will you share with ${esc(n)}?</h2><p class="muted small">Everyone has a favorite. Guess right for a bigger bond.</p>
-    ${SNACKS.map((s,i)=>`<button class="moodbtn" data-snack="${i}">${iconSVG(SNACKI[i])}<div><b>${s}</b></div></button>`).join('')}<div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
+    ${SNACKS.map((s,i)=>`<button class="moodbtn" data-snack="${i}">${iconSVG(SNACKI[i])}<div><b>${s}${c.snackKnown&&i===fav?' · Favorite':''}</b></div></button>`).join('')}<div class="row" style="justify-content:center"><button class="ghost" data-close>Not now</button></div>`);
 }
 function openStory(c){
   const n=c.nick||c.name,k=rand(7);
@@ -2947,6 +2976,7 @@ $('#view-hearth').addEventListener('click',e=>{
   else if(b.id==='hForge')openForge();
   else if(b.id==='hBell')bellRing();
   else if(b.id==='hCompass')compassAsk();
+  else if(b.id==='hAffection'&&c)affection(c);
   else if(b.id==='hSnack'&&c)openSnack(c);
   else if(b.id==='hStory'&&c)openStory(c);
   else if(b.id==='hPlay'&&c)openGames(c);
@@ -3673,7 +3703,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspHome'){const c=cardById(inspId);if(c){const on=state.homeFav!==c.id;state.homeFav=on?c.id:null;save();b.textContent=on?'On Today \u2713':'Show on Today';b.setAttribute('aria-pressed',String(on));renderToday();toast(on?`${c.nick||c.name} will keep you company on Today, after each day\u2019s new find.`:'Today shows your newest find again.');}}
   else if(b.id==='inspFav'){const c=cardById(inspId);if(c){c.fav=!c.fav;save();b.textContent=c.fav?'\u2605 Favorited':'\u2606 Favorite';renderBinder();renderHearth();}}
   else if(b.id==='inspName')openEdit(inspId,'inspect');
-  else if(b.dataset.snack!==undefined){const c=slotCards()[hf.sel];if(c){const fav=+b.dataset.snack===c.seed%4;doVisit(c,'snack',fav?2:1,lineFor(c,fav?'snackFav':'snack',''));}}
+  else if(b.dataset.snack!==undefined){const c=slotCards()[hf.sel];if(c){const fav=+b.dataset.snack===c.seed%4;if(fav&&visitsLeft()>0)c.snackKnown=true;doVisit(c,'snack',fav?2:1,lineFor(c,fav?'snackFav':'snack',''));}}
   else if(b.id==='storySave'){const c=slotCards()[hf.sel],t=(($('#storyIn')||{}).value||'').trim();if(c){if(t){c.fire=(c.fire||[]).concat([{date:todayKey(),text:t}]);}doVisit(c,'story',2,lineFor(c,'story',''));renderChronicle();}}
   else if(b.id==='pgSit'){const c=cardById(+b.dataset.cid);if(c){const fr=game&&game.free;if(pgT){pgT.stop();pgT=null;}game=null;if(fr){closeModal();renderHearth();}else doVisit(c,'sit',1,lineFor(c,'sit',''));}}
   else if(b.dataset.pick){const id=+b.dataset.pick,i=pickSel.indexOf(id);if(i>=0){pickSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}else if(pickSel.length<3){pickSel.push(id);b.classList.add('on');b.setAttribute('aria-pressed','true');}else{sfx('no');toast('Three is plenty for one fire.');}}
