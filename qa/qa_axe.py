@@ -22,5 +22,5 @@ with sync_playwright() as p:
                     k=(v["id"],v["impact"]); e=agg.setdefault(k,{"help":v["help"],"where":set(),"n":0,"ex":v["ex"]}); e["where"].add(f"{theme}/{mood}/stage{stage}"); e["n"]+=v["n"]
             ctx.close()
     b.close()
-if not agg: print("AXE: zero violations on the Map in light + dark theme, both moods, and every stage")
-for (vid,imp),e in sorted(agg.items(),key=lambda kv:kv[0][1]): print(f"{imp.upper()} {vid} x{e['n']} in {sorted(e['where'])[:3]} | {e['help']} | {e['ex']}")
+if not agg: print("PASS AXE: zero violations on the Map in light + dark theme, both moods, and every stage")
+for (vid,imp),e in sorted(agg.items(),key=lambda kv:kv[0][1]): print(f"FAIL {imp.upper()} {vid} x{e['n']} in {sorted(e['where'])[:3]} | {e['help']} | {e['ex']}")

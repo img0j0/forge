@@ -8,10 +8,11 @@ ctx.save();assert(nodes.has('saveWarning'));assert.equal(ctx.state.cards.length,
 ctx.save();assert.equal(nodes.size,1);blocked=false;nodes.get('saveWarning').children[2].onclick();assert.equal(nodes.size,0);assert.equal(JSON.parse(stored).cards[0].firstFind.id,'key');
 ctx.saveProblem('native',true);ctx.save();assert(nodes.has('saveWarning'));ctx.saveProblem('native',false);assert.equal(nodes.size,0);
 console.log('PASS storage failure warning, backup action, retry, memory preservation, independent native error');
+const CUR=(fs.readFileSync('pwa/sw.js','utf8').match(/const V='(forge-[0-9.]+)'/)||[])[1];assert(CUR,'cache name not found in pwa/sw.js');
 const events={},deleted=[],writes=[];let response=new Response('new'),cached=new Response('old');
-const sw={URL,Response,Promise,setTimeout,clearTimeout,location:{origin:'https://example.test'},self:{registration:{scope:'https://example.test/forge/'},addEventListener:(n,f)=>events[n]=f,clients:{claim:async()=>{}},skipWaiting:async()=>{}},fetch:async()=>response,caches:{keys:async()=>['forge-0.38.6','forge-0.38.7','another-app','forge-unrelated'],delete:async k=>deleted.push(k),open:async()=>({put:async(k,v)=>writes.push(await v.text()),addAll:async()=>{}}),match:async()=>cached.clone()}};
+const sw={URL,Response,Promise,setTimeout,clearTimeout,location:{origin:'https://example.test'},self:{registration:{scope:'https://example.test/forge/'},addEventListener:(n,f)=>events[n]=f,clients:{claim:async()=>{}},skipWaiting:async()=>{}},fetch:async()=>response,caches:{keys:async()=>['forge-0.1.0','forge-0.2.0',CUR,'another-app','forge-unrelated'],delete:async k=>deleted.push(k),open:async()=>({put:async(k,v)=>writes.push(await v.text()),addAll:async()=>{}}),match:async()=>cached.clone()}};
 vm.createContext(sw);vm.runInContext(fs.readFileSync('pwa/sw.js','utf8'),sw);
-let activation;events.activate({waitUntil:p=>activation=p});await activation;assert.deepEqual(deleted,['forge-0.38.6']);
+let activation;events.activate({waitUntil:p=>activation=p});await activation;assert.deepEqual(deleted,['forge-0.1.0','forge-0.2.0']);
 async function navigate(url){let result,background;events.fetch({request:{method:'GET',url,mode:'navigate'},respondWith:p=>result=p,waitUntil:p=>background=p});const r=await result;await background;return r.text();}
 assert.equal(await navigate('https://example.test/forge/'),'new');assert.deepEqual(writes,['new']);response=new Response('error',{status:503});assert.equal(await navigate('https://example.test/forge/'),'old');sw.fetch=async()=>{throw Error('offline')};assert.equal(await navigate('https://example.test/forge/index.html'),'old');
 console.log('PASS scoped cache cleanup, network update, cache-write lifetime, HTTP-error and offline fallback');

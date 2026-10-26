@@ -33,5 +33,5 @@ with sync_playwright() as p:
             tabto(pg,"today"); pg.evaluate("()=>{const b=document.getElementById('btnPack');b&&b.click()}"); pg.wait_for_timeout(500); audit(pg,L+"/pack-sealed")
             ctx.close()
     b.close()
-if not agg: print("AXE2: zero violations across Today, Hearth, Binder (with calling note), Map tabs, realm page, Tales, Journal, Settings, card, card back, second reading and pack, in light and dark theme, both moods")
-for (vid,imp),e in sorted(agg.items(),key=lambda kv:kv[0][1]): print(f"{imp.upper()} {vid} x{e['n']} in {sorted(e['where'])[:4]} | {e['help']} | {e['ex']}")
+if not agg: print("PASS AXE2: zero violations across Today, Hearth, Binder (with calling note), Map tabs, realm page, Tales, Journal, Settings, card, card back, second reading and pack, in light and dark theme, both moods")
+for (vid,imp),e in sorted(agg.items(),key=lambda kv:kv[0][1]): print(f"FAIL {imp.upper()} {vid} x{e['n']} in {sorted(e['where'])[:4]} | {e['help']} | {e['ex']}")
