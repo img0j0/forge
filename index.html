@@ -1164,7 +1164,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.7',APPVER='1.0.0';
+const VERSION='prototype 0.38.8',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -2575,7 +2575,8 @@ function sleepHTML(){
   const T=state.hearth.sleep.tier,msg=(sleepRun&&sleepRun.msg)||SLEEP_INTRO[T-1];
   return `<p class="muted small" style="margin-bottom:8px">Welcome back. Nothing is waiting on you here.</p>
     <div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings asleep in a heap beside low embers"></canvas></div>
-    <p class="hmsg" id="hmsg">${esc(msg)}</p>
+    <button class="outline" id="hAffection" ${away?'disabled':''} aria-describedby="hmsg" style="width:100%;min-height:44px;margin-top:8px">Sit with ${esc(n)}<small> · Just for company</small></button>
+    <p class="hmsg" id="hmsg" aria-live="polite" aria-atomic="true">${esc(msg)}</p>
     ${sleepRun?'':'<button class="primary" id="hRelight" style="margin-top:6px">Relight the fire</button>'}`;
 }
 function startWake(){
@@ -2902,21 +2903,20 @@ function renderHearth(){
     <div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
     <p class="hmsg" id="hmsg">${esc(hf.msg||(!away&&memoryLine(c))||'The fire crackles. Everyone is settling in.')}</p>
     <div class="chips" role="group" aria-label="Companions">${cs.map((x,i)=>`<button class="chip" data-hslot="${i}" aria-pressed="${i===hf.sel}">${esc(x.nick||x.name)}</button>`).join('')}<button class="chip" id="hChange">Change who is here</button></div>
-    ${away?'':mEchoHTML(c)}${wPanelHTML(c,n)}
     <div class="panel-box" style="margin-top:8px">
       <div class="row" style="margin:0"><h2 style="margin:0">${esc(n)}</h2><span class="muted small">${BOND_NAMES[lv-1]}, bond ${lv} of 5</span></div>
       <div class="bondbar" role="img" aria-label="Bond progress"><i style="width:${pct}%"></i></div>
       <p class="muted small">${nx?`${nx-(c.bond||0)} more ${nx-(c.bond||0)===1?'point':'points'} to ${BOND_NAMES[lv]}. Bond never fades.`:'Forgebound. A golden glow outlines '+esc(n)+'.'}</p>
       <button class="rowl" data-tale="${c.id}" style="border-top:0;padding:6px 0;min-height:48px"><span class="rt"><b>${esc(n)}’s story</b><span class="rs">${lv} of 5 chapters${lv<5?'. The next opens at '+BOND_NAMES[lv]+'.':'. All told.'}</span></span><span class="chev" aria-hidden="true">›</span></button>
       ${memoryHTML(c)}
-      <button class="outline" id="hAffection" ${away?'disabled':''}>Sit together<small> · Just for company</small></button>
       <div class="actions">
         <button class="act" id="hSnack" ${left&&!away?'':'disabled'}>Snack<small>+1 or +2</small></button>
         <button class="act" id="hStory" ${left&&!away?'':'disabled'}>Story<small>+2</small></button>
         <button class="act" id="hPlay" ${!away?'':'disabled'}>Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       </div>
       <p class="muted small" style="margin-top:8px">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>
-      <details class="more"><summary>Keepsakes and backdrops</summary><div class="lbl2">Keepsake</div><div class="chips" role="group" aria-label="Keepsake">${keeps}</div>${state.keepsR.length<KEEPR.length?'<p class="muted small" style="margin-top:4px">More keepsakes come as thank-yous when you answer a request.</p>':''}<div class="lbl2">Backdrop</div><div class="chips" role="group" aria-label="Backdrop">${bds}</div></details>${furnListHTML()}</div>`;
+      <details class="more"><summary>Keepsakes and backdrops</summary><div class="lbl2">Keepsake</div><div class="chips" role="group" aria-label="Keepsake">${keeps}</div>${state.keepsR.length<KEEPR.length?'<p class="muted small" style="margin-top:4px">More keepsakes come as thank-yous when you answer a request.</p>':''}<div class="lbl2">Backdrop</div><div class="chips" role="group" aria-label="Backdrop">${bds}</div></details>${furnListHTML()}</div>
+    ${away?'':mEchoHTML(c)}${wPanelHTML(c,n)}`;
   drawHearth(performance.now());
   bloomCheck();
 }
@@ -2942,7 +2942,11 @@ function memoryHTML(c){
 function affection(c){
   if(!c||state.hearth.sleep||(wOut()&&state.wander.id===c.id))return;
   hf.msg=memoryLine(c)||lineFor(c,'sit','');
-  renderHearth();const i=state.hearth.slots.indexOf(c.id);if(i>=0)fxAdd(i,'love');chime(0);
+  const msg=document.getElementById('hmsg');if(msg)msg.textContent=hf.msg;
+  const scene=document.getElementById('hearthCv');
+  if(scene){const r=scene.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)scene.scrollIntoView({block:'start',behavior:'instant'});}
+  const i=slotCards().findIndex(x=>x.id===c.id);if(i>=0)fxAdd(i,'love');
+  if(REDUCE)drawHearth(performance.now());chime(0);
 }
 
 function lineFor(c,key,extra){
@@ -4604,4 +4608,5 @@ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.tar
 </script>
 </body>
 </html>
+
 
