@@ -1164,7 +1164,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.38.6',APPVER='1.0.0';
+const VERSION='prototype 0.38.7',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1220,9 +1220,13 @@ const SPEAK_DARK=['{n} regards you. Slowly nods.','{n} rumbles softly. That is a
 
 /* ================= State ================= */
 const KEY='forge-app-v1',BLOCK='forge-age-block',MIN_AGE=18;
-const NQ={q:{},t:null};
+const NQ={q:{},t:null,seq:{}};
 function nset(k,v){if(!NATIVE||!PL.Preferences)return;NQ.q[k]=v;clearTimeout(NQ.t);NQ.t=setTimeout(nflush,250);}
-function nflush(){const q=NQ.q;NQ.q={};clearTimeout(NQ.t);Object.keys(q).forEach(k=>{try{const p=q[k]===null?PL.Preferences.remove({key:k}):PL.Preferences.set({key:k,value:q[k]});if(p&&p.catch)p.catch(()=>{});}catch(e){}});}
+function nflush(){const q=NQ.q;NQ.q={};clearTimeout(NQ.t);Object.keys(q).forEach(k=>{
+  const seq=NQ.seq[k]=(NQ.seq[k]||0)+1;
+  const report=failed=>{if(k===KEY&&seq===NQ.seq[k])saveProblem('native',failed);};
+  try{const p=q[k]===null?PL.Preferences.remove({key:k}):PL.Preferences.set({key:k,value:q[k]});Promise.resolve(p).then(()=>report(false),()=>report(true));}catch(e){report(true);}
+});}
 async function nrestore(){
   if(!NATIVE||!PL.Preferences)return;
   const sv=t=>{try{return (JSON.parse(t)||{})._sv||0;}catch(e){return -1;}};
@@ -1350,7 +1354,27 @@ function load(){
   try{localStorage.setItem(KEY+'-recovery',raw);}catch(e){}
   return null;
 }
-function save(){try{let s=state;if(!s)return;s._sv=(s._sv||0)+1;if(sleepRun&&s.hearth&&s.hearth.sleep)s=Object.assign({},s,{hearth:Object.assign({},s.hearth,{sleep:null})});const j=JSON.stringify(s);try{localStorage.setItem(KEY,j);}catch(e){}nset(KEY,j);remindSoon();}catch(e){}}
+const saveProblems=new Set();
+function saveProblem(channel,failed){
+  if(failed)saveProblems.add(channel);else saveProblems.delete(channel);
+  let box=document.getElementById('saveWarning');
+  if(!saveProblems.size){if(box)box.remove();return;}
+  if(box||!document.body)return;
+  box=document.createElement('aside');box.id='saveWarning';box.setAttribute('role','alert');
+  box.style.cssText='margin:12px;padding:16px;border:2px solid #9b4720;border-radius:12px;background:#fff3d6;color:#35223c;position:relative;z-index:2';
+  const msg=document.createElement('p');msg.textContent='Your latest progress could not be fully saved on this device. Keep this app open and save a backup copy before leaving.';box.appendChild(msg);
+  const backup=document.createElement('button');backup.className='outline';backup.textContent='Save a backup';backup.onclick=()=>openExport();box.appendChild(backup);
+  const retry=document.createElement('button');retry.className='outline';retry.textContent='Try saving again';retry.onclick=()=>{save();nflush();};box.appendChild(retry);
+  document.body.prepend(box);
+}
+function save(){
+  try{let s=state;if(!s)return;s._sv=(s._sv||0)+1;
+    if(sleepRun&&s.hearth&&s.hearth.sleep)s=Object.assign({},s,{hearth:Object.assign({},s.hearth,{sleep:null})});
+    const j=JSON.stringify(s);saveProblem('encode',false);
+    try{localStorage.setItem(KEY,j);saveProblem('web',false);}catch(e){saveProblem('web',true);}
+    nset(KEY,j);remindSoon();
+  }catch(e){saveProblem('encode',true);}
+}
 function rollover(){
   const k=todayKey();if(state.date===k)return;
   if(!['done','rest'].includes(state.status))state.history.push({date:state.date,status:'skipped',v:state.todayV});
@@ -4580,3 +4604,4 @@ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.tar
 </script>
 </body>
 </html>
+
