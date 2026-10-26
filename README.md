@@ -14,7 +14,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base386.html` | Current source includes They Remember; base386 is the pre-update historical snapshot |
+| `work.html`, `base389.html` | The current build, 0.38.9 (identical files; includes They Remember and 0.38.7–0.38.9) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
 | `legal/` | `page.py` builds privacy, terms and support pages into `legal/out/` |
@@ -26,7 +26,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 ## Making the next version
 
-1. Preserve the They Remember changes in current `work.html` (see RELEASE_PROCESS.md); do not overwrite them with an unmodified historical base. Write `patch39.py` at the top of this folder. It reads `base386.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch386.py`. Bump the title, `VERSION`, `SEEN_V` (to 44) and add a What's New entry.
+1. Write `patch39.py` at the top of this folder. It reads `base389.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch389.py`. Bump the title, `VERSION`, `SEEN_V` (to 44) and add a What's New entry.
 2. Check the script: extract the `<script>` and run `node --check` on it.
 3. Add `qa/qa_39.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
 4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.

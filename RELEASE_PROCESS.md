@@ -14,6 +14,7 @@ The pre-update dev/work.html, transformed by pwa.py's page transformations, exac
 The They Remember changes have now been backported to dev/work.html and ios-app/forgelings.html.
 Repacking the reconciled source reproduces the current live index.html byte for byte.
 base386.html remains the historical pre-update snapshot. work.html is no longer identical to it.
+Update 0.38.9: base388.html is 0.38.8 as Hunter committed it; base389.html is identical to work.html again (They Remember, 0.38.7 and the 0.38.9 fix included). Patches from now on read base389.html.
 They Remember shipped without a version bump: VERSION and the service-worker cache still say 0.38.6. Do not use that version alone to identify this release; use commit 1031617c9ec46d9a7d433307a0515c8e73d1b1f9 or hAffection.
 Do not run a historical patch against base386 and replace work.html without retaining the memory changes.
 
