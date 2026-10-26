@@ -28,7 +28,7 @@ with sync_playwright() as p:
         mc=pg.evaluate("()=>{const m=document.querySelector('.mapcap'),cs=getComputedStyle(m);return {parch:m.classList.contains('parch'),bg:cs.backgroundColor,clip:cs.clipPath.startsWith('polygon'),ink:getComputedStyle(m.querySelector('p')).color}}")
         rec("Map",f"{ph}: the notes under the map are on parchment, in dark ink",mc["parch"] and mc["bg"]=="rgb(251, 245, 230)" and mc["clip"] and mc["ink"] in ("rgb(46, 42, 71)","rgb(94, 88, 120)"),mc)
         bad+=[f"{ph} map: "+v for v in axe(pg)]
-        pg.evaluate("()=>{const r=[...document.querySelectorAll('svg .mphit')].find(x=>x.dataset&&x.dataset.realm!==undefined)||document.querySelector('svg .mphit');r.dispatchEvent(new MouseEvent('click',{bubbles:true}))}"); pg.wait_for_timeout(700)
+        ti=st(pg)["cards"][0]["theme"]; pg.evaluate("(ti)=>document.querySelector('svg .mphit[data-realm=\"'+ti+'\"]').dispatchEvent(new MouseEvent('click',{bubbles:true}))",ti); pg.wait_for_timeout(700)
         rp=pg.evaluate("()=>{const r=document.querySelector('.realmpage');if(!r)return null;const n=r.querySelector('.realmnotes'),w=r.querySelector('[data-wto]');return {notes:!!n&&getComputedStyle(n).backgroundColor==='rgb(251, 245, 230)',inside:!!w&&!!w.closest('.realmnotes'),gold:!!w&&w.classList.contains('primary'),places:!!r.querySelector('.realmnotes ul.places'),cards:r.querySelectorAll('.realmnotes [data-insp]').length}}")
         rec("Realm",f"{ph}: a realm page's places, tale and cards sit on parchment, with a gold wander button",rp and rp["notes"] and rp["inside"] and rp["gold"] and rp["places"] and rp["cards"]>=1,rp)
         bad+=[f"{ph} realm: "+v for v in axe(pg)]

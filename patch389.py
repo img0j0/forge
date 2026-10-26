@@ -29,6 +29,8 @@ def _opt(m):
     assert list(_Im.open(_io.BytesIO(d)).convert('RGBA').getdata())==list(im.convert('RGBA').getdata())
     return 'data:image/png;base64,'+_b64.b64encode(d if len(d)<len(raw) else raw).decode()
 src=_re.sub(r'data:image/png;base64,([A-Za-z0-9+/=]+)',_opt,src)
+# ---- They Remember: keep snackKnown only when true, so a restored backup matches the cards that were exported
+rep("    c.snackKnown=c.snackKnown===true;\n","    if(c.snackKnown===true)c.snackKnown=true;else delete c.snackKnown;\n")
 rep('<title>Forgelings (prototype 0.38.8)</title>', '<title>Forgelings (prototype 0.38.9)</title>')
 rep("const VERSION='prototype 0.38.8'", "const VERSION='prototype 0.38.9'")
 open('work.html', 'w', encoding='utf8').write(src)

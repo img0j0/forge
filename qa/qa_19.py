@@ -58,7 +58,7 @@ with sync_playwright() as p:
     closemodals(pg); pg.evaluate("()=>{const c=document.getElementById('ovClose');if(c)c.click();}"); pg.wait_for_timeout(300)
     # ---------- the Hearth grows ----------
     s=build(base,[1,1,1,0,0]); s["seen"]=99; s["hearth"]["slots"]=[c["id"] for c in s["cards"]]; s["hearth"]["fseen"]=[]; s["history"]=[]; ready(pg,s)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].pop().open=true"); t=pg.inner_text("#view-hearth")
+    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true"); t=pg.inner_text("#view-hearth")
     rec("Hearth","the list says 0 of 16 and shows how to get the first thing","By the fire, 0 of 16" in t and "After your first calling. 0 so far." in t,t[-400:])
     s=hist(st(pg),[("done",2),("rest",5),("done",2),("skipped",4),("done",2)]); s["hearth"]["fseen"]=[]; ready(pg,s)
     tabto(pg,"today"); r=pg.inner_text("#btnHearth")
@@ -67,10 +67,10 @@ with sync_playwright() as p:
     rec("Hearth","3 days done (rest and missed days not counted) bring the rug, and 3 Depth days the pond; opening the Hearth announces them once",msg=="2 new things by the fire. Have a look around." and sorted(st(pg)["hearth"]["fseen"])==["pond","rug"],msg)
     tabto(pg,"today"); r=pg.inner_text("#btnHearth")
     rec("Hearth","…after that, Today's row goes back to normal","Something new" not in r and not pg.evaluate("document.getElementById('btnHearth').classList.contains('ready')"),r)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].pop().open=true"); t=pg.inner_text("#view-hearth")
+    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true"); t=pg.inner_text("#view-hearth")
     rec("Hearth","the list explains each one in your own terms","You have given something your full attention 3 times." in t and "After 3 Clarity days. 0 so far." in t and "By the fire, 2 of 16" in t,t[-500:])
     s=st(pg); s["history"].append({"date":s["history"][-1]["date"],"status":"done","v":2}); ready(pg,s)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].pop().open=true")
+    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true")
     rec("Hearth","a doubled day in a damaged history counts once","After 5 callings done. 3 so far." in pg.inner_text("#view-hearth"))
     # one at a time: a single new thing gets its own name
     s=hist(st(pg),[("done",2)]*3+[("done",3)]*3); s["hearth"]["fseen"]=["pond","rug","lights"]; ready(pg,s); tabto(pg,"hearth")

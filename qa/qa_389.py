@@ -34,7 +34,7 @@ with sync_playwright() as p:
     rec("Remember","a Forgeling remembers the first thing it brings home from a wander",bool(w) and isinstance(w[0].get("firstFind"),dict) and bool(w[0]["firstFind"].get("id")),w[0].get("firstFind") if w else None)
     # sanitizer keeps good memories, drops broken ones
     s=st(pg); s["cards"][0]["firstFind"]={"id":"nope","at":"2026-01-01"}; s["cards"][1]["firstFind"]={"id":w[0]["firstFind"]["id"] if w else "x","at":"yesterday"}; s["cards"][0]["snackKnown"]="yes"; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
-    s3=st(pg); rec("Damaged","broken memories are dropped and snackKnown is only ever true or false","firstFind" not in s3["cards"][0] and "firstFind" not in s3["cards"][1] and s3["cards"][0]["snackKnown"] is False,(s3["cards"][0].get("firstFind"),s3["cards"][1].get("firstFind")))
+    s3=st(pg); rec("Damaged","broken memories are dropped and snackKnown is only ever true or false","firstFind" not in s3["cards"][0] and "firstFind" not in s3["cards"][1] and "snackKnown" not in s3["cards"][0],(s3["cards"][0].get("firstFind"),s3["cards"][1].get("firstFind")))
     rec("A11y","axe: zero violations on the awake and sleeping Hearth",not bad,bad[:3])
     rec("All","no page errors",not pg._errs,pg._errs[:1]); b.close()
 save_results("qa_389"); print(sum(r["ok"] for r in RES),"/",len(RES))

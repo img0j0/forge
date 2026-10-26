@@ -83,7 +83,7 @@ with sync_playwright() as p:
     rec("Request","anyone can answer it: the asker gains 3 bond and a thank-you keepsake arrives",f"{nm}’s request is done" in m and s2["cards"][0]["bond"]==b0+3 and K in s2["keepsR"] and KN in m,(who,m[-200:]))
     rec("Request","…the request is closed and dated",s2["request"] is None and s2["reqLast"]==s2["date"] and s2["reqDone"]==1)
     pg.evaluate("document.getElementById('wcOk').click()"); pg.wait_for_timeout(300)
-    tabto(pg,"hearth"); pg.evaluate("document.querySelectorAll('#view-hearth details.more')[1].open=true"); chips=pg.evaluate("[...document.querySelectorAll('#view-hearth [data-keep]')].map(b=>b.textContent)")
+    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('Keepsakes')).open=true"); chips=pg.evaluate("[...document.querySelectorAll('#view-hearth [data-keep]')].map(b=>b.textContent)")
     rec("Keepsake","the thank-you keepsake is in the keepsake list for every Forgeling, with no level needed",KN in chips and pg.evaluate(f"!document.querySelector('#view-hearth [data-keep=\"{K}\"]').disabled"),chips)
     rec("Keepsake","…and the list says more come from requests","More keepsakes come as thank-yous" in pg.inner_text("#view-hearth"))
     pg.evaluate(f"document.querySelector('#view-hearth [data-keep=\"{K}\"]').click()"); pg.wait_for_timeout(300)
