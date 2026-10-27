@@ -66,6 +66,9 @@ rep(".chb{position:absolute;right:.3em;bottom:.3em;",
     ".stshelf img{width:40px;height:40px;image-rendering:pixelated}\n"
     ".fgh{font:600 16px var(--display);margin:14px 0 4px}\n"
     ".chb{position:absolute;right:.3em;bottom:.3em;")
+# What's new keeps the latest eight notes: the oldest (The map, inked) rolls off
+_i=src.index('function openWhatsNew(){'); _j=src.index('</ul>',_i); _k=src.rindex('<li><b>The map, inked.</b>',_i,_j)
+_e=src.rindex('\n',_i,_k); src=src[:_e]+src[_j:]
 rep('<title>Forgelings (prototype 0.38.10)</title>', '<title>Forgelings (prototype 0.39.0)</title>')
 rep("const VERSION='prototype 0.38.10'", "const VERSION='prototype 0.39.0'")
 open('work.html', 'w', encoding='utf8').write(src)
