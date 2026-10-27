@@ -16,9 +16,10 @@ run_suite() {
 }
 # Optional suite names allow focused checks with the same failure handling.
 if [ "$#" -gt 0 ]; then
-  for t in "$@"; do run_suite "$t" 400 python3 "$t.py"; done
+  for t in "$@"; do if [ "$t" = qa_pwa ]; then run_suite qa_pwa 400 bash pwa_serve.sh; else run_suite "$t" 400 python3 "$t.py"; fi; done
 else
-  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_17 qa_18 qa_181 qa_19 qa_20 qa_21 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_fit mo qa_odds qa_time qa_clock qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
+  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_17 qa_18 qa_181 qa_19 qa_20 qa_21 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_402 qa_fit mo qa_odds qa_time qa_clock qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
+  run_suite qa_pwa 400 bash pwa_serve.sh
   run_suite qa_journey 2400 env JOURNEY_DAYS=125 JOURNEY_SEED=7 python3 qa_journey.py
   for sd in 1 2 3 4 5 6; do run_suite "monkey$sd" 400 python3 monkey.py "$sd"; done
 fi

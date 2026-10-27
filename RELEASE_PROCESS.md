@@ -17,6 +17,7 @@ base386.html remains the historical pre-update snapshot. work.html is no longer 
 Update 0.38.9: base388.html is 0.38.8 as Hunter committed it; base389.html is identical to work.html again (They Remember, 0.38.7 and the 0.38.9 fix included). Patches from now on read base389.html.
 They Remember shipped without a version bump: VERSION and the service-worker cache still say 0.38.6. Do not use that version alone to identify this release; use commit 1031617c9ec46d9a7d433307a0515c8e73d1b1f9 or hAffection.
 Do not run a historical patch against base386 and replace work.html without retaining the memory changes.
+Update 0.40.2: the old root copies base34 to base401 (and base386/388/389) were removed; git history keeps them. Patches now read base402.html, which equals work.html. base.html, base12-14.html and forge-pilot.html stay because qa_mig and qa_15 load them.
 
 ## Size budget
 The budget is 1 MB (qa_22, qa_30, qa_301) and is a soft guide set by Hunter on 2026-10-26: when a wanted feature needs more room, raise it and note it rather than cutting the feature. Prefer loading heavy optional extras on first use as separate cached files.

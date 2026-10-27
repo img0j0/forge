@@ -14,21 +14,21 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base401.html` | The current build, 0.40.1 (identical files) |
+| `work.html`, `base402.html` | The current build, 0.40.2 (identical files) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
 | `legal/` | `page.py` builds privacy, terms and support pages into `legal/out/` |
 | `curios/` | Curio pixel art: edit `sprites.py`, run it, then `tojs.py` |
 | `slim/` | The SVG slimming tool used in 0.30.1 |
 | `tools/` | Game tuning simulations |
-| `qa/` | The regression suite: `bash qa/runall.sh`, about 80 minutes, then read `qa/full_summary.txt` |
+| `qa/` | The regression suite: `bash qa/runall.sh`, about 80 minutes, then read `qa/full_summary.txt`. The offline suite runs through `qa/pwa_serve.sh`, which serves a fresh build at /forge/ |
 | `base.html`, `base12-14.html`, `forge-pilot.html`, `cal.js` | Old builds and helpers that `qa_mig` and `qa_15` need |
 
 ## Making the next version
 
-1. Write `patch41.py` at the top of this folder. It reads `base401.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch401.py`. Bump the title, `VERSION`, `SEEN_V` (to 46) and add a What's New entry.
+1. Write `patch41.py` at the top of this folder. It reads `base402.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch402.py`. Bump the title, `VERSION`, `SEEN_V` (to 46) and add a What's New entry.
 2. Check the script: extract the `<script>` and run `node --check` on it.
 3. Add `qa/qa_39.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
 4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.
 5. Copy `work.html` to the `ios-app` branch as `forgelings.html`, then run `python3 build-www.py` and `npx cap sync ios` there, and push.
-6. Here: `cp work.html base39.html`, move `patch39.py` into `history/`, update `forge-handoff.md`, and push this branch.
+6. Here: `cp work.html base41.html`, `git rm` the previous base copy, move `patch41.py` into `history/`, update `forge-handoff.md`, and push this branch.
