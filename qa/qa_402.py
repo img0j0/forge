@@ -9,6 +9,10 @@ def axe(pg):
 CNT="(()=>{window.__raf=0;const o=window.requestAnimationFrame;window.requestAnimationFrame=f=>{window.__raf++;return o(f)}})()"
 def rate(pg,ms=2000):
     pg.wait_for_timeout(700); pg.evaluate("()=>window.__raf=0"); pg.wait_for_timeout(ms); return pg.evaluate("()=>window.__raf")*1000/ms
+def moves(pg,sel,n=8,gap=200):
+    seen={pix(pg,sel)}
+    for _ in range(n): pg.wait_for_timeout(gap); seen.add(pix(pg,sel))
+    return len(seen)>1
 def pix(pg,sel): return pg.evaluate("(s)=>{const c=document.querySelector(s);return c?Array.from(c.getContext('2d').getImageData(0,0,c.width,c.height).data.filter((v,i)=>i%16===0)).join(','):''}",sel)
 bad=[]
 with sync_playwright() as p:
@@ -20,14 +24,12 @@ with sync_playwright() as p:
     tabto(pg,"chronicle"); r=rate(pg); rec("Loops","on the Map the loops sleep too",r<8,round(r,1))
     tabto(pg,"hearth"); a=pix(pg,"#hearthCv"); pg.wait_for_timeout(600); a2=pix(pg,"#hearthCv")
     rec("Loops","coming back to the Hearth, the fire moves again at once",a!=a2)
-    tabto(pg,"binder"); sel="#view-binder canvas.pcv"; a=pix(pg,sel); pg.wait_for_timeout(500); a2=pix(pg,sel)
-    rec("Loops","in the Binder the creatures still breathe",a!=a2)
-    pg.evaluate("()=>document.querySelector('#view-binder .card').click()"); pg.wait_for_timeout(500); a=pix(pg,"#stage canvas.pcv"); pg.wait_for_timeout(500)
-    rec("Loops","a card close-up still animates",a!=pix(pg,"#stage canvas.pcv")); closemodals(pg)
-    tabto(pg,"settings",fold=True); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"today\"]').click()"); pg.wait_for_timeout(150)
-    sel="#view-today canvas.pcv"
-    if pg.locator(sel).count():
-        a=pix(pg,sel); pg.wait_for_timeout(400); rec("Loops","a sleeping loop wakes straight away on a tab change",a!=pix(pg,sel))
+    tabto(pg,"binder"); rec("Loops","in the Binder the creatures still breathe",moves(pg,"#view-binder canvas.pcv"))
+    pg.evaluate("()=>document.querySelector('#view-binder .card').click()"); pg.wait_for_timeout(500)
+    rec("Loops","a card close-up still animates",moves(pg,"#stage canvas.pcv")); closemodals(pg)
+    tabto(pg,"settings",fold=True); pg.wait_for_timeout(1500)
+    n=pg.evaluate("async()=>{window.__raf=0;document.querySelector('.tab[data-tab=\\\"binder\\\"]').click();await new Promise(r=>setTimeout(r,300));return window.__raf}")
+    rec("Loops","a sleeping loop wakes straight away on a tab change (frames running within 0.3 s)",n>=8,n)
     # restore: age answer and long text
     s=st(pg); s["cards"][0]["nick"]="N"*100; s["cards"][0]["tale"]="T"*900; s["ageBand"]="teen"
     tabto(pg,"settings"); pg.evaluate("document.getElementById('btnRestore').click()"); pg.wait_for_timeout(300); pg.fill("#resText",json.dumps(s))
@@ -70,8 +72,9 @@ with sync_playwright() as p:
         bad+=["update note: "+v for v in axe(pg)]
         pg.tap("#updLater"); pg.wait_for_timeout(200); rec("Update","Later puts it away",pg.locator("#updBar").count()==0)
         pg.evaluate("()=>{window.__stay=1}")
-        open(tmp+"/forge/sw.js","w").write(_re.sub(r"forge-[0-9.]+","forge-9.9.11",sw))
-        pg.reload(); pg.wait_for_timeout(1200); closemodals(pg)
+        pg.reload(); pg.wait_for_selector("#view-today",state="attached"); pg.wait_for_timeout(1500); closemodals(pg)
+        pg.evaluate("()=>{window.__stay=1}")
+        open(tmp+"/forge/sw.js","w").write(_re.sub(r"forge-[0-9.]+","forge-9.9.11",sw))  # released after this visit began
         pg.evaluate("()=>document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_selector("#updBar",timeout=8000)
         pg.tap("#updGo"); pg.wait_for_timeout(1500)
         rec("Update","Load it reloads into the new release, keeping your Forgelings",pg.evaluate("()=>window.__stay")is None and pg.locator("#updBar").count()==0 and len(st(pg)["cards"])>=1)
