@@ -1,0 +1,3 @@
+# Voxel edition prototype
+
+Standalone page (published as the Claude page "Urvyr in Voxels"). `template.html` is the viewer with `/*DATA*/null` where a 32x32 sprite (hex colours, null = empty) goes; `spr.json` is Urvyr (Holo, Inferno) read from Hunter's card at 12 screen px per art px, creature cut out using the nearest generator outline (seed 37113 family). The viewer: depth from distance to the silhouette, outline painted on front/back faces only, features one voxel proud, hand-written WebGL with per-vertex ambient occlusion, rim light, Holo sheen, Inferno plinth with lava cracks, volcano, embers. In the app the sprite would come straight from `buildSprite`/`makePal` instead of a screenshot.

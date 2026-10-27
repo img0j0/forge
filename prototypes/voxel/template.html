@@ -1,0 +1,230 @@
+<title>Urvyr in Voxels</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito+Sans:wght@400;700&family=VT323&display=swap">
+<style>
+/* A display case at night: one creature on its realm plinth, turned by hand. Single dark look on purpose (the app's night glass). */
+:root{
+  --night:#140F2E; --glass:rgba(20,15,48,.94); --ink:#FFF7EC; --muted:#C9BFEA;
+  --gold:#FFD36B; --holo:#E58BFF; --ember:#FF8A2E; --line:rgba(255,244,201,.18);
+  --display:'Fredoka',ui-rounded,system-ui,sans-serif; --body:'Nunito Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --px:'VT323',ui-monospace,'Courier New',monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:radial-gradient(120% 80% at 50% 38%,#3A1E5C 0%,#22143F 45%,var(--night) 80%);background-color:var(--night);color:var(--ink);font:16px/1.45 var(--body);overflow:hidden}
+.case{position:relative;height:100%;display:grid;grid-template-rows:auto 1fr auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.edition{font:400 20px/1 var(--px);letter-spacing:.06em;color:var(--gold);text-transform:uppercase}
+.sprite{display:flex;align-items:center;gap:10px;font:400 18px/1 var(--px);color:var(--muted)}
+.sprite canvas{width:48px;height:48px;image-rendering:pixelated;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 2px var(--line)}
+.stage{position:relative;min-height:0}
+#gl{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+#gl:active{cursor:grabbing}
+#gl:focus-visible{box-shadow:inset 0 0 0 3px var(--gold)}
+.plate{display:grid;justify-items:center;gap:6px;padding-bottom:4px;text-align:center}
+.name{font:600 clamp(34px,9vw,52px)/1 var(--display);letter-spacing:.14em;text-transform:uppercase;margin:0;text-wrap:balance}
+.name span{color:var(--holo)}
+.meta{font:700 15px/1.2 var(--body);color:var(--holo);letter-spacing:.02em}
+.meta b{color:var(--ember);font-weight:700}
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px}
+.controls button{min-height:44px;min-width:44px;padding:0 16px;border:0;background:var(--glass);color:var(--ink);font:400 20px/1 var(--px);letter-spacing:.04em;cursor:pointer;
+  clip-path:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px));
+  box-shadow:inset 0 0 0 2px var(--line)}
+.controls button[aria-pressed="true"]{background:var(--gold);color:#2E2A47;box-shadow:none}
+.controls button:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--gold)}
+.hint{font-size:13px;color:var(--muted)}
+[hidden]{display:none!important}
+.fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
+</style>
+
+<div class="case">
+  <header class="top">
+    <div class="edition">Voxel edition · prototype</div>
+    <div class="sprite" title="The card's 32 by 32 sprite this model is built from"><canvas id="src" width="32" height="32" aria-label="Urvyr's original pixel sprite"></canvas><span>from the card</span></div>
+  </header>
+  <div class="stage">
+    <canvas id="gl" tabindex="0" role="img" aria-label="Urvyr as a 3D voxel figure on a smouldering Inferno plinth. Drag to turn, pinch or scroll to zoom, arrow keys to turn."></canvas>
+    <p class="fallback" id="nogl" hidden>This phone's browser could not start 3D drawing, so the voxel figure can't be shown here.</p>
+  </div>
+  <footer class="plate">
+    <h1 class="name">Urvyr <span>VX</span></h1>
+    <div class="meta">Holo · <b>Inferno</b></div>
+    <div class="controls">
+      <button id="bTurn" aria-pressed="true">Turntable</button>
+      <button id="bHolo" aria-pressed="true">Holo sheen</button>
+      <button id="bBase" aria-pressed="true">Plinth</button>
+      <button id="bReset">Front view</button>
+    </div>
+    <div class="hint" id="hint">Drag to turn · pinch to zoom · <span id="vc"></span></div>
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* ---- the sprite: 32x32 colours read from Urvyr's card, null = empty ---- */
+const SPR=/*DATA*/null;
+const W=32,H=32;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* draw the source sprite thumbnail */
+(()=>{const x=document.getElementById('src').getContext('2d'),im=x.createImageData(W,H);
+  for(let i=0;i<W*H;i++){const c=SPR[i];if(!c)continue;const n=parseInt(c.slice(1),16);im.data.set([n>>16,(n>>8)&255,n&255,255],i*4);}x.putImageData(im,0,0);})();
+
+const hex=c=>{const n=parseInt(c.slice(1),16);return [(n>>16)/255,((n>>8)&255)/255,(n&255)/255];};
+const lum=c=>{const [r,g,b]=hex(c);return .3*r+.59*g+.11*b;};
+
+/* ---- 1. pixels to voxels ----
+   Body pixels get depth from their distance to the silhouette edge (a soft, rounded bulge). The outline wraps the
+   whole rim. Small features (eyes, mouth, markings) sit one voxel proud of the front face; behind them is body. */
+const filled=i=>!!SPR[i];
+const dist=new Float32Array(W*H).fill(99);
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x;if(!filled(i)){dist[i]=0;continue;}if(x===0||y===0||x===W-1||y===H-1)dist[i]=1;}
+for(let pass=0;pass<2;pass++)for(let k=0;k<W*H;k++){const i=pass?W*H-1-k:k,x=i%W,y=(i/W)|0;if(!dist[i])continue;
+  for(const[dx,dy,w]of[[-1,0,1],[1,0,1],[0,-1,1],[0,1,1],[-1,-1,1.4],[1,-1,1.4],[-1,1,1.4],[1,1,1.4]]){const X=x+dx,Y=y+dy;const d=(X<0||Y<0||X>=W||Y>=H)?0:dist[Y*W+X];if(d+w<dist[i])dist[i]=d+w;}}
+const OUT=SPR.filter(Boolean).reduce((a,c)=>lum(c)<lum(a)?c:a,'#ffffff');
+const isOut=i=>SPR[i]&&lum(SPR[i])<.09;
+/* body colour = most common non-outline colour */
+const cnt={};SPR.forEach((c,i)=>{if(c&&!isOut(i))cnt[c]=(cnt[c]||0)+1;});
+const BODY=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'#6b4a3a';
+const RIM='#'+hex(BODY).map(v=>Math.round(v*255*.78).toString(16).padStart(2,'0')).join('');
+/* colour regions; a small region enclosed by other colours is a feature */
+const reg=new Int32Array(W*H).fill(-1),regSize=[];
+for(let i=0;i<W*H;i++){if(!SPR[i]||reg[i]>=0)continue;const id=regSize.length,st=[i];reg[i]=id;let n=0;
+  while(st.length){const j=st.pop();n++;const x=j%W,y=(j/W)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=W||Y>=H)continue;const k=Y*W+X;if(reg[k]<0&&SPR[k]===SPR[i]){reg[k]=id;st.push(k);}}}
+  regSize.push(n);}
+const feature=i=>SPR[i]&&!isOut(i)&&SPR[i]!==BODY&&regSize[reg[i]]<=14&&dist[i]>=2;
+
+const vox=new Map(); /* key "x,y,z" -> {c:[r,g,b],e:emissive 0..1,holo:0/1} */
+const put=(x,y,z,c,e,h,f)=>vox.set(x+','+y+','+z,{c:typeof c==='string'?hex(c):c,f:f?hex(f):null,e:e||0,h:h||0});
+let figVox=0;
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x;if(!SPR[i])continue;
+  const d=dist[i],half=isOut(i)?Math.max(1,Math.min(4,Math.round(1+1.3*Math.sqrt(Math.max(0,d))))):Math.max(1,Math.min(6,Math.round(1+1.55*Math.sqrt(d))));
+  const X=x-16,Y=31-y; /* y up; feet sit at Y=0 */
+  const holo=SPR[i]!==BODY&&!isOut(i)&&!feature(i)&&/^#([c-f][0-9a-f]){1}/i.test('#')?0:0;
+  for(let z=-half;z<half;z++){
+    let c=SPR[i];
+    if(feature(i)&&z<half-1)c=BODY; /* behind a feature is body */
+    /* the outline is painted on the front and back faces only; its sides and top are body, so no black stripes */
+    if(isOut(i)){put(X,Y,z,RIM,0,1,(z===half-1||z===-half)?SPR[i]:null);figVox++;continue;}
+    put(X,Y,z,c,0,1);figVox++;}
+  if(feature(i)){put(X,Y,half,SPR[i],/^#(?:[89a-f])/i.test(SPR[i])&&lum(SPR[i])>.55?.15:0,0);figVox++;}
+}
+/* ---- 2. the Inferno plinth: cooled rock, glowing cracks, and a small volcano behind ---- */
+const rnd=(()=>{let a=0x5eed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})();
+const ROCK=['#3A2629','#46302F','#523834','#33222A'],LAVA=['#FF6A1A','#FF8A2E','#FFB347','#FFD36B'];
+const base=new Map();const putB=(x,y,z,c,e)=>base.set(x+','+y+','+z,{c:hex(c),e:e||0,h:0});
+const R=22;
+for(let x=-R;x<=R;x++)for(let z=-R;z<=R;z++){const r=Math.hypot(x,z*1.15);if(r>R-rnd()*2.5)continue;
+  const crack=(Math.abs(Math.sin(x*.45+z*.2)+Math.cos(z*.38-x*.15))<.22)&&r>9&&rnd()<.85;
+  const hgt=r<11?2:(rnd()<.35?3:rnd()<.5?1:2);
+  for(let y=-hgt;y<0;y++)putB(x,y,z,crack&&y===-1?LAVA[(rnd()*3)|0]:ROCK[(rnd()*4)|0],crack&&y===-1?1:0);
+  if(r>R-5&&rnd()<.18)putB(x,0,z,ROCK[(rnd()*4)|0],0);}
+/* volcano behind, back right */
+for(let y=0;y<18;y++){const rr=Math.max(1.6,7.5-y*.36);for(let x=-8;x<=8;x++)for(let z=-8;z<=8;z++){const d=Math.hypot(x,z);if(d>rr)continue;if(d<rr-1.6&&y<17)continue;
+  const flow=(Math.abs(x-z*.4-Math.sin(y*.55)*1.2)<1.1&&z>-1)||(y>15&&d<2.6);
+  putB(x+15,y,z-16,flow?LAVA[(1+rnd()*3)|0]:ROCK[(rnd()*4)|0],flow?1:0);}}
+document.getElementById('vc').textContent=figVox.toLocaleString()+' voxels';
+
+/* ---- 3. mesh: only faces that touch air, with per-vertex ambient occlusion ---- */
+const FACES=[ /* normal, 4 corners (unit cube) */
+  [[1,0,0],[[1,0,0],[1,1,0],[1,1,1],[1,0,1]]],[[-1,0,0],[[0,0,1],[0,1,1],[0,1,0],[0,0,0]]],
+  [[0,1,0],[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]],[[0,-1,0],[[0,0,0],[1,0,0],[1,0,1],[0,0,1]]],
+  [[0,0,1],[[1,0,1],[1,1,1],[0,1,1],[0,0,1]]],[[0,0,-1],[[0,0,0],[0,1,0],[1,1,0],[1,0,0]]]];
+function build(sets){
+  const has=(x,y,z)=>sets.some(s=>s.has(x+','+y+','+z));
+  const P=[],N=[],C=[],A=[],E=[],Hh=[],I=[];let v=0;
+  for(const s of sets)for(const [k,o] of s){const [x,y,z]=k.split(',').map(Number);
+    for(const [n,cs] of FACES){if(has(x+n[0],y+n[1],z+n[2]))continue;
+      for(const q of cs){
+        /* AO: the two edge neighbours and the corner neighbour on the face's outer side */
+        const t=[0,1,2].filter(a=>!n[a]),s1=[0,0,0],s2=[0,0,0];s1[t[0]]=q[t[0]]?1:-1;s2[t[1]]=q[t[1]]?1:-1;
+        const bx=x+n[0],by=y+n[1],bz=z+n[2];
+        const a1=has(bx+s1[0],by+s1[1],bz+s1[2]),a2=has(bx+s2[0],by+s2[1],bz+s2[2]),a3=has(bx+s1[0]+s2[0],by+s1[1]+s2[1],bz+s1[2]+s2[2]);
+        const ao=(a1&&a2)?0:3-(a1+a2+a3);
+        P.push(x+q[0],y+q[1],z+q[2]);N.push(...n);C.push(...(o.f&&n[2]?o.f:o.c));A.push(ao/3);E.push(o.e);Hh.push(o.h);}
+      I.push(v,v+1,v+2,v,v+2,v+3);v+=4;}}
+  return {P:new Float32Array(P),N:new Float32Array(N),C:new Float32Array(C),A:new Float32Array(A),E:new Float32Array(E),Hh:new Float32Array(Hh),I:v>65535?new Uint32Array(I):new Uint16Array(I),count:I.length,big:v>65535};
+}
+
+/* ---- 4. WebGL ---- */
+const cv=document.getElementById('gl');
+const gl=cv.getContext('webgl',{antialias:true,alpha:true,premultipliedAlpha:false});
+if(!gl){document.getElementById('nogl').hidden=false;}
+else{
+const u32=gl.getExtension('OES_element_index_uint');
+const VS=`attribute vec3 p,n,c;attribute float a,e,h;uniform mat4 M;uniform float T;varying vec3 vc,vn,vw;varying float va,ve,vh;
+void main(){vc=c;vn=n;va=a;ve=e;vh=h;vw=p;gl_Position=M*vec4(p,1.);}`;
+const FS=`precision mediump float;varying vec3 vc,vn,vw;varying float va,ve,vh;uniform float T,holo;uniform vec3 eye;
+vec3 hsv(float h){return clamp(abs(mod(h*6.+vec3(0,4,2),6.)-3.)-1.,0.,1.);}
+void main(){vec3 L=normalize(vec3(.45,.8,.55));float d=max(dot(vn,L),0.);
+  float ao=.42+.58*va;
+  vec3 col=vc*(.48+.85*d)*ao;
+  /* warm rim from the lava, cool rim from the night */
+  vec3 V=normalize(eye-vw);float rim=pow(1.-max(dot(vn,V),0.),2.2);
+  col+=rim*(vn.x>0.?vec3(1.,.42,.12)*.35:vec3(.55,.35,1.)*.28);
+  col+=vec3(1.,.45,.12)*max(0.,-vn.y)*.0+vec3(1.,.38,.1)*.18*clamp(1.-vw.y/10.,0.,1.)*max(dot(vn,vec3(0,-.2,1)),0.);
+  if(holo>.5&&vh>.5){float s=sin((vw.x*.35+vw.y*.25-T*1.6))*.5+.5;vec3 hc=hsv(fract(vw.x*.03+vw.y*.05-T*.15));col=mix(col,col+hc*.35,pow(s,6.)*(.4+rim));}
+  col=mix(col,vc*(1.25+.25*sin(T*3.+vw.x)),ve);
+  gl_FragColor=vec4(col,1.);}`;
+const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o;};
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
+const loc=n=>gl.getAttribLocation(pr,n),U=n=>gl.getUniformLocation(pr,n);
+function upload(m){const o={count:m.count,big:m.big,b:{}};
+  for(const [k,arr,sz] of [['p',m.P,3],['n',m.N,3],['c',m.C,3],['a',m.A,1],['e',m.E,1],['h',m.Hh,1]]){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);o.b[k]=[b,sz];}
+  o.ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,m.I,gl.STATIC_DRAW);return o;}
+const meshFig=upload(build([vox])),meshAll=upload(build([vox,base]));
+/* points: embers and lava glow */
+const PV=`attribute vec3 p;attribute float s,k;uniform mat4 M;uniform float T,px;varying float vk,vl;
+void main(){vec3 q=p;float life=fract(T*.06*(.6+k)+k*7.);vk=k;vl=life;
+  if(k>0.){q.y+=life*30.;q.x+=sin(T*.9+k*20.)*1.5;}
+  gl_Position=M*vec4(q,1.);gl_PointSize=s*px/gl_Position.w;}`;
+const PF=`precision mediump float;varying float vk,vl;void main(){vec2 d=gl_PointCoord-.5;float r=length(d);
+  if(vk>0.){if(max(abs(d.x),abs(d.y))>.5)discard;float a=(1.-vl)*smoothstep(0.,.15,vl);gl_FragColor=vec4(1.,.55+.35*(1.-vl),.18,a);}
+  else{float a=smoothstep(.5,0.,r)*.22;gl_FragColor=vec4(1.,.45,.12,a);}}`;
+const pp=gl.createProgram();gl.attachShader(pp,sh(gl.VERTEX_SHADER,PV));gl.attachShader(pp,sh(gl.FRAGMENT_SHADER,PF));gl.linkProgram(pp);
+const pts=[];for(const [k,o] of base)if(o.e>0&&rnd()<.25){const [x,y,z]=k.split(',').map(Number);pts.push(x+.5,y+1,z+.5,26,0);}
+for(let i=0;i<70;i++){const a=rnd()*6.283,r=6+rnd()*18;pts.push(Math.cos(a)*r,0,Math.sin(a)*r,.55+rnd()*.6,.05+rnd()*.95);}
+const pBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pts),gl.STATIC_DRAW);const pN=pts.length/5;
+
+/* ---- 5. camera: orbit by hand, a slow turntable at rest ---- */
+let yaw=-0.5,pitch=0.32,zoom=1,turn=!reduce,holo=1,showBase=1,last=performance.now(),idle=0;
+const mul=(a,b)=>{const o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];o[i*4+j]=s;}return o;};
+function persp(f,asp,n,fa){const t=1/Math.tan(f/2);return new Float32Array([t/asp,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]);}
+function look(e,c){const z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]],zl=Math.hypot(...z);z.forEach((v,i)=>z[i]=v/zl);const x=[z[2],0,-z[0]],xl=Math.hypot(...x)||1;x.forEach((v,i)=>x[i]=v/xl);const y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];
+  return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]),-(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]),-(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]),1]);}
+function resize(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=Math.max(1,r.width*d|0);cv.height=Math.max(1,r.height*d|0);}
+addEventListener('resize',resize);resize();
+const ptr=new Map();let pinch0=0,zoom0=1;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);idle=0;if(ptr.size===2){const [a,b]=[...ptr.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]);zoom0=zoom;}});
+cv.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;const p=ptr.get(e.pointerId);
+  if(ptr.size===1){yaw-=(e.clientX-p[0])*.009;pitch=Math.max(-.15,Math.min(1.2,pitch+(e.clientY-p[1])*.006));}
+  ptr.set(e.pointerId,[e.clientX,e.clientY]);
+  if(ptr.size===2){const [a,b]=[...ptr.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0)zoom=Math.max(.55,Math.min(2.2,zoom0*d/pinch0));}idle=0;});
+const up=e=>{ptr.delete(e.pointerId);pinch0=0;};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.55,Math.min(2.2,zoom*Math.exp(-e.deltaY*.0012)));},{passive:false});
+cv.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft')yaw+=.15;else if(k==='ArrowRight')yaw-=.15;else if(k==='ArrowUp')pitch=Math.min(1.2,pitch+.08);else if(k==='ArrowDown')pitch=Math.max(-.15,pitch-.08);else if(k==='+'||k==='=')zoom=Math.min(2.2,zoom*1.1);else if(k==='-')zoom=Math.max(.55,zoom/1.1);else return;e.preventDefault();idle=0;});
+const tog=(id,get,set)=>{const b=document.getElementById(id);b.setAttribute('aria-pressed',String(!!get()));b.onclick=()=>{set(!get());b.setAttribute('aria-pressed',String(!!get()));};};
+tog('bTurn',()=>turn,v=>turn=v);tog('bHolo',()=>holo,v=>holo=v?1:0);tog('bBase',()=>showBase,v=>showBase=v?1:0);
+document.getElementById('bReset').onclick=()=>{yaw=0;pitch=.22;zoom=1;};
+
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;idle+=dt;if(turn&&idle>1.2)yaw-=dt*.35;
+  const T=reduce?0:t/1000;
+  gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);
+  const asp=cv.width/cv.height,dist=(asp<.8?96:74)/zoom,ctr=[0,showBase?12:15,0];
+  const eye=[ctr[0]+Math.sin(yaw)*Math.cos(pitch)*dist,ctr[1]+Math.sin(pitch)*dist,ctr[2]+Math.cos(yaw)*Math.cos(pitch)*dist];
+  const M=mul(persp(.62,asp,1,600),look(eye,ctr));
+  const m=showBase?meshAll:meshFig;
+  gl.useProgram(pr);gl.uniformMatrix4fv(U('M'),false,M);gl.uniform1f(U('T'),T);gl.uniform1f(U('holo'),holo);gl.uniform3fv(U('eye'),eye);
+  for(const k in m.b){const [b,sz]=m.b[k];const l=loc(k);gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,sz,gl.FLOAT,false,0,0);}
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.ib);gl.drawElements(gl.TRIANGLES,m.count,m.big&&u32?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT,0);
+  for(const k in m.b)gl.disableVertexAttribArray(loc(k));
+  if(showBase){gl.useProgram(pp);gl.uniformMatrix4fv(gl.getUniformLocation(pp,'M'),false,M);gl.uniform1f(gl.getUniformLocation(pp,'T'),reduce?3:t/1000);gl.uniform1f(gl.getUniformLocation(pp,'px'),cv.height*.9);
+    gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);
+    gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);const a=gl.getAttribLocation(pp,'p'),s=gl.getAttribLocation(pp,'s'),k=gl.getAttribLocation(pp,'k');
+    gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,3,gl.FLOAT,false,20,0);gl.enableVertexAttribArray(s);gl.vertexAttribPointer(s,1,gl.FLOAT,false,20,12);gl.enableVertexAttribArray(k);gl.vertexAttribPointer(k,1,gl.FLOAT,false,20,16);
+    gl.drawArrays(gl.POINTS,0,pN);gl.disableVertexAttribArray(a);gl.disableVertexAttribArray(s);gl.disableVertexAttribArray(k);gl.depthMask(true);gl.disable(gl.BLEND);}
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+}
+</script>
