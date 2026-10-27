@@ -1,11 +1,11 @@
 # Forge handoff (start of a new chat)
 
-Last updated October 26, 2026, at prototype **0.38.9**. Read `RELEASE_PROCESS.md` on the dev branch too: it sets the release steps (gh-pages fast-forward only, verify the live deploy for the exact SHA). This replaces the 0.16.0 handoff PDF.
+Last updated October 26, 2026, at prototype **0.38.10**. Read `RELEASE_PROCESS.md` on the dev branch too: it sets the release steps (gh-pages fast-forward only, verify the live deploy for the exact SHA). This replaces the 0.16.0 handoff PDF.
 
 ## Starting a new session
 
 1. Attach the repo with push access: owner `img0j0`, repo `forge`.
-2. Clone the **`dev` branch**. It holds the whole build workspace: the current build (`work.html` = `base389.html`), every patch script, `pwa.py`, the legal pages, curio art, tools and the full QA suite. Its README has the setup commands and the step-by-step for a new version. Nothing needs to be attached.
+2. Clone the **`dev` branch**. It holds the whole build workspace: the current build (`work.html` = `base3810.html`), every patch script, `pwa.py`, the legal pages, curio art, tools and the full QA suite. Its README has the setup commands and the step-by-step for a new version. Nothing needs to be attached.
 3. Clone the **`ios-app`** branch separately when shipping, and copy each new build there.
 4. **Next job:** finish the Your small things and Ink plan (https://claude.ai/artifact/Kt3TnuTRS44Ax69aMDsmy4): 0.36, 0.37 and 0.38 shipped, so that plan is done. **Next: 0.39 the other side** from the Forge design doc (https://claude.ai/artifact/WvF6qntNFo6CfAbRyji9Wj): the lantern (1 spare from each of 3 realms, 6 embers), turning a fully charted realm's map over, five Shade realms with 25 places, 20 Shade curios with their own pixel art (`curios/sprites.py`), five Shade tales and Shade wards. The map's front keeps the bright names; the back shows the Shade names. The app is about 611 KB after 0.38, so trim the release build (prototype tools and JS comments, in `pwa.py`) before the Shade side.
 5. After shipping, push the updated `dev` branch and handoff, swap the project's `claude/Forge (prototype X).html` copy, and republish the Claude page.
@@ -16,8 +16,8 @@ Last updated October 26, 2026, at prototype **0.38.9**. Read `RELEASE_PROCESS.md
 
 - **Live app:** https://img0j0.github.io/forge/. It's installable (Add to Home Screen) and works offline. Hunter uses it daily on his iPhone, and it also works in Edge.
 - **Testing:** Hunter uses it himself, then friends and family. The invite text asks testers to send feedback with **Settings → Send my report**.
-- **Claude copy:** the Forge page at https://claude.ai/artifact/QgLcL9SXJ3BWaWHzJSQo5w (version 68 = 0.38.9). This copy still shows the prototype tools, so use it for testing and demos. The Claude page can't save files, so Save picture and the backup file do nothing there; they work on the live link. A separate artifact (7Dwvf5MirwuPuAGLm3aypU) is stuck at 0.21.0 and can be ignored or deleted.
-- **Project copy:** `claude/Forge (prototype 0.38.9).html`.
+- **Claude copy:** the Forge page at https://claude.ai/artifact/QgLcL9SXJ3BWaWHzJSQo5w (version 69 = 0.38.10). This copy still shows the prototype tools, so use it for testing and demos. The Claude page can't save files, so Save picture and the backup file do nothing there; they work on the live link. A separate artifact (7Dwvf5MirwuPuAGLm3aypU) is stuck at 0.21.0 and can be ignored or deleted.
+- **Project copy:** `claude/Forge (prototype 0.38.10).html`.
 
 ## Design rules
 
@@ -80,6 +80,7 @@ Last updated October 26, 2026, at prototype **0.38.9**. Read `RELEASE_PROCESS.md
 | 0.38.7 | (Hunter.) Reliability: `saveProblem()` shows a persistent warning with backup and retry when local storage or native Preferences writes fail; the service worker deletes only versioned Forge caches, falls back on HTTP errors and keeps cache writes alive; `qa/runall.sh` exits nonzero on FAIL, crash, timeout or no PASS output. `qa/reliability.cjs` (node; run `python3 pwa.py` first). See RELEASE_0.38.7.md. |
 | 0.38.8 | (Hunter.) Hearth: the echo and wander panels move below the companion panel; `affection` updates the line in place and scrolls the scene into view. Bug: the "Sit with …" button landed in `sleepHTML`, which has no `away`/`n`, so the sleeping Hearth threw a ReferenceError and the awake Hearth had no button. |
 | 0.38.9 | **Fix.** The button sits right under the awake scene (`#hAffection`, `aria-describedby=hmsg`, `#hmsg` is `aria-live`); the sleeping Hearth is as before. Room: removed styles for 8 unused classes and recompressed the two icons losslessly (629.3 KB, under the 630 KB line; trim fonts and comments before the Shade side). They Remember fix: `snackKnown` is kept only when true (it was added as false to every card, so a restored backup no longer matched). Test fixes: Hearth tests open folding sections by name (0.38.8 moved the wander panel); qa_386 opens a realm you have drawn; `qa/reliability.cjs` reads the current cache name from `pwa/sw.js`; `qa_axe`/`qa_axe2` print PASS/FAIL lines so the stricter runner can read them. QA: qa_389 (9). |
+| 0.38.10 | **Room before the Shade side.** VT323 and Press Start 2P are re-saved without TrueType hinting (same characters, outlines and layout features; zero differing pixels at 1× and 3× in Chromium). 629.3 → 603.5 KB, so about 26 KB of room under the 630 KB line. Fredoka and Nunito Sans were left as they were: dropping their hints moved one curly quote by a pixel, for only 2.5 KB. Windows may render the pixel fonts slightly softer at tiny sizes without hints; check in Edge. Next easy room if needed: code comments (about 11.5 KB). |
 
 ## Key technical facts
 
