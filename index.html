@@ -1137,7 +1137,7 @@ function drawFrame(e,cv,t,ph){
   const si=bob*2+blink;if(!e.sp[si])e.sp[si]=buildSprite(e.spec,bob,blink);
   const g=e.sp[si],pal=pulse?e.palP:e.pal,bg=e.scene.rgb,bf=e.scene.foil;
   const hov=ph!=null,hue=to/1100+(hov?ph*.9:0),sheen=hov?ph*70:((to/50)%95)-10,Rr=16+Math.sin(to/450)*1.3;
-  const FS=R===3?FOIL3:R===4?FOIL4:null,OX=8,OY=4;
+  const ha=e.hopT?t-e.hopT:9e9,FS=R===3?FOIL3:R===4?FOIL4:null,OX=8,OY=4-(ha<620?Math.round(Math.sin(ha/620*Math.PI)*4):0);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     const i=y*W+x,sx=x-OX,sy=y-OY;let slot=0;
     if(sx>=0&&sx<32&&sy>=0&&sy<32)slot=g[sy*32+sx];
@@ -1178,7 +1178,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.39.0',APPVER='1.0.0';
+const VERSION='prototype 0.40.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1693,7 +1693,7 @@ function inspect(id){
 }
 function talk(){
   const c=cardById(inspId);if(!c)return;const n=c.nick||c.name,art=$('#stage .art'),h=$('#inspHint');
-  if(art){art.classList.remove('hop');void art.offsetWidth;art.classList.add('hop');}
+  {const cv=$('#stage .art canvas.pcv');if(cv&&cv._e){cv._e.hopT=performance.now();if(REDUCE)drawFrame(cv._e,cv,performance.now(),null);}}
   let line;
   if(c.tale&&Math.random()<.4)line=`${n} remembers: \u201C${c.tale}\u201D`;
   else{const L=c.dark?SPEAK_DARK:SPEAK_CUTE;line=L[rand(L.length)].replace(/\{n\}/g,n);}
@@ -2819,7 +2819,23 @@ function wanderTick(){
 }
 
 const HW=128,HH=72,GYH=52;
-let hbg=null,hbgMode='',hImg=null,hfx=[];
+let hbg=null,hbgMode='',hImg=null,hfx=[],hPos=[],hWake={};
+/* 0.40: after 10 pm everyone by the fire dozes (a tap wakes one for a while) */
+const hLate=()=>{const h=new Date().getHours();return h>=22||h<6;};
+/* 0.40: weather from the realm of whoever is sitting by the fire: the most common realm, Shade if most are dark */
+function hWeather(cs){const t={};let dk=0,n=0;cs.forEach(c=>{t[c.theme]=(t[c.theme]||0)+1;dk+=c.dark?1:0;n++;});if(!n)return null;const ti=+Object.keys(t).sort((a,b)=>t[b]-t[a])[0];return {ti,dk:dk*2>n};}
+function drawWeather(setpx,W,t){if(!W)return;const ti=W.ti,dk=W.dk,G=hexRGB(dk?THEMES[ti].dark.glow:'#FFFFFF');
+  for(let k=0;k<18;k++){const s=(k*73)%128,sp=.6+((k*37)%10)/10,ph=(t/1000*sp*9+k*13);
+    if(ti===3&&!dk){const x=(s+Math.sin(t/900+k)*3+128)%128,y=ph%56;setpx(x,y,[255,255,255]);setpx(x,y+1,[196,212,236]);if(k%3===0){setpx(x+1,y,[255,255,255]);setpx(x+1,y+1,[196,212,236]);}}
+    else if(ti===2&&!dk){const y=(ph*2.2)%60,x=(s+y*.3)%128;for(let q=0;q<3;q++)setpx(x+q*.3,y+q,[96,156,214]);}
+    else if(ti===0&&!dk){if(k%3===2)continue;const x=(s+ph*.6)%128,y=(ph*.7+k*7)%50,q=k%4?[244,140,180]:[255,214,232];setpx(x,y,q);setpx(x+1,y,q);}
+    else if(ti===4&&!dk){if(k%3)continue;const on=Math.sin(t/430+k*2.1)>.1;if(on)setpx(s+Math.round(Math.sin(t/1700+k)*6),18+((k*11)%26)+Math.round(Math.cos(t/1300+k)*3),[255,224,138]);}
+    else if(ti===1&&!dk){if(k%2)continue;setpx(s+Math.sin(t/600+k)*2,52-(ph%50),[255,160,70]);}
+    else{if(k%2)continue;const up=ti!==3,y=up?52-(ph*.5%50):(ph*.5%52);if(Math.sin(t/500+k*1.7)>-.3)setpx(s+Math.sin(t/800+k)*3,y,G);}}}
+/* 0.40: statues stand on little plinths at the scene's edges, the two most recent */
+function drawStatues(setpx,t){const L=statues().slice(-2);L.forEach((c,j)=>{const g=prep(Object.assign({},c,{keep:c.statue.keep})),sp=g.sp[0]||(g.sp[0]=buildSprite(g.spec,0,0)),x0=j?111:1,y0=GYH-19;
+  for(let y=0;y<16;y++)for(let x=0;x<16;x++){const sl=sp[(2*y+1)*32+2*x+1]||sp[(2*y)*32+2*x];if(!sl)continue;setpx(x0+x,y0+y,g.pal[sl]);}
+  for(let x=-1;x<17;x++){setpx(x0+x,y0+16,[150,140,166]);setpx(x0+x,y0+17,[112,102,130]);setpx(x0+x,y0+18,[86,78,104]);}});}
 function todMode(){const h=new Date().getHours();return h>=7&&h<17?'day':(h>=17&&h<20)||(h>=5&&h<7)?'dusk':'night';}
 function buildHearthBG(mode,style,fs){
   const BD={glade:{sky:['#8FD3F2','#DFF3C8'],g:['#7BC46F','#5FA85A'],hill:'#8FD08A'},snow:{sky:['#15204A','#8EA6DA'],g:['#F4F8FF','#D5E1F3'],hill:'#C4D3EC'},cave:{sky:['#18080F','#5C1F24'],g:['#2B1516','#190B0C'],hill:'#26100F'},gilded:{sky:['#0A0C26','#3A2E66'],g:['#2B2340','#1E1830'],hill:'#1B1633'}};
@@ -2860,14 +2876,19 @@ function drawHearth(t){
   order.forEach(i=>{if(cs[i].id===outId)return;const p=pos(i);for(let y=-2;y<=2;y++)for(let x=-10;x<=10;x++){if((x*x)/100+(y*y)/5<=1){const X=p[0]+16+x,Y=p[1]+30+y;if(X>=0&&X<HW&&Y>=0&&Y<HH){const o=(Y*HW+X)*4;d[o]=Math.round(d[o]*.62);d[o+1]=Math.round(d[o+1]*.62);d[o+2]=Math.round(d[o+2]*.62);}}}});
   const drawOne=i=>{
     const c=cs[i];if(c.id===outId)return;const e=prep(c),p=pos(i),to=t+(c.seed%2000),slp=isSleep(i);
-    const still=(i===soloI&&soloV===8),bob=(slp||still)?0:Math.floor(to/520)%2,blink=slp?1:(still?((to%9000)<160?1:0):((to%3600)<140?1:0)),pulse=Math.floor(to/640)%2,si=bob*2+blink;
+    const dz=!slp&&hLate()&&!(hWake[c.id]&&t-hWake[c.id]<6000)&&!hfx.some(f=>f.i===i&&t-f.t0<1500);
+    const still=(i===soloI&&soloV===8),bob=(slp||still||dz)?0:Math.floor(to/520)%2,blink=(slp||dz)?1:(still?((to%9000)<160?1:0):((to%3600)<140?1:0)),pulse=Math.floor(to/640)%2,si=bob*2+blink;
+    hPos[i]=[p[0],p[1],c.id];
     if(!e.sp[si])e.sp[si]=buildSprite(e.spec,bob,blink);
     const g=e.sp[si],pal=pulse?e.palP:e.pal;
-    let hop=0;hfx.forEach(f=>{if(f.i===i){const a=t-f.t0;if(a<420)hop=a<210?-2:-1;}});
-    if(slp)hop=Math.floor(t/1500+i)%2;else if(still)hop=Math.floor(t/3000)%2;
+    let hop=0;hfx.forEach(f=>{if(f.i===i){const a=t-f.t0;if(f.k==='hop'){if(a<640)hop=-Math.round(Math.sin(a/640*Math.PI)*6);}else if(a<420)hop=a<210?-2:-1;}});
+    if(slp||dz)hop=Math.floor(t/1500+i)%2;else if(still)hop=Math.floor(t/3000)%2;
     for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[sy*32+sx];if(!sl)continue;let q=pal[sl];if(sl===1&&c.bond>=BOND_AT[4])q=GOLD[Math.floor((((sx+sy)*.05+t/1100)%1)*6)%6];setpx(p[0]+sx,p[1]+sy+hop,q);}
-    if(slp){const zt=((t/900)+i*.9)%3;if(zt<2.5){const zy=p[1]+3-Math.floor(zt*3),zx=p[0]+23+Math.floor(zt*1.5);ZB.forEach((row,j)=>{for(let k=0;k<3;k++)if(row[k]==='#')setpx(zx+k,zy+j,[220,232,255]);});}}
+    if(slp||dz){const zt=((t/900)+i*.9)%3;if(zt<2.5){const zy=p[1]+3-Math.floor(zt*3),zx=p[0]+23+Math.floor(zt*1.5);ZB.forEach((row,j)=>{for(let k=0;k<3;k++)if(row[k]==='#')setpx(zx+k,zy+j,[220,232,255]);});}}
   };
+  if(!heapOn)drawWeather(setpx,hWeather(cs.filter(c=>c.id!==outId)),t);
+  drawStatues(setpx,t);
+  hPos=[];
   order.filter(i=>isSleep(i)).forEach(drawOne);
   if(heapOn&&T3>=2){
     const sl=order.filter(i=>isSleep(i)&&cs[i].id!==outId).map(i=>pos(i));
@@ -2893,7 +2914,7 @@ function drawHearth(t){
   if(lvl<1){const mm=.62+.38*lvl;for(let qq=0;qq<HW*HH;qq++){d[qq*4]*=mm;d[qq*4+1]*=mm;d[qq*4+2]*=mm;}}
   /* little reactions above heads */
   hfx=hfx.filter(f=>t-f.t0<1500);
-  hfx.forEach(f=>{const p=pos(f.i);if(!p)return;const a=t-f.t0,bm=f.k==='play'?STARB:HEART,col=f.k==='play'?[255,214,90]:[255,120,160];if(a>1200&&Math.floor(a/100)%2)return;
+  hfx.forEach(f=>{if(f.k==='hop')return;const p=pos(f.i);if(!p)return;const a=t-f.t0,bm=f.k==='play'?STARB:HEART,col=f.k==='play'?[255,214,90]:[255,120,160];if(a>1200&&Math.floor(a/100)%2)return;
     bm.forEach((row,j)=>{for(let k=0;k<5;k++)if(row[k]==='#')setpx(p[0]+14+k,p[1]-6-a/70+j,col);});});
   ctx.putImageData(hImg,0,0);
 }
@@ -2936,6 +2957,12 @@ function renderHearth(){
   bloomCheck();
 }
 function fxAdd(i,k){hfx.push({i,k,t0:performance.now()});}
+/* 0.40: a tap on a Forgeling makes it hop and say something; dozers wake for a few seconds */
+function hearthTap(e){const cv=e.target,r=cv.getBoundingClientRect();if(!r.width)return false;const x=(e.clientX-r.left)/r.width*HW,y=(e.clientY-r.top)/r.height*HH;
+  const hit=hPos.map((p,i)=>p&&x>=p[0]+5&&x<=p[0]+27&&y>=p[1]+4&&y<=p[1]+32?i:-1).filter(i=>i>=0).pop();if(hit===undefined)return false;
+  const c=cardById(hPos[hit][2]);if(!c)return false;const now=performance.now(),was=hLate()&&!(hWake[c.id]&&now-hWake[c.id]<6000);hWake[c.id]=now;fxAdd(hit,'hop');chime(0);
+  const n=c.nick||c.name,L=c.dark?SPEAK_DARK:SPEAK_CUTE;hf.msg=was?`${n} opens one eye, then hops up to say hello.`:L[rand(L.length)].replace(/\{n\}/g,n);const m=$('#hmsg');if(m)m.textContent=hf.msg;
+  if(REDUCE)drawHearth(now);return true;}
 /* They Remember: optional per-creature memories preserve older saves. */
 function rememberFind(c,id){
   if(c&&!c.firstFind)c.firstFind={id,at:todayKey()};
@@ -3005,7 +3032,7 @@ function openPick(){
   hydrate(modal);
 }
 $('#view-hearth').addEventListener('click',e=>{
-  if(e.target.id==='hearthCv'){hearthPoke();if(state.hearth.sleep&&!sleepRun)startWake();return;}
+  if(e.target.id==='hearthCv'){if(!state.hearth.sleep&&hearthTap(e))return;hearthPoke();if(state.hearth.sleep&&!sleepRun)startWake();return;}
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.statue){openStatue(+b.dataset.statue);return;}
   const cs=slotCards(),c=cs[hf.sel];
@@ -3059,7 +3086,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=44;
+const SEEN_V=45;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -3460,14 +3487,14 @@ function statueShelfHTML(){
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up.</li>
+    <ul class="newlist"><li><b>A living Hearth.</b> Tap a Forgeling by the fire and it hops to say hello. After 10 pm everyone dozes, and a tap wakes one up. The weather follows whoever is sitting there: petals, embers, rain, snow or fireflies. Statues you have cast now stand at the edges of the scene. On a card, tap the art and the creature hops inside its frame.</li>
+    <li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up.</li>
     <li><b>The Scribe.</b> Write sixty lines in your book, whenever you like, and a Scribe comes to your fire for good, with an ink-dipped quill. Now and then it reads one of your old lines back to you. And on days you do one of your own small things, your Forgelings notice.</li>
     <li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
     <li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
     <li><b>Living Sky.</b> The whole app now sits in the sky that follows your day, from bright morning to dusk to a starry night, with glowing panels, gold buttons and pixel icons. Prefer the old look? Settings, Sky, Plain.</li>
     <li><b>The Forge.</b> Every day you do your small thing earns an ember (two when you go all in), and they never fade. At the Hearth, forge spare curios and embers into charms your Forgelings can wear, a bell that rings a wanderer home, a compass that points to something unfound, and pieces for the fire. Every piece is signed by the Forgeling who helped. The Forge never takes your last copy of a curio.</li>
-    <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li>
-    <li><b>A slower, longer road.</b> The paths now share one new find a day: the day’s first wander can bring a new curio and a new place, and later wanders bring a spare, a story and a little bond. Realms also take more Forgelings to ink in fully. Nothing you have already found or drawn changes.</li></ul>
+    <li><b>Your favourite, on Today.</b> Open any Forgeling’s card and tap Show on Today. Each day’s new find still shows first, then your favourite keeps you company there. Every card back now wears the campfire, too.</li></ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
