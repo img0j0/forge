@@ -416,6 +416,7 @@ ul.places li b{font-weight:700}
 .stshelf button{flex:none;display:grid;justify-items:center;gap:2px;min-width:64px;min-height:44px;padding:6px 6px 4px;border:0;background:var(--chip);color:var(--ink);font:600 12px inherit;cursor:pointer}
 .stshelf img{width:40px;height:40px;image-rendering:pixelated}
 .fgh{font:600 16px var(--display);margin:14px 0 4px}
+.stline{margin:4px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:0 8px;color:var(--muted)}.stline .ghost{min-height:44px;padding:0 4px}
 .chb{position:absolute;right:.3em;bottom:.3em;width:1.6em;height:2em;image-rendering:pixelated;filter:drop-shadow(0 .1em 0 #0A0814)}
 .mini .chb{right:.5em;bottom:.5em;width:2.4em;height:3em}
 ul.forgel li{align-items:center}ul.forgel li .fi{width:34px;height:42px;background:none;display:grid;place-items:center}
@@ -1178,7 +1179,7 @@ requestAnimationFrame(loop);
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.40.0',APPVER='1.0.0';
+const VERSION='prototype 0.40.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -2943,6 +2944,7 @@ function renderHearth(){
       <div class="row" style="margin:0"><h2 style="margin:0">${esc(n)}</h2><span class="muted small">${BOND_NAMES[lv-1]}, bond ${lv} of 5</span></div>
       <div class="bondbar" role="img" aria-label="Bond progress"><i style="width:${pct}%"></i></div>
       <p class="muted small">${nx?`${nx-(c.bond||0)} more ${nx-(c.bond||0)===1?'point':'points'} to ${BOND_NAMES[lv]}. Bond never fades.`:'Forgebound. A golden glow outlines '+esc(n)+'.'}</p>
+      <p class="small stline">${c.statue?`<button class="ghost" data-statue="${c.id}">See ${esc(n)}’s statue</button>`:lv>=5?`${esc(n)}’s statue is ready to cast at the Forge. <button class="ghost" data-spre="${c.id}">Preview</button>`:`A statue waits at Forgebound. <button class="ghost" data-spre="${c.id}">Preview it in clay</button>`}</p>
       <button class="rowl" data-tale="${c.id}" style="border-top:0;padding:6px 0;min-height:48px"><span class="rt"><b>${esc(n)}’s story</b><span class="rs">${lv} of 5 chapters${lv<5?'. The next opens at '+BOND_NAMES[lv]+'.':'. All told.'}</span></span><span class="chev" aria-hidden="true">›</span></button>
       ${memoryHTML(c)}
       <div class="actions">
@@ -3035,6 +3037,7 @@ $('#view-hearth').addEventListener('click',e=>{
   if(e.target.id==='hearthCv'){if(!state.hearth.sleep&&hearthTap(e))return;hearthPoke();if(state.hearth.sleep&&!sleepRun)startWake();return;}
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.statue){openStatue(+b.dataset.statue);return;}
+  if(b.dataset.spre){openStatuePreview(+b.dataset.spre);return;}
   const cs=slotCards(),c=cs[hf.sel];
   if(b.id==='hGift'){openGiftSend(c);return;}
   if(b.dataset.cur){openCurio(b.dataset.cur);return;}
@@ -3316,20 +3319,20 @@ const STATUE_EMB=6;
 const statueReady=c=>!!c&&!c.statue&&bondLevel(c)>=5;
 const statues=()=>state.cards.filter(c=>c.statue);
 let stv=null,stvId=null; /* the open viewer: {v, stop, frame} */
-function statueSprite(c){
-  const cc=Object.assign({},c,{keep:c.statue?c.statue.keep:(c.keep||'')}),spec=genSpec(cc),pl=makePal(spec,cc),g=buildSprite(spec,0,0),R=c.rarity,FS=R===3?FOIL3:R===4?FOIL4:null;
+function statueSprite(c,clay){
+  const cc=Object.assign({},c,{keep:clay?'':(c.statue?c.statue.keep:(c.keep||''))}),spec=genSpec(cc),pl=makePal(spec,cc),g=buildSprite(spec,0,0),R=c.rarity,FS=R===3?FOIL3:R===4?FOIL4:null;
   const col=new Array(1024).fill(null),out=new Uint8Array(1024);
   for(let i=0;i<1024;i++){const sl=g[i];if(!sl)continue;let [r,gg,b]=pl.pal[sl];
     if((FS&&FS[sl])||(c.bond>=25&&sl===1)){const x=i%32+8,y=(i>>5)+4;
       if(R===3){const q=RAINBOW[Math.floor((((x+y)*.045)%1)*12)%12];r=lerp(r,q[0],.7);gg=lerp(gg,q[1],.7);b=lerp(b,q[2],.7);}
       else{const q=GOLD[Math.floor((((x+y)*.05)%1)*6)%6];r=lerp(r,q[0],.85);gg=lerp(gg,q[1],.85);b=lerp(b,q[2],.85);}}
-    col[i]=[r/255,gg/255,b/255];out[i]=sl===1?1:0;}
+    if(clay){const L=Math.round((.3*r+.59*gg+.11*b)/255*4)/4;col[i]=sl===1?[.30,.28,.34]:[.50+.36*L,.48+.36*L,.54+.34*L];}else col[i]=[r/255,gg/255,b/255];out[i]=sl===1?1:0;}
   return {col,out};
 }
 /* pixels to blocks: depth from the distance to the silhouette edge; the outline is painted on the front and back faces
    only (its sides are body); small features (eyes, mouth, markings) sit one block proud of the face */
-function statueFigure(c){
-  const {col,out}=statueSprite(c),W=32,V=new Map(),dist=new Float32Array(1024).fill(99),key=a=>a.map(v=>Math.round(v*255)).join(',');
+function statueFigure(c,clay){
+  const {col,out}=statueSprite(c,clay),W=32,V=new Map(),dist=new Float32Array(1024).fill(99),key=a=>a.map(v=>Math.round(v*255)).join(',');
   for(let i=0;i<1024;i++){const x=i&31,y=i>>5;if(!col[i])dist[i]=0;else if(!x||!y||x===31||y===31)dist[i]=1;}
   for(let p=0;p<2;p++)for(let k=0;k<1024;k++){const i=p?1023-k:k,x=i&31,y=i>>5;if(!dist[i])continue;
     for(const [dx,dy,w] of [[-1,0,1],[1,0,1],[0,-1,1],[0,1,1],[-1,-1,1.4],[1,-1,1.4],[-1,1,1.4],[1,1,1.4]]){const X=x+dx,Y=y+dy,d=(X<0||Y<0||X>31||Y>31)?0:dist[Y*W+X];if(d+w<dist[i])dist[i]=d+w;}}
@@ -3400,7 +3403,7 @@ function stvMesh(sets,fig){
 }
 function statueView(cv,c,o){
   o=o||{};const gl=cv.getContext('webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true});if(!gl)return null;
-  const u32=gl.getExtension('OES_element_index_uint'),st=statueStand(c.theme,c.dark),fig=statueFigure(c);
+  const u32=gl.getExtension('OES_element_index_uint'),st=statueStand(c.theme,c.dark),fig=statueFigure(c,o.clay);if(o.clay)st.gc=[.78,.72,.9];
   let fh=0;for(const k of fig.keys()){const y=+k.split(',')[1];if(y+1>fh)fh=y+1;}
   const mFig=stvMesh([fig],0),mAll=stvMesh([fig,st.S],0);
   if((mFig.big||mAll.big)&&!u32)return null;
@@ -3408,8 +3411,8 @@ function statueView(cv,c,o){
   const pr=prog(STV_VS,STV_FS),pp=prog(STV_PV,STV_PF);if(!pr||!pp)return null;
   const up=m=>{const r={count:m.count,big:m.big,b:{}};for(const [k,arr,sz] of [['p',m.P,3],['n',m.N,3],['c',m.C,3],['a',m.A,1],['e',m.E,1],['h',m.H,1]]){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);r.b[k]=[b,sz,gl.getAttribLocation(pr,k)];}r.ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,r.ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,m.I,gl.STATIC_DRAW);return r;};
   const gFig=up(mFig),gAll=up(mAll),pBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(st.pts),gl.STATIC_DRAW);const pN=st.pts.length/5;
-  const U=n=>gl.getUniformLocation(pr,n),UP=n=>gl.getUniformLocation(pp,n),holo=c.rarity===3?1:c.rarity===4?2:0;
-  const v={yaw:-.35,pitch:.28,zoom:1,turn:!REDUCE,base:true,idle:o.rise?-2.2:-1.5,rise:o.rise&&!REDUCE?0:1,raf:0,last:performance.now(),dead:false};
+  const U=n=>gl.getUniformLocation(pr,n),UP=n=>gl.getUniformLocation(pp,n),holo=o.clay?0:c.rarity===3?1:c.rarity===4?2:0;
+  const v={yaw:-.35,pitch:.28,zoom:1,turn:!REDUCE,base:!o.clay,idle:o.rise?-2.2:-1.5,rise:o.rise&&!REDUCE?0:1,raf:0,last:performance.now(),dead:false};
   const mul=(a,b)=>{const r=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];r[i*4+j]=s;}return r;};
   const persp=(f,as,n,fa)=>{const t=1/Math.tan(f/2);return new Float32Array([t/as,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]);};
   const look=(e,ct)=>{const z=[e[0]-ct[0],e[1]-ct[1],e[2]-ct[2]],zl=Math.hypot(...z);for(let i=0;i<3;i++)z[i]/=zl;const x=[z[2],0,-z[0]],xl=Math.hypot(...x)||1;for(let i=0;i<3;i++)x[i]/=xl;const y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];
@@ -3453,6 +3456,20 @@ function openStatue(id,o){
   if(!stv){cv.hidden=true;$('#stNo').hidden=false;['stTurn','stBase','stPic'].forEach(i=>{const b=$('#'+i);if(b)b.hidden=true;});}
   if(o.fresh)chime(3);const f=$('#ovClose');if(f)f.focus({preventScroll:true});
 }
+/* 0.40.1: preview a statue in clay before it can be cast */
+const bondToGo=c=>Math.max(0,BOND_AT[4]-(c.bond||0));
+function openStatuePreview(id){
+  const c=cardById(id);if(!c)return;if(stv){stv.stop();stv=null;}const n=c.nick||c.name,left=bondToGo(c);
+  ovMode='statue';
+  openOverlay(`<div class="stview" style="--sg:#C9B8FF"><p class="rv-title">${esc(n)}’s statue, in clay</p><p class="stsub">A preview · ${left?`${left} more bond ${left===1?'point':'points'} to Forgebound`:'Ready to cast at the Forge'}</p>
+    <div class="stcan"><canvas id="stCv" tabindex="0" role="img" aria-label="A clay preview of ${esc(n)}'s statue. Drag to turn it, pinch or scroll to zoom, arrow keys to turn."></canvas><p class="stno" id="stNo" hidden>This phone could not start 3D drawing, so here is ${esc(n)} as on the card.<img src="${spriteURL(c)}" alt="${esc(n)}"></p></div>
+    <p class="rv-hint">This is ${esc(n)}’s shape. When ${esc(n)} is Forgebound, cast it at the Forge for ${STATUE_EMB} embers and it comes to life in full colour, wearing its keepsake, on a stand from ${esc(realmName(c))}.</p>
+    <div class="row stbtns"><button class="chip" id="stTurn" aria-pressed="${!REDUCE}">Turntable</button></div>
+    <button class="ghost" id="ovClose">Close</button></div>`,true);
+  ovMode='statue';const cv=$('#stCv');stvId=null;stv=statueView(cv,c,{clay:true});
+  if(!stv){cv.hidden=true;$('#stNo').hidden=false;const b=$('#stTurn');if(b)b.hidden=true;}
+  const f=$('#ovClose');if(f)f.focus({preventScroll:true});
+}
 function keepName(k){const all=KEEPS.concat(KEEPR,FORGE_R.filter(r=>r.ti!==undefined).map(r=>({id:r.id,name:r.name})));const x=all.find(q=>q.id===k);return x?x.name:k;}
 function statueCast(id){
   const c=cardById(id);if(!statueReady(c)||embers()<STATUE_EMB)return;
@@ -3476,9 +3493,11 @@ async function statuePicture(c){
 }
 function statueForgeHTML(){
   const fb=state.cards.filter(c=>bondLevel(c)>=5),e=embers();
-  if(!fb.length)return `<h3 class="fgh">Statues</h3><p class="muted small">When a Forgeling becomes Forgebound (bond 5), the Forge can cast it as a 3D statue for ${STATUE_EMB} embers.</p>`;
+  const near=state.cards.filter(c=>bondLevel(c)<5).sort((a,b)=>(b.bond||0)-(a.bond||0)||a.id-b.id)[0];
+  const nearHTML=near?`<li><span class="fi" aria-hidden="true"><img class="cimg" src="${spriteURL(near)}" width="30" height="30" alt=""></span><span><b>${esc(near.nick||near.name)}’s statue</b><small>Closest to Forgebound: ${bondToGo(near)} more bond ${bondToGo(near)===1?'point':'points'}.</small></span><button class="chip" data-spre="${near.id}">Preview</button></li>`:'';
+  if(!fb.length)return `<h3 class="fgh">Statues</h3><p class="muted small">When a Forgeling becomes Forgebound (bond 5), the Forge can cast it as a 3D statue for ${STATUE_EMB} embers. Preview one in clay now.</p>${nearHTML?`<ul class="furn forgel">${nearHTML}</ul>`:''}`;
   return `<h3 class="fgh">Statues</h3><ul class="furn forgel">${fb.map(c=>{const n=c.nick||c.name,ok=!!c.statue,can=!ok&&e>=STATUE_EMB;
-    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true"><img class="cimg" src="${spriteURL(c)}" width="30" height="30" alt=""></span><span><b>${esc(n)}’s statue</b><small>Statue. ${esc(n)} in 3D on a ${esc(realmName(c))} stand.</small><small>${ok?`Cast ${esc(dateLabel(c.statue.at))}.`:`Needs ${STATUE_EMB} embers (you have ${e}).`}</small></span>${ok?`<button class="chip" data-statue="${c.id}">See it</button>`:can?`<button class="chip" data-scast="${c.id}">Cast it</button>`:''}</li>`;}).join('')}</ul>`;
+    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true"><img class="cimg" src="${spriteURL(c)}" width="30" height="30" alt=""></span><span><b>${esc(n)}’s statue</b><small>Statue. ${esc(n)} in 3D on a ${esc(realmName(c))} stand.</small><small>${ok?`Cast ${esc(dateLabel(c.statue.at))}.`:`Needs ${STATUE_EMB} embers (you have ${e}).`}</small></span>${ok?`<button class="chip" data-statue="${c.id}">See it</button>`:can?`<button class="chip" data-scast="${c.id}">Cast it</button>`:`<button class="chip" data-spre="${c.id}">Preview</button>`}</li>`;}).join('')}${nearHTML}</ul>`;
 }
 function statueShelfHTML(){
   const s=statues();if(!s.length)return '';
@@ -3488,7 +3507,7 @@ function statueShelfHTML(){
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
     <ul class="newlist"><li><b>A living Hearth.</b> Tap a Forgeling by the fire and it hops to say hello. After 10 pm everyone dozes, and a tap wakes one up. The weather follows whoever is sitting there: petals, embers, rain, snow or fireflies. Statues you have cast now stand at the edges of the scene. On a card, tap the art and the creature hops inside its frame.</li>
-    <li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up.</li>
+    <li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up, and preview any Forgeling's statue in clay before it is Forgebound.</li>
     <li><b>The Scribe.</b> Write sixty lines in your book, whenever you like, and a Scribe comes to your fire for good, with an ink-dipped quill. Now and then it reads one of your old lines back to you. And on days you do one of your own small things, your Forgelings notice.</li>
     <li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
     <li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>
@@ -3937,6 +3956,7 @@ modal.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.hasAttribute('data-close')||b.id==='ovClose')closeModal();
   else if(b.dataset.statue)openStatue(+b.dataset.statue);
+  else if(b.dataset.spre)openStatuePreview(+b.dataset.spre);
   else if(b.dataset.scast)statueCast(+b.dataset.scast);
   else if(b.id==='stTurn'||b.id==='stBase'){if(stv){const k=b.id==='stTurn'?'turn':'base';stv.v[k]=!stv.v[k];stv.v.idle=9;b.setAttribute('aria-pressed',String(stv.v[k]));}}
   else if(b.id==='stPic'){const c=cardById(stvId);if(c)statuePicture(c);}
