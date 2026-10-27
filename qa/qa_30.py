@@ -17,7 +17,7 @@ with sync_playwright() as p:
     s=build(st(A),[2,1,0,1,0]); s["seen"]=99; ids=[c["id"] for c in s["cards"]]; s["hearth"]["slots"]=ids[:2]
     s["curios"]={k:{"n":1,"cid":ids[0],"at":s["date"]} for k in ["acorn","mushroom","snow"]}; s["curios"]["moon"]={"n":2,"cid":0,"at":s["date"],"gift":1,"from":"Pip"}
     load(A,s)
-    rec("Room","the app stays under its size budget (below 630 KB, as qa_301)",len(open(P.replace("file://","")).read().encode())<630000 if P.startswith("file://") else True)
+    rec("Room","the app stays under its size budget (1 MB, as qa_22)",len(open(P.replace("file://","")).read().encode())<1_000_000 if P.startswith("file://") else True)
     rec("Room","the unused Fredoka 400 face is gone, the used ones remain",A.evaluate("[...document.styleSheets].flatMap(s=>{try{return [...s.cssRules]}catch(e){return []}}).filter(r=>r.cssText&&r.cssText.startsWith('@font-face')&&r.cssText.includes('Fredoka')).map(r=>r.style.fontWeight).sort().join(',')")=="500,600")
     openshelf(A); sh=A.inner_text("#view-hearth .shelf")
     rec("Shelf","the shelf has a shelf per realm with four places each",A.locator(".shelf .splank").count()==5 and A.locator(".shelf .scur").count()==20)

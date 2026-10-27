@@ -119,7 +119,7 @@ Last updated October 26, 2026, at prototype **0.38.10**. Read `RELEASE_PROCESS.m
 - **Ask what the player wants to do, not what the code allows.** Twice Hunter said he couldn't choose his game: first nothing reached other games, then realm locks did. Freedom to choose matters to him.
 - **Check a feature can be reached, not just that it works.** Tests opened each game directly, so nothing noticed that Hunter could only reach one of them from the Hearth.
 - Timing-sensitive checks belong inside the page (rAF), not driven from Python, which adds 50–150 ms per step. Scans must wait for animations to finish (`document.getAnimations()`), as qa_21 now does.
-- qa_22 holds the whole app under 640 KB (raised from 600 KB in 0.26.0; the app is about 601 KB).
+- **Size budget (Hunter, October 26): 1 MB, and it is a soft guide.** If a feature Hunter wants needs more room, raise the budget (update qa_22, qa_30, qa_301) and note it; never drop or shrink an idea to fit. Heavy optional extras (like a 3D viewer) load on first use as their own file, cached for offline, so everyday launches stay fast. The app is about 604 KB.
 - qa_axe and qa_axe2 print one AXE line instead of PASS lines, so their summary shows pass=0 fail=0. Read their logs.
 
 **Status on 0.35.0:** everything passes, including the full run (qa_35: 42, qa_351: 29, qa_36: 30, qa_37: 27, qa_38: 16). qa_21's 'title at noon' check fails now and then on 0.26.0 too: a clock-dependent flake, not a regression. qa_21 failed once on the title sky and contrast, then passed 36/36 three times alone on both 0.24.0 and 0.24.1, so treat it as an occasional timing flake.

@@ -18,6 +18,9 @@ Update 0.38.9: base388.html is 0.38.8 as Hunter committed it; base389.html is id
 They Remember shipped without a version bump: VERSION and the service-worker cache still say 0.38.6. Do not use that version alone to identify this release; use commit 1031617c9ec46d9a7d433307a0515c8e73d1b1f9 or hAffection.
 Do not run a historical patch against base386 and replace work.html without retaining the memory changes.
 
+## Size budget
+The budget is 1 MB (qa_22, qa_30, qa_301) and is a soft guide set by Hunter on 2026-10-26: when a wanted feature needs more room, raise it and note it rather than cutting the feature. Prefer loading heavy optional extras on first use as separate cached files.
+
 ## Every release
 1. Read this file, forge-handoff.md, and current branch heads. Fetch fresh source; do not reuse a prior chat's cached file.
 2. Work from dev/work.html. Use a focused branch/commit. Preserve local-storage key forge-app-v1, origin, and /forge/ path.
