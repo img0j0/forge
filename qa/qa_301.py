@@ -9,6 +9,6 @@ with sync_playwright() as p:
     big=[len(u) for u in re.findall(r"data:image/svg\+xml,<svg.*?</svg>",html,re.S) if len(u)>9000]
     rec("SVG","no pixel-art background is stored one rectangle per pixel any more",not big,big)
     rec("SVG","the card back and frames still draw",pg.evaluate("(()=>{const v=getComputedStyle(document.documentElement).getPropertyValue('--cbT');return v.includes('<path')})()"))
-    if P.startswith("file://"): rec("Size","the app keeps room under the 640 KB budget (below 630 KB; trim before the Shade side)",len(open(P[7:]).read().encode())<630000)
+    if P.startswith("file://"): rec("Size","the app keeps room under the 640 KB budget (below 630 KB)",len(open(P[7:]).read().encode())<630000)
     rec("All","no page errors",not pg._errs,pg._errs[:1]); b.close()
 save_results("qa_301"); print(sum(r["ok"] for r in RES),"/",len(RES))
