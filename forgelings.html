@@ -504,6 +504,10 @@ html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.updbar{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 6px 6px 16px;border-radius:24px;font-weight:700;font-size:14px;z-index:69;display:flex;gap:6px;align-items:center;width:max-content;max-width:92vw;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.updbar span{flex:1;line-height:1.3}
+.updbar button{min-height:44px;min-width:44px;border-radius:22px;padding:0 14px;border:0;font:inherit;font-weight:800;background:var(--bg);color:var(--ink);cursor:pointer}
+.updbar button.later{background:transparent;color:var(--bg);text-decoration:underline;text-underline-offset:3px}
 
 /* Card extras: Moment back and flip */
 .card{transition:transform .17s ease-in}
@@ -1163,21 +1167,31 @@ function hydrate(root){
     if(cv._e)return;const c=CMAP[cv.dataset.k];if(!c)return;
     cv._e=prep(c);REG.push(cv);drawFrame(cv._e,cv,performance.now(),null);
   });
+  wakeLoops();
 }
+/* 0.40.2: the loops sleep (a slow check, not 60 wake-ups a second) when nothing on screen moves; wakeLoops() rouses them at once. */
+var cardSleep=0,hearthSleep=0;
 function loop(ts){
-  if(!REDUCE&&!document.hidden&&ts-last>72){
-    last=ts;REG=REG.filter(cv=>cv.isConnected);
-    REG.forEach(cv=>{const st=cv._st||(cv._st=cv.closest('.stage')||{});drawFrame(cv._e,cv,ts,st._ph==null?null:st._ph);});
+  if(REDUCE||document.hidden){cardSleep=setTimeout(()=>{cardSleep=0;requestAnimationFrame(loop);},600);return;}
+  if(ts-last>72){
+    last=ts;REG=REG.filter(cv=>cv.isConnected);const vis=REG.filter(cv=>cv.getClientRects().length);
+    if(!vis.length){cardSleep=setTimeout(()=>{cardSleep=0;requestAnimationFrame(loop);},600);return;}
+    vis.forEach(cv=>{const st=cv._st||(cv._st=cv.closest('.stage')||{});drawFrame(cv._e,cv,ts,st._ph==null?null:st._ph);});
   }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+function wakeLoops(){
+  if(cardSleep){clearTimeout(cardSleep);cardSleep=0;requestAnimationFrame(loop);}
+  if(hearthSleep&&typeof hearthLoop==='function'){clearTimeout(hearthSleep);hearthSleep=0;requestAnimationFrame(hearthLoop);}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops();});
 
 
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.40.1',APPVER='1.0.0';
+const VERSION='prototype 0.40.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1299,7 +1313,7 @@ function sanitize(s){
   s.cards=s.cards.filter(c=>c&&typeof c==='object'&&Number.isFinite(c.id)&&!seenId.has(c.id)&&seenId.add(c.id)).map(c=>{
     c.seed=Number.isFinite(c.seed)?c.seed:Math.abs(Math.round(c.id*2654435761))%2147483647;
     c.v=int(c.v,0,VECTORS.length-1,0);c.theme=int(c.theme,0,THEMES.length-1,0);c.rarity=int(c.rarity,0,4,0);c.dark=!!c.dark;
-    c.name=str(c.name,'Mystery Forgeling');c.nick=str(c.nick,'');c.note=str(c.note,'');c.tale=str(c.tale,c.note);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}
+    c.name=str(c.name,'Mystery Forgeling').slice(0,40);c.nick=str(c.nick,'').slice(0,24);c.note=str(c.note,'').slice(0,200);c.tale=str(c.tale,c.note).slice(0,200);c.keep=str(c.keep,'');c.own=str(c.own,'').slice(0,60);if(c.ink!==undefined){c.ink=str(c.ink,'').slice(0,200);if(!c.ink)delete c.ink;}
     if(c.snackKnown===true)c.snackKnown=true;else delete c.snackKnown;
     if(c.statue!==undefined){if(!c.statue||typeof c.statue!=='object'||typeof c.statue.at!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(c.statue.at))delete c.statue;else c.statue={at:c.statue.at,keep:typeof c.statue.keep==='string'?c.statue.keep.slice(0,24):''};}
     if(c.firstFind&&(!CURIOS.some(x=>x.id===c.firstFind.id)||typeof c.firstFind.at!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(c.firstFind.at)))delete c.firstFind;
@@ -1398,7 +1412,7 @@ function rollover(){
   state.status='fresh';state.todayCard=null;
 }
 const cardById=id=>state.cards.find(c=>c.id===id);
-function applySettings(){setTimeout(()=>drawSky(true),0);REDUCE=!!state.settings.reduce||(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);document.documentElement.classList.toggle('reduce',REDUCE);const th=state.settings.theme||'auto';if(th==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',th);lsApply();}
+function applySettings(){setTimeout(()=>drawSky(true),0);REDUCE=!!state.settings.reduce||(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);document.documentElement.classList.toggle('reduce',REDUCE);wakeLoops();const th=state.settings.theme||'auto';if(th==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',th);lsApply();}
 
 /* ================= Cards ================= */
 function weighted(W){let t=W.reduce((a,b)=>a+b,0),r=Math.random()*t;for(let i=0;i<W.length;i++){if(r<W[i])return i;r-=W[i];}return 0;}
@@ -1691,7 +1705,7 @@ function inspect(id){
   attachTilt($('#stage'));hydrate(modal);$('#ovClose').focus({preventScroll:true});
 }
 function talk(){
-  const c=cardById(inspId);if(!c)return;const n=c.nick||c.name,art=$('#stage .art'),h=$('#inspHint');
+  const c=cardById(inspId);if(!c)return;const n=c.nick||c.name,h=$('#inspHint');
   {const cv=$('#stage .art canvas.pcv');if(cv&&cv._e){cv._e.hopT=performance.now();if(REDUCE)drawFrame(cv._e,cv,performance.now(),null);}}
   let line;
   if(c.tale&&Math.random()<.4)line=`${n} remembers: \u201C${c.tale}\u201D`;
@@ -1724,7 +1738,7 @@ const homeFav=()=>{const f=state.homeFav!=null?cardById(state.homeFav):null;retu
 function favShows(){const f=homeFav();return !!f&&f.id!==state.todayCard&&state.findSeen===state.date&&!ui.showFind;}
 function markFindSeen(){if(state&&state.status==='done'&&state.findSeen!==state.date&&homeFav()){state.findSeen=state.date;ui.showFind=false;save();}}
 function renderToday(){
-  const V=VECTORS[state.todayV],s=state.status,el=$('#view-today');
+  const s=state.status,el=$('#view-today');
   const EMB='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9z"/><path d="M5 9h14M9 9l3 12M15 9l-3 12"/></svg>';
   const IC={hearth:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2 0 2 1 3 2 3 0-3-1-5 1-8.8z"/></svg>',
     map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>',
@@ -1840,6 +1854,7 @@ function renderSettings(){
     <p class="muted small center" style="margin:14px 0 0">${STORE?'Forgelings '+APPVER:VERSION}</p>`;
 }
 function renderNav(){
+  wakeLoops();
   const lore=state.settings.lore!==false;
   document.querySelector('.tab[data-tab="chronicle"]').hidden=!lore;
   if(!lore&&tab==='chronicle')tab='today';
@@ -1980,17 +1995,6 @@ function realmPageHTML(ti){
   if(loreOn()){const tp=talePages(ti);out+=`<p class="muted small" style="margin:6px 0 0">Old tale: ${TALES[ti].t}. ${tp===4?'The tale is whole.':tp+' of 4 pages found.'}</p>`;}
   return out+`<div class="latest" style="margin-top:6px">${mini.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:62,mini:true})}</button>`).join('')}</div></div>`;
 }
-function realmsHTML(){
-  const mood=state.settings.mood;let out='';
-  THEMES.forEach((T,ti)=>{[0,1].forEach(d=>{
-    const key=ti+'-'+d,P=REALM_PAGES[key],n=state.cards.filter(c=>c.theme===ti&&(c.dark?1:0)===d).length;
-    if(!n&&((mood==='cute'&&d)||(mood==='dark'&&!d)))return;
-    const acc=(d?T.dark:T.cute).accent;
-    out+=`<div class="realm${n?'':' locked'}" style="--rc:${acc}"><div><b>${P.t}</b><span class="tag">${P.tag}</span></div>
-      <p class="${n?'world':'muted'}">${n?esc(P.x):'Find your first '+P.t+' Forgeling to open this page.'}</p>${n?`<span class="muted small">${n} found here</span>`:''}</div>`;
-  });});
-  return out;
-}
 function callingNoteHTML(i){
   return [VECTORS[i]].map((V)=>{
     const n=state.cards.filter(c=>c.v===i).length,L=CALLINGS[i];
@@ -2000,7 +2004,6 @@ function callingNoteHTML(i){
     return `<div class="calling" style="--rc:${V.color}"><div class="row" style="margin:0"><b>${V.name}</b><span class="muted small">${n} found</span></div><div class="bar2" aria-hidden="true"><i style="width:${Math.min(100,n*10)}%"></i></div>${t1}${t2}${t3}</div>`;
   }).join('');
 }
-const callingsHTML=()=>VECTORS.map((V,i)=>callingNoteHTML(i)).join('');
 function renderChronicle(){
   const el=$('#view-chronicle'),subs=[['map','Map'],['tales','Tales'],['journal','Journal']];
   if(!subs.some(x=>x[0]===ch.sub))ch.sub='map';
@@ -2918,7 +2921,7 @@ function drawHearth(t){
   ctx.putImageData(hImg,0,0);
 }
 let hLast=0;
-function hearthLoop(ts){if(!REDUCE&&!document.hidden&&tab==='hearth'&&ts-hLast>80){hLast=ts;drawHearth(ts);}requestAnimationFrame(hearthLoop);}
+function hearthLoop(ts){if(REDUCE||document.hidden||tab!=='hearth'){hearthSleep=setTimeout(()=>{hearthSleep=0;requestAnimationFrame(hearthLoop);},600);return;}if(ts-hLast>80){hLast=ts;drawHearth(ts);}requestAnimationFrame(hearthLoop);}
 requestAnimationFrame(hearthLoop);
 
 function renderHearth(){
@@ -4008,7 +4011,7 @@ modal.addEventListener('click',e=>{
   else if(b.id==='shBack'){const id=+b.dataset.cid;closeModal();inspect(id);}
   else if(b.id==='doRestore'){
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to replace this device';return;}
-    const prevState=state;try{const s=JSON.parse($('#resText').value.trim());if(!(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object'))throw 0;s.ageBand=s.ageBand||state.ageBand;state=migrate(s);rollover();save();applySettings();closeModal();tab='today';render();toast('Restored.');}
+    const prevState=state;try{const s=JSON.parse($('#resText').value.trim());if(!(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object'))throw 0;s.ageBand=state.ageBand||s.ageBand;state=migrate(s);rollover();save();applySettings();closeModal();tab='today';render();toast('Restored.');}
     catch(err){state=prevState;save();try{applySettings();render();}catch(e2){}b.dataset.armed='0';b.textContent='Restore';sfx('no');toast('That does not look like a saved copy. Nothing was changed.');}
   }
 });
@@ -4536,8 +4539,23 @@ window.addEventListener('resize',()=>{if(modal.querySelector('.stageCv'))drawSta
 const RELEASE=!!document.querySelector('meta[name="forge-build"][content="release"]');
 const STANDALONE=()=>!!((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone);
 if(RELEASE){document.documentElement.classList.add('release');
-  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+    /* 0.40.2: an installed copy often resumes instead of reloading, so look for a new release on each return and offer it. */
+    const hadSW=!!navigator.serviceWorker.controller;let updLast=0;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadSW)updBar();});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden||Date.now()-updLast<30*60*1000)return;updLast=Date.now();
+      navigator.serviceWorker.getRegistration().then(r=>{if(r)return r.update();}).catch(()=>{});});
+  }
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}}
+function updBar(){
+  if(document.getElementById('updBar')||!document.body)return;
+  const b=document.createElement('div');b.id='updBar';b.className='updbar';b.setAttribute('role','status');
+  b.innerHTML='<span>A new version of Forgelings is ready.</span><button type="button" id="updGo">Load it</button><button type="button" class="later" id="updLater">Later</button>';
+  document.body.appendChild(b);
+  b.querySelector('#updGo').onclick=()=>{try{save();}catch(e){}location.reload();};
+  b.querySelector('#updLater').onclick=()=>b.remove();
+}
 function installTipHTML(){
   if(!RELEASE||STANDALONE()||NATIVE)return '';
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
