@@ -219,6 +219,7 @@ Don't chase focus timers, app blockers, leaderboards or heavy stats. Pitch: the 
    - Map border shifts on era change (idea 52). Map ideas not built yet: a sea creature doodle in open water, gently drifting waves, and fog that thins as a realm gets close to being found.
    - Parked: Edge of the Light, a Sleep-Talking experiment, rhythm identity, unseen archivists.
    - Possible later: seasonal content, so a year of daily use stays fresh.
+   - **Tabled for the iPhone app (Hunter, October 28): AR statues.** Export a cast statue as .usdz so iOS AR Quick Look can stand it on a real desk; a 3D-printable export (.obj/.stl) could come with it. Native-only, after TestFlight. Also suggested, not yet decided: statue links (a link carrying seed, realm, rarity, calling and cast keepsake that opens the full 3D viewer for a friend, display only, never added to their collection) and a short turntable video for social sharing.
 8. **Lore:** the five old tales and the 25 map places are also written into the Lore Bible doc. Ideas raised but not built: curios as gifts to Forgelings; placing curios around the Hearth.
 9. **Known tradeoff:** setting the phone's clock back lets someone farm days, since there's no server to check.
 9. **Housekeeping:**
