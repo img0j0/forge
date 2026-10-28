@@ -31,10 +31,10 @@ with sync_playwright() as p:
     s=build(base,[3,3,3,3,3],dark_in={0,2}); setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg); openmap(pg); m=mapinfo(pg)
     rec("Map","a Shade card in a realm adds the hidden under-drawing to exactly that realm",m["shade"]==2,m["shade"])
     # mood names
-    for mood,names in [("cute",{"Meadow","Ember","Tide","Frost","Dusk"}),("dark",{"Bramble","Inferno","Abyss","Wraith","Void"})]:
+    for mood,names in [("cute",{"Meadow","Ember","Tide","Frost","Dusk"}),("dark",{"Meadow","Ember","Tide","Frost","Dusk"})]:  # 0.41: the front shows bright names for every mood
         s=build(base,[3,3,3,3,3],mood=mood); setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg); openmap(pg); m=mapinfo(pg)
         got={l for l in m["labels"]}&{"Meadow","Ember","Tide","Frost","Dusk","Bramble","Inferno","Abyss","Wraith","Void"}
-        rec("Map",f"{mood} mood uses {'bright' if mood=='cute' else 'Shade'} realm names",got==names,sorted(got))
+        rec("Map",f"{mood} mood uses the bright realm names on the front (0.41)",got==names,sorted(got))
     # world marks follow the calendar
     s=build(base,[3,3,3,3,3]); setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg); openmap(pg); m1=mapinfo(pg)
     rec("Map","up to 3 recent world events are marked, each with a margin line",1<=m1["marks"]<=3 and "Small marks in the margin" in m1["text"],m1["marks"])

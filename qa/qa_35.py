@@ -40,7 +40,7 @@ with sync_playwright() as p:
     # ---------- the sheet: every recipe visible, nothing affordable without spares ----------
     t=forge_sheet(pg)
     names=["Charm of Meadow","Charm of Ember","Charm of Tide","Charm of Frost","Charm of Dusk","Wanderer’s bell","Compass","A copper kettle","An iron stand","Wind chimes"]
-    rec("Sheet","all ten recipes are listed, each saying what it needs",all(n in t for n in names) and t.count("Needs ")==10 and "0 of 10 pieces made" in t,t[:200])
+    rec("Sheet","all ten recipes are listed (with the 0.41 lantern, eleven), each saying what it needs",all(n in t for n in names) and t.count("Needs ")==11 and "0 of 11 pieces made" in t,t[:200])
     rec("Sheet","with no spares, nothing can be made yet, and the reason is shown",pg.locator("#modal [data-fmake]").count()==0 and "(you have 0 and" in t)
     rec("Sheet","the sheet says who signs the piece",re.search(r"Today that is \S",t) is not None)
     bad+=["forge sheet: "+v for v in axe(pg)]
@@ -108,7 +108,7 @@ with sync_playwright() as p:
         s=st(pg); s["forge"]["spent"]=0; load(pg,s)
         forge_sheet(pg); pg.tap(f"#modal [data-fmake='{pid}']"); pg.wait_for_timeout(500); closemodals(pg)
     s=st(pg); tabto(pg,"hearth")
-    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and "6 of 10 pieces made" in pg.inner_text("#view-hearth .forgep"))
+    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and "6 of 11 pieces made" in pg.inner_text("#view-hearth .forgep"))
     pm=pg.evaluate("async()=>{const cv=document.getElementById('hearthCv'),x=cv.getContext('2d');const px=(X,Y)=>Array.from(x.getImageData(X,Y,1,1).data).slice(0,3);const diff=(a,b)=>Math.max(...a.map((v,i)=>Math.abs(v-b[i])));let best=0,kettle=false;for(let s=0;s<8;s++){let legs=0;for(let y=55;y<=57;y++){if(diff(px(57,y),px(55,y))>12&&diff(px(71,y),px(73,y))>12)legs++;}best=Math.max(best,legs);const k=px(78,58);if(k[0]>k[1]&&k[1]>k[2]&&k[0]<240)kettle=true;await new Promise(r=>setTimeout(r,120));}return [best,kettle]}")
     rec("Hearth","the iron stand's legs and the copper kettle are drawn into the fire scene (sampled over a second, past the sparks)",pm[0]==3 and pm[1],pm)
     t=forge_sheet(pg)

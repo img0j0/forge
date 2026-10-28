@@ -35,7 +35,7 @@ with sync_playwright() as p:
     # an unknown realm stays blank
     rec("Unknown","realms you have no Forgeling from show no places",places(pg)==3+4)
     # damaged
-    for bad in ("x",None,[1],{"0":"no","1":-3,"2":99,"7":2},{"3":2.6}):
+    for bad in ("x",None,[1],{"0":"no","1":-3,"2":99,"17":2},{"3":2.6}):  # 0.41: realms 5-9 are the Shade side now, so 17 is the out-of-range key
         s3=st(pg); s3["explore"]=bad; ready(pg,s3); ex=st(pg)["explore"]
         rec("Damaged",f"damaged exploration records ({bad!r}) are repaired",isinstance(ex,dict) and all(k in "01234" and isinstance(v,int) and 1<=v<=4 for k,v in ex.items()) and not pg._errs,(ex,pg._errs[:1]))
     s4=st(pg); s4.pop("explore",None); ready(pg,s4)
