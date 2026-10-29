@@ -58,3 +58,4 @@ Never reset or clear player data as a deployment remedy.
 JavaScript parse check; first find is immutable after later finds; JSON round-trip preserves memory; origin callbacks distinguish daily and pack creatures; repeated affection does not consume visits or increase bond; sleeping state blocks affection.
 These are targeted checks, not a substitute for full browser regression.
 Update 0.41.1: patches now read base411.html (= work.html); base41.html removed (git keeps it).
+Update 0.42.0: patches now read base42.html (= work.html); base411.html removed (git keeps it). qa_17 and qa_181 run over http in runall.sh.
