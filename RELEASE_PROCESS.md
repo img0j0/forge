@@ -62,3 +62,5 @@ Update 0.42.0: patches now read base42.html (= work.html); base411.html removed 
 
 Update 0.43.0: patches now read base43.html (= work.html); base42.html removed (git keeps it). qa_43 caps page lengths; put new features in sheets.
 Update 0.43.1: patches now read base431.html (= work.html); base43.html removed (git keeps it). runall.sh now also runs qa_431, qa_ref (fixed-seed appearance references in qa/ref; regenerate with REF_UPDATE=1 only when art changes on purpose, and say so in the handoff) and reliability.cjs.
+
+Update 0.44.0: patches now read base44.html (= work.html); base431.html removed (git keeps it). runall.sh now also runs qa_44; qa_ref adds the Meadow island reference (isle00).
