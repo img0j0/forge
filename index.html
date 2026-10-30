@@ -412,6 +412,13 @@ ul.places li b{font-weight:700}
 .stno{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;text-align:center;color:#D2C9EE;padding:16px}
 .stno img{width:160px;height:160px;image-rendering:pixelated}
 .stbtns{justify-content:center;gap:8px;flex-wrap:wrap}
+.isle .stcan{height:min(44vh,420px)}
+.islek{margin:0;font:700 11px/1.2 var(--body,inherit);letter-spacing:.12em;text-transform:uppercase;color:#FFD36B}
+.isle .stsub{margin:-4px 0 0;color:#D2C9EE;font-weight:400;text-align:center}
+.islelist{list-style:none;margin:0;padding:0;width:min(100%,560px);display:grid;gap:4px}
+.islelist button{display:block;width:100%;min-height:44px;padding:8px 12px;border:0;background:#F7EEDA;color:#3A2E22;font:400 13px/1.4 var(--body,inherit);text-align:left;cursor:pointer}
+.islelist button[aria-pressed="true"]{background:#FFE9A8;box-shadow:inset 4px 0 0 #8A5A00}
+.isgo{display:block;margin:8px 0 0;min-height:44px}
 .stshelf{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
 .stshelf button{flex:none;display:grid;justify-items:center;gap:2px;min-width:64px;min-height:44px;padding:6px 6px 4px;border:0;background:var(--chip);color:var(--ink);font:600 12px inherit;cursor:pointer}
 .stshelf img{width:40px;height:40px;image-rendering:pixelated}
@@ -1281,7 +1288,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.43.1',APPVER='1.0.0';
+const VERSION='prototype 0.44.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -2154,7 +2161,7 @@ function realmPageHTML(ti){
   const hc=slotCards(),hw=hc[Math.min(hf.sel,hc.length-1)],wc0=wCard(),rq=state.request,ra=rq&&rq.realm===ti?reqAsker():null;
   out+=hw?(state.wander&&wc0?`<p class="muted small" style="margin:8px 0 0">${esc(wc0.nick||wc0.name)} is out wandering${state.wander.realm>=0?' in '+esc(rName(state.wander.realm)):''}.</p>`:state.hearth.sleep?'':`<button class="primary" data-wto="${ti}">Send ${esc(hw.nick||hw.name)} to wander here</button>`):'';
   if(ra)out+=`<p class="muted small" style="margin:6px 0 0">${esc(ra.nick||ra.name)} asked for something from here.</p>`;
-  out+=placesListHTML(ti);
+  out+=placesListHTML(ti)+isleBtn(ti);
   if(loreOn()){const tp=talePages(ti);out+=`<p class="muted small" style="margin:6px 0 0">Old tale: ${TALES[ti].t}. ${tp===4?'The tale is whole.':tp+' of 4 pages found.'}</p>`;}
   return out+`<div class="latest" style="margin-top:6px">${mini.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.nick||c.name)}">${cardHTML(c,{w:62,mini:true})}</button>`).join('')}</div></div>`;
 }
@@ -2604,6 +2611,7 @@ function openPlace(ti,k){
     <p class="center world">${esc(p.x)}</p><div class="stack">${go}<button class="outline" data-realmopen="${ti}">Open ${esc(mapName(ti))}’s page</button></div>
     <div class="row" style="justify-content:center"><button class="ghost" data-close>Close</button></div>`);
 }
+const isleBtn=ti=>placesFound(ti)===5?`<button class="chip isgo" data-isle="${ti}">See ${esc(mapName(ti))} in 3D</button>`:'';
 function placesListHTML(ti){
   const n=placesFound(ti);if(!n)return '';
   return `<p class="muted small" style="margin:8px 0 0">Places on ${ti>=5?'the back of ':''}the map${n===5?'. Fully charted.':''}</p><ul class="places">${PLACES[ti].slice(0,n).map(p=>`<li><b>${esc(p.n)}.</b> <span class="world">${esc(p.x)}</span></li>`).join('')}${n<5?'<li class="gone">There is more to find here. Wander here to uncover it.</li>':''}</ul>`;
@@ -2773,7 +2781,7 @@ function shadePageHTML(si){
   let out=`<div class="realm" style="--rc:${T.dark.accent}"><div><b>${T.dark.name}</b><span class="tag">The other side of ${T.name}</span></div><p class="world">${esc(SREALM_TXT[b])}</p></div><div class="parch realmnotes">`;
   const hc=slotCards(),hw=hc[Math.min(hf.sel,hc.length-1)],wc0=wCard();
   out+=hw?(state.wander&&wc0?`<p class="muted small" style="margin:8px 0 0">${esc(wc0.nick||wc0.name)} is out wandering${state.wander.realm>=0?' in '+esc(rName(state.wander.realm)):''}.</p>`:state.hearth.sleep?'':`<button class="primary" data-wto="${si}">Send ${esc(hw.nick||hw.name)} across to wander here</button>`):'';
-  out+=placesListHTML(si);
+  out+=placesListHTML(si)+isleBtn(si);
   if(loreOn()){const tp=talePages(si);out+=`<p class="muted small" style="margin:6px 0 0">Shade tale: ${TALES[si].t}. ${tp===4?'The tale is whole.':tp+' of 4 pages found.'}</p>`;}
   return out+'</div>';
 }
@@ -3513,7 +3521,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=48;
+const SEEN_V=49;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -3820,11 +3828,11 @@ function statueStand(ti,dk){
   return {S,pts,pc:hx(pc),gc:hx(glow),fall:ti===3?1:0};
 }
 const STV_VS='attribute vec3 p,n,c;attribute float a,e,h;uniform mat4 M;varying vec3 vc,vn,vw;varying float va,ve,vh;void main(){vc=c;vn=n;va=a;ve=e;vh=h;vw=p;gl_Position=M*vec4(p,1.);}';
-const STV_FS='precision mediump float;varying vec3 vc,vn,vw;varying float va,ve,vh;uniform float T,holo,rise;uniform vec3 eye,gc;vec3 hsv(float h){return clamp(abs(mod(h*6.+vec3(0,4,2),6.)-3.)-1.,0.,1.);}'
+const STV_FS='precision mediump float;varying vec3 vc,vn,vw;varying float va,ve,vh;uniform float T,holo,rise,hl;uniform vec3 eye,gc;vec3 hsv(float h){return clamp(abs(mod(h*6.+vec3(0,4,2),6.)-3.)-1.,0.,1.);}'
  +'void main(){if(vh>-1.&&vw.y>rise)discard;vec3 L=normalize(vec3(.45,.8,.55));float d=max(dot(vn,L),0.);vec3 col=vc*(.48+.85*d)*(.42+.58*va);vec3 V=normalize(eye-vw);float rim=pow(1.-max(dot(vn,V),0.),2.2);'
  +'col+=rim*(vn.x>0.?gc*.35:vec3(.55,.35,1.)*.28);col+=gc*.16*clamp(1.-vw.y/10.,0.,1.)*max(dot(vn,vec3(0,-.2,1)),0.);'
  +'if(holo>.5&&vh>.5){float s=pow(sin(vw.x*.35+vw.y*.25-T*1.6)*.5+.5,6.)*(.4+rim);col=mix(col,col+(holo>1.5?vec3(1.,.85,.4):hsv(fract(vw.x*.03+vw.y*.05-T*.15)))*.35,s);}'
- +'col=mix(col,vc*(1.25+.25*sin(T*3.+vw.x)),ve);gl_FragColor=vec4(col,1.);}';
+ +'col=mix(col,vc*(1.25+.25*sin(T*3.+vw.x)),ve);if(hl>.5&&abs(vh-hl)<.5)col+=gc*(.26+.1*sin(T*3.));gl_FragColor=vec4(col,1.);}';
 const STV_PV='attribute vec3 p;attribute float s,k;uniform mat4 M;uniform float T,px,fall;varying float vk,vl;void main(){vec3 q=p;float life=fract(T*.06*(.6+k)+k*7.);vk=k;vl=life;if(k>0.){q.y+=(fall>.5?-life:life)*28.;q.x+=sin(T*.9+k*20.)*1.5;}gl_Position=M*vec4(q,1.);gl_PointSize=s*px/gl_Position.w;}';
 const STV_PF='precision mediump float;varying float vk,vl;uniform vec3 pc,gc;void main(){vec2 d=gl_PointCoord-.5;if(vk>0.){if(max(abs(d.x),abs(d.y))>.5)discard;gl_FragColor=vec4(pc,(1.-vl)*smoothstep(0.,.15,vl));}else gl_FragColor=vec4(gc,smoothstep(.5,0.,length(d))*.22);}';
 function stvMesh(sets,fig){
@@ -3840,16 +3848,16 @@ function stvMesh(sets,fig){
 }
 function statueView(cv,c,o){
   o=o||{};const gl=cv.getContext('webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true});if(!gl)return null;
-  const u32=gl.getExtension('OES_element_index_uint'),st=statueStand(c.theme,c.dark),fig=statueFigure(c,o.clay);if(o.clay)st.gc=[.78,.72,.9];
+  const u32=gl.getExtension('OES_element_index_uint'),sc=o.scene,st=sc||statueStand(c.theme,c.dark),fig=sc?new Map():statueFigure(c,o.clay);if(o.clay)st.gc=[.78,.72,.9];
   let fh=0;for(const k of fig.keys()){const y=+k.split(',')[1];if(y+1>fh)fh=y+1;}
-  const mFig=stvMesh([fig],0),mAll=stvMesh([fig,st.S],0);
-  if((mFig.big||mAll.big)&&!u32)return null;
+  const mFig=sc?null:stvMesh([fig],0),mAll=sc?stvMesh([st.S],0):stvMesh([fig,st.S],0);
+  if(((mFig&&mFig.big)||mAll.big)&&!u32)return null;
   const sh=(t,s)=>{const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);return x;},prog=(a,b)=>{const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,a));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,b));gl.linkProgram(p);return gl.getProgramParameter(p,gl.LINK_STATUS)?p:null;};
   const pr=prog(STV_VS,STV_FS),pp=prog(STV_PV,STV_PF);if(!pr||!pp)return null;
   const up=m=>{const r={count:m.count,big:m.big,b:{}};for(const [k,arr,sz] of [['p',m.P,3],['n',m.N,3],['c',m.C,3],['a',m.A,1],['e',m.E,1],['h',m.H,1]]){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);r.b[k]=[b,sz,gl.getAttribLocation(pr,k)];}r.ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,r.ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,m.I,gl.STATIC_DRAW);return r;};
-  const gFig=up(mFig),gAll=up(mAll),pBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(st.pts),gl.STATIC_DRAW);const pN=st.pts.length/5;
-  const U=n=>gl.getUniformLocation(pr,n),UP=n=>gl.getUniformLocation(pp,n),holo=o.clay?0:c.rarity===3?1:c.rarity===4?2:0;
-  const v={yaw:-.35,pitch:.28,zoom:1,turn:!REDUCE,base:!o.clay,idle:o.rise?-2.2:-1.5,rise:o.rise&&!REDUCE?0:1,raf:0,last:performance.now(),dead:false};
+  const gFig=mFig?up(mFig):null,gAll=up(mAll),pBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(st.pts),gl.STATIC_DRAW);const pN=st.pts.length/5;
+  const U=n=>gl.getUniformLocation(pr,n),UP=n=>gl.getUniformLocation(pp,n),holo=o.clay||sc?0:c.rarity===3?1:c.rarity===4?2:0;
+  const v={yaw:sc?.5:-.35,pitch:sc?.36:.28,zoom:1,hl:0,goal:null,turn:!REDUCE,base:!o.clay,idle:o.rise?-2.2:-1.5,rise:o.rise&&!REDUCE?0:1,raf:0,last:performance.now(),dead:false};
   const mul=(a,b)=>{const r=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];r[i*4+j]=s;}return r;};
   const persp=(f,as,n,fa)=>{const t=1/Math.tan(f/2);return new Float32Array([t/as,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]);};
   const look=(e,ct)=>{const z=[e[0]-ct[0],e[1]-ct[1],e[2]-ct[2]],zl=Math.hypot(...z);for(let i=0;i<3;i++)z[i]/=zl;const x=[z[2],0,-z[0]],xl=Math.hypot(...x)||1;for(let i=0;i<3;i++)x[i]/=xl;const y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];
@@ -3858,10 +3866,11 @@ function statueView(cv,c,o){
   function draw(t){
     if(v.dead)return;fit();const dt=Math.min(.05,(t-v.last)/1000);v.last=t;v.idle+=dt;if(v.turn&&v.idle>1.2)v.yaw-=dt*.35;
     if(v.rise<1)v.rise=Math.min(1,v.rise+dt/2.2);const T=REDUCE?0:t/1000;
+    if(v.goal!=null){const d=Math.atan2(Math.sin(v.goal-v.yaw),Math.cos(v.goal-v.yaw));if(REDUCE||Math.abs(d)<.004){v.yaw+=d;v.goal=null;}else{v.yaw+=d*Math.min(1,dt*5);v.idle=0;}}
     gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);
-    const as=cv.width/cv.height,dist=(as<.8?96:76)/v.zoom,ct=[0,v.base?12:fh/2,0],eye=[ct[0]+Math.sin(v.yaw)*Math.cos(v.pitch)*dist,ct[1]+Math.sin(v.pitch)*dist,ct[2]+Math.cos(v.yaw)*Math.cos(v.pitch)*dist];
+    const as=cv.width/cv.height,dist=(as<.8?96:76)*(sc?sc.dist:1)/v.zoom,ct=[0,sc?sc.cy:v.base?12:fh/2,0],eye=[ct[0]+Math.sin(v.yaw)*Math.cos(v.pitch)*dist,ct[1]+Math.sin(v.pitch)*dist,ct[2]+Math.cos(v.yaw)*Math.cos(v.pitch)*dist];
     const M=mul(persp(.62,as,1,600),look(eye,ct)),m=v.base?gAll:gFig;
-    gl.useProgram(pr);gl.uniformMatrix4fv(U('M'),false,M);gl.uniform1f(U('T'),T);gl.uniform1f(U('holo'),holo);gl.uniform1f(U('rise'),v.rise>=1?999:v.rise*(fh+1)-.5);gl.uniform3fv(U('eye'),eye);gl.uniform3fv(U('gc'),st.gc);
+    gl.useProgram(pr);gl.uniformMatrix4fv(U('M'),false,M);gl.uniform1f(U('T'),T);gl.uniform1f(U('holo'),holo);gl.uniform1f(U('rise'),v.rise>=1?999:v.rise*(fh+1)-.5);gl.uniform3fv(U('eye'),eye);gl.uniform3fv(U('gc'),st.gc);gl.uniform1f(U('hl'),v.hl);
     for(const k in m.b){const [b,sz,l]=m.b[k];gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,sz,gl.FLOAT,false,0,0);}
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.ib);gl.drawElements(gl.TRIANGLES,m.count,m.big?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT,0);for(const k in m.b)gl.disableVertexAttribArray(m.b[k][2]);
     if(v.base){gl.useProgram(pp);gl.uniformMatrix4fv(UP('M'),false,M);gl.uniform1f(UP('T'),REDUCE?3:t/1000);gl.uniform1f(UP('px'),cv.height*.9);gl.uniform1f(UP('fall'),st.fall);gl.uniform3fv(UP('pc'),st.pc);gl.uniform3fv(UP('gc'),st.gc);
@@ -3882,6 +3891,84 @@ function statueView(cv,c,o){
   v.raf=requestAnimationFrame(draw);
   return {v,kick,stop(){window.removeEventListener('resize',kick);v.dead=true;cancelAnimationFrame(v.raf);},frame(){draw(performance.now());cancelAnimationFrame(v.raf);v.raf=requestAnimationFrame(draw);}};
 }
+/* ---- 0.44: realm dioramas. A fully charted realm opens as a small floating voxel island of its five places, drawn by
+   the statue viewer. Everything comes from the realm and its places, so nothing is stored. ---- */
+function isleScene(ti){
+  const b=ti%5,dk=ti>=5,T=THEMES[b],P=dk?T.dark:T.cute,hx=h=>hexRGB(h).map(v=>v/255),S=new Map(),pts=[],spots=[];
+  let a=(ti*131+17)|0;const rnd=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+  const put=(x,y,z,h,e,id)=>S.set(x+','+y+','+z,{c:typeof h==='string'?hx(h):h,f:null,e:e||0,h:id||0});
+  const mix=(h,k)=>hx(h).map(v=>Math.min(1,v*k)),pick=A=>A[(rnd()*A.length)|0];
+  const G=P.ground,glow=dk?P.glow:P.accent,top=[hx(G[0]),hx(G[1]),mix(G[0],.88)],side=[mix(G[1],.62),mix(G[1],.52),mix(G[0],.56)],rock=dk?[hx('#2A2438'),hx('#221D30'),hx('#302940')]:[hx('#8C7A68'),hx('#7A6A5A'),hx('#9A8774')];
+  const R=22,crack=(x,z,r)=>(Math.abs(Math.sin(x*.45+z*.2)+Math.cos(z*.38-x*.15))<.2)&&r>7;
+  for(let x=-R;x<=R;x++)for(let z=-R;z<=R;z++){const r=Math.hypot(x,z*1.1),edge=R-rnd()*2.2;if(r>edge)continue;
+    const f=1-r/edge,dep=2+Math.round(Math.pow(f,.75)*15+rnd()*2.5);
+    for(let y=-dep;y<0;y++){let c3=y===-1?pick(top):y>-4?pick(side):pick(rock),e=0;
+      if(y===-1){if(b===1&&crack(x,z,r)&&rnd()<.85){c3=hx(rnd()<.5?glow:(dk?P.glow2:'#FF9F43'));e=1;}
+        else if((dk||b===4)&&b!==1&&crack(x,z,r)&&rnd()<.5){c3=hx(glow);e=dk?.9:.6;}}
+      put(x,y,z,c3,e);}}
+  /* the five places sit in a ring; each place's blocks carry its number so it can be lit */
+  const off=-Math.PI/2+.35;
+  PLACES[ti].forEach((p,i)=>{const an=off+i*Math.PI*2/5,rr=i===0?11:13,ox=Math.round(Math.cos(an)*rr),oz=Math.round(Math.sin(an)*rr);spots.push([ox,oz]);
+    const L=(x,y,z,c,e)=>put(ox+x,y,oz+z,c,e,i+1),ux=ox/(Math.hypot(ox,oz)||1),uz=oz/(Math.hypot(ox,oz)||1);
+    const stone=dk?['#4A4458','#3A3548','#55506A']:['#A8A196','#B9B2A6','#958E83'],wood=dk?'#2A2018':'#7A5230',body=dk?P.bodies:T.cute.bodies;
+    const leaf=dk?[G[0],G[1],mix(G[0],1.3)]:b===1?['#D9583B','#E8744A','#C9472E']:b===3?['#DCEFF7','#BFE6FF','#FFFFFF']:b===2?['#5FB878','#4FA36A']:[G[0],G[1],'#5FA85A'];
+    const k=p.k;
+    if(k==='hill'){let hh=0;for(let x=-5;x<=5;x++)for(let z=-5;z<=5;z++){const d=Math.hypot(x,z),h=Math.round(4.6*(1-d/5.6));for(let y=0;y<h;y++)L(x,y,z,y===h-1?pick(top):pick(side));if(!x&&!z)hh=h;}
+      L(0,hh,0,body[1]);L(0,hh+1,0,body[1]);L(0,hh+2,0,mix(body[1],1.15));}
+    else if(k==='tree'){for(let y=0;y<7;y++)L(0,y,0,wood);for(let x=-4;x<=4;x++)for(let y=-3;y<=3;y++)for(let z=-4;z<=4;z++)if(Math.hypot(x,y*1.25,z)<3.9&&rnd()<.93){const g=dk&&rnd()<.07;L(x,9+y,z,g?glow:pick(leaf),g?.9:0);}
+      if(b===1&&dk)for(let q=0;q<6;q++)L(Math.round(Math.cos(q)*4),8,Math.round(Math.sin(q)*4),'#E8B93C',.5);}
+    else if(k==='star'){for(let x=-3;x<=3;x++)for(let z=-3;z<=3;z++){if(Math.hypot(x,z)>3.4||(!x&&!z)||rnd()<.4)continue;const h=1+(rnd()<.4);for(let y=0;y<h;y++)L(x,y,z,y===h-1?pick(body):leaf[0],0);}
+      for(let y=0;y<3;y++)L(0,y,0,stone[1]);L(0,3,0,glow,1);L(1,4,0,glow,.8);L(-1,4,0,glow,.8);L(0,4,1,glow,.8);L(0,4,-1,glow,.8);L(0,5,0,glow,1);}
+    else if(k==='zig'){const path=dk?'#5A4A3A':'#C9A878';for(let t=-6;t<=6;t++){const x=Math.round(t*uz*-1+Math.sin(t*.9)*2*ux),z=Math.round(t*ux+Math.sin(t*.9)*2*uz);L(x,-1,z,path);
+        if(t%2===0){const s=t%4===0?2:-2,bx=x+Math.round(s*ux),bz=z+Math.round(s*uz),th=dk?['#2A3A2A','#1E2B20']:['#3E6B3A','#2F5A30'];L(bx,0,bz,pick(th));if(rnd()<.6)L(bx,1,bz,pick(th));if(dk&&rnd()<.5)L(bx,2,bz,glow,.8);}}
+      if(b===4)for(let t=-6;t<=6;t++)L(Math.round(t*uz*-1+Math.sin(t*.9)*2*ux),0,Math.round(t*ux+Math.sin(t*.9)*2*uz),'#D9475A',.25);}
+    else if(k==='stone'){for(let x=-3;x<=3;x++)for(let z=-2;z<=2;z++){if(Math.abs(x)===3&&Math.abs(z)===2)continue;L(x,0,z,stone[0]);L(x,1,z,Math.abs(x)<3&&Math.abs(z)<2?stone[1]:stone[2]);}}
+    else if(k==='cave'){for(let x=-5;x<=5;x++)for(let z=-5;z<=5;z++){const d=Math.hypot(x,z),h=Math.round(6*(1-d/5.8)),al=x*ux+z*uz,pp=-x*uz+z*ux;for(let y=0;y<h;y++){if(al>-.5&&Math.abs(pp)<1.6&&y<3)continue;L(x,y,z,y===h-1?pick(rock):pick(side));}}
+      L(Math.round(-ux),0,Math.round(-uz),glow,1);L(Math.round(-ux),1,Math.round(-uz),glow,.8);}
+    else if(k==='gem'){for(const [cx,cz,h] of [[0,0,8],[2,1,5],[-2,1,4],[1,-2,6],[-1,-2,3]])for(let y=0;y<h;y++){L(cx,y,cz,glow,y>h-3?1:.5);if(y<h-3&&rnd()<.5)L(cx+(rnd()<.5?1:-1),y,cz,mix(glow,.75),.3);}}
+    else if(k==='pool'){const w=dk?(b===2?'#1D6F7A':'#1D3A6B'):b===3?'#9FD3F0':'#4FA9D9';for(let x=-5;x<=5;x++)for(let z=-5;z<=5;z++){const d=Math.hypot(x,z);if(d<3.6)L(x,-1,z,rnd()<.25?mix(w,1.15):w,dk?.45:.18);else if(d<4.6&&rnd()<.7)L(x,0,z,pick(stone));}}
+    else if(k==='dots'){for(let q=0;q<12;q++){const an2=rnd()*6.283,r2=rnd()*4.5,x=Math.round(Math.cos(an2)*r2),z=Math.round(Math.sin(an2)*r2);L(x,0,z,dk&&q%3===0?glow:rnd()<.5?pick(stone):pick(body),dk&&q%3===0?.7:0);if(dk&&q%3===0)L(x,1,z,'#C4FFF8',.5);}}
+    else if(k==='tower'){for(let y=0;y<11;y++)for(let x=-1;x<=1;x++)for(let z=-1;z<=1;z++)L(x,y,z,y===0?stone[0]:pick(stone));
+      for(const [x,z] of [[2,0],[-2,0],[0,2],[0,-2]])L(x,8,z,dk?glow:'#FFE08A',.9);
+      for(let y=11;y<14;y++){const w=13-y;for(let x=-w;x<=w;x++)for(let z=-w;z<=w;z++)L(x,y,z,dk?P.accent:b===2?'#FF8FA3':'#A8463A',dk?.3:0);}
+      if(dk&&b===2)for(let y=14;y<22;y++)L(0,y,0,glow,.9);}
+    else if(k==='arch'){for(const x of [-3,3])for(let y=0;y<6;y++){L(x,y,0,pick(stone));L(x,y,1,pick(stone));}for(let x=-3;x<=3;x++){L(x,6,0,stone[1]);L(x,6,1,stone[1]);if(Math.abs(x)<2){L(x,7,0,stone[2]);L(x,7,1,stone[2]);}}
+      if(b===3)for(const [x,y] of [[-1,3],[0,4],[1,3]])L(x,y,0,dk?glow:'#FFF3C4',.9);if(b===2&&!dk)for(let x=-2;x<=2;x++)L(x,-1,0,'#4FA9D9',.2);}
+    else if(k==='bell'){for(let x=-4;x<=4;x++)for(let z=-4;z<=4;z++){const d=Math.hypot(x,z),h=Math.round(5*(1-d/4.6));for(let y=0;y<h;y++)L(x,y,z,y===h-1?'#FFFFFF':dk?'#5A6480':'#DCE8FA');}
+      for(const x of [-2,2])for(let y=5;y<9;y++)L(x,y,0,wood);for(let x=-2;x<=2;x++)L(x,9,0,wood);for(let x=-1;x<=0;x++)for(let y=6;y<8;y++)for(let z=0;z<=1;z++)L(x,y,z-0,'#E8B93C',.2);}
+    else if(k==='house'){const wall=dk?'#3B2B1E':'#C99B6A',roof=dk?'#2A2140':'#A8463A';for(let x=-2;x<=2;x++)for(let z=-2;z<=2;z++)for(let y=0;y<4;y++){const edge2=Math.abs(x)===2||Math.abs(z)===2;if(!edge2)continue;const win=y>0&&y<3&&((Math.abs(x)===2&&!z)||(Math.abs(z)===2&&!x));L(x,y,z,win?'#FFE08A':wall,win?1:0);}
+      for(let y=4;y<7;y++){const w=6-y;for(let x=-w-1;x<=w+1;x++)for(let z=-w;z<=w;z++)L(x,y,z,roof);}for(let y=5;y<9;y++)L(2,y,1,stone[0]);}
+    else if(k==='key'){for(let x=-2;x<=2;x++)for(let y=0;y<7;y++){const hole=!x&&(y===2||y===3||y===4)||(Math.abs(x)===1&&y===4);if(hole)continue;L(Math.round(x*-uz),y,Math.round(x*ux),y===6||Math.abs(x)===2?stone[0]:pick(stone));}
+      L(Math.round(ux*2),1,Math.round(uz*2),'#FFD36B',.7);L(Math.round(ux*2),2,Math.round(uz*2),'#FFD36B',.7);for(let y=2;y<5;y++)L(Math.round(-ux),y,Math.round(-uz),glow,1);}
+  });
+  /* grass, snow and little flowers between the places */
+  for(let q=0;q<120;q++){const an=rnd()*6.283,r=rnd()*19,x=Math.round(Math.cos(an)*r),z=Math.round(Math.sin(an)*r);if(spots.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<6)||S.has(x+',0,'+z)||!S.has(x+',-1,'+z))continue;
+    const fl=rnd()<.3;put(x,0,z,fl?(dk?glow:pick(T.cute.bodies)):(b===3&&!dk?'#FFFFFF':pick(side)),fl&&dk?.8:0);}
+  for(const [k,o] of S)if(o.e>.5&&rnd()<.18){const [x,y,z]=k.split(',').map(Number);pts.push(x+.5,y+1,z+.5,20,0);}
+  for(let i=0;i<90;i++){const an=rnd()*6.283,r=5+rnd()*22;pts.push(Math.cos(an)*r,b===3?30:-2,Math.sin(an)*r,.55+rnd()*.6,.05+rnd()*.95);}
+  const pc={0:dk?P.glow:'#FFB7D0',1:'#FFB347',2:dk?P.glow:'#D6F2FF',3:'#FFFFFF',4:dk?P.glow:'#FFE08A'}[b];
+  return {S,pts,pc:hx(pc),gc:hx(glow),fall:b===3?1:0,spots,cy:-1,dist:1.02};
+}
+function openIsle(ti){
+  if(!(ti>=0&&ti<=9)||placesFound(ti)<5)return;if(stv){stv.stop();stv=null;}
+  const nm=mapName(ti),b=ti%5,dk=ti>=5,gc=dk?THEMES[b].dark.glow:THEMES[b].cute.accent,PL=PLACES[ti];
+  openOverlay(`<div class="stview isle" style="--sg:${gc}"><p class="islek">Fully charted</p><p class="rv-title">${esc(nm)}</p><p class="stsub">${dk?'The other side of '+esc(THEMES[b].name)+'. ':''}Five places, all found. Turn it to look around.</p>
+    <div class="stcan"><canvas id="stCv" tabindex="0" role="img" aria-label="${esc(nm)} as a small floating island of its five places: ${PL.map(p=>esc(p.n)).join(', ')}. Drag to turn it, pinch or scroll to zoom, arrow keys to turn."></canvas><p class="stno" id="stNo" hidden>This phone could not start 3D drawing, so ${esc(nm)} stays on the map for now.</p></div>
+    <div class="row stbtns"><button class="chip" id="isL">Turn left</button><button class="chip" id="isR">Turn right</button><button class="chip" id="stTurn" aria-pressed="${!REDUCE}">Turntable</button></div>
+    <ul class="islelist">${PL.map((p,i)=>`<li><button data-isp="${i}" aria-pressed="false"><b>${esc(p.n)}.</b> ${esc(p.x)}</button></li>`).join('')}</ul>
+    <button class="ghost" id="ovClose">Close</button></div>`,true);
+  ovMode='statue';stvId=null;
+  const cv=$('#stCv'),sc=isleScene(ti);stv=statueView(cv,{rarity:0},{scene:sc});
+  if(stv)stv.spots=sc.spots;else{cv.hidden=true;$('#stNo').hidden=false;['isL','isR','stTurn'].forEach(i=>{const x=$('#'+i);if(x)x.hidden=true;});}
+  const f=$('#ovClose');if(f)f.focus({preventScroll:true});
+}
+function isleTurn(goal,hl){
+  if(!stv)return;const v=stv.v;v.goal=goal;v.idle=0;
+  if(hl!=null){v.hl=hl;if(v.turn){v.turn=false;const t=$('#stTurn');if(t)t.setAttribute('aria-pressed','false');}
+    document.querySelectorAll('#modal [data-isp]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.isp+1===hl)));}
+  stv.kick();
+}
+document.addEventListener('click',e=>{const x=e.target.closest&&e.target.closest('[data-isle]');if(x)openIsle(+x.dataset.isle);});
 function openStatue(id,o){
   o=o||{};const c=cardById(id);if(!c||!c.statue)return;if(stv){stv.stop();stv=null;}
   const n=c.nick||c.name,R=RAR[c.rarity],gc=c.dark?THEMES[c.theme].dark.glow:THEMES[c.theme].cute.accent;
@@ -3990,13 +4077,13 @@ function statueShelfHTML(){
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
+    <ul class="newlist"><li><b>Realms in 3D.</b> Find all five places in a realm, and its page on the Map opens it as a small floating island you can turn. Tap a place to turn it into view.</li><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
     <li><b>A living map.</b> Every place on the map is now a little pixel landmark. Tap one to see it up close and send a Forgeling there. The realms are gently alive, with petals, smoke, glints, snow and fireflies, and while a Forgeling is out wandering you can watch it walk the trail, look around and come home.</li>
     <li><b>The other side.</b> Fully chart a realm, then forge a Crossing Lantern at the Hearth, and you can turn the map over. Each realm has a Shade twin on the back, with its own places, four new curios, an old tale told from the other side, and a ward to forge. The Shade names now live on the back of the map, so the front always shows the bright ones.</li>
     <li><b>A living Hearth.</b> Tap a Forgeling by the fire and it hops to say hello. After 10 pm everyone dozes, and a tap wakes one up. The weather follows whoever is sitting there: petals, embers, rain, snow or fireflies. Statues you have cast now stand at the edges of the scene. On a card, tap the art and the creature hops inside its frame.</li>
     <li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up, and preview any Forgeling's statue in clay before it is Forgebound. Share a statue as a link, and a friend can turn it in 3D too.</li>
     <li><b>The Scribe.</b> Write sixty lines in your book, whenever you like, and a Scribe comes to your fire for good, with an ink-dipped quill. Now and then it reads one of your old lines back to you. And on days you do one of your own small things, your Forgelings notice.</li>
-    <li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
+    
     </ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
@@ -4452,6 +4539,8 @@ modal.addEventListener('click',e=>{
   else if(b.dataset.scast)statueCast(+b.dataset.scast);
   else if(b.id==='stTurn'||b.id==='stBase'){if(stv){const k=b.id==='stTurn'?'turn':'base';stv.v[k]=!stv.v[k];stv.v.idle=9;b.setAttribute('aria-pressed',String(stv.v[k]));}}
   else if(b.id==='stPic'){const c=cardById(stvId);if(c)statuePicture(c);}
+  else if(b.id==='isL'||b.id==='isR'){if(stv)isleTurn((stv.v.goal!=null?stv.v.goal:stv.v.yaw)+(b.id==='isL'?1:-1)*Math.PI/4);}
+  else if(b.dataset.isp!=null){if(stv&&stv.spots){const i=+b.dataset.isp,s=stv.spots[i];if(stv.v.hl===i+1)isleTurn(null,0);else isleTurn(Math.atan2(s[0],s[1]),i+1);}}
   else if(b.id==='stBack')openStatue(+b.dataset.cid);
   else if(b.id==='stLink'){const c=cardById(stvId);if(c)statueLinkSend(c);}
   else if(b.id==='stGet'){closeModal();}
