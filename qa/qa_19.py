@@ -45,7 +45,7 @@ with sync_playwright() as p:
     s=st(pg); s["cards"][0]["nick"]="Biscuit"; ready(pg,s)
     rec("Story","a new nickname appears in the story",all("Biscuit" in t for t in chapters(pg,0)[:3]))
     # bond-up shows the new chapter
-    s=st(pg); s["cards"][0]["bond"]=14; s["hearth"]["slots"]=[s["cards"][0]["id"]]; s["hearth"]["visits"]={"date":s["date"],"used":0}; ready(pg,s); tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth [data-hslot]')][0].click()"); pg.wait_for_timeout(200)
+    s=st(pg); s["cards"][0]["bond"]=14; s["hearth"]["slots"]=[s["cards"][0]["id"]]; s["hearth"]["visits"]={"date":s["date"],"used":0}; ready(pg,s); tabto(pg,"hearth"); pg.evaluate("(()=>{const b=document.querySelector('#view-hearth [data-hslot]');b&&b.click()})()"); pg.wait_for_timeout(200)
     pg.evaluate("document.getElementById('hStory').click()"); pg.wait_for_timeout(300); pg.fill("#storyIn","We found a bridge."); pg.evaluate("document.getElementById('storySave').click()"); pg.wait_for_timeout(1300); m=mt(pg)
     rec("Story","growing a bond opens the next chapter right in the bond-up note","New chapter: The day it found you" in m and "Biscuit" in m,m[:220])
     closemodals(pg)

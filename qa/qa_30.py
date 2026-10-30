@@ -53,7 +53,7 @@ with sync_playwright() as p:
     closemodals(A)
     # tales list
     tabto(A,"chronicle"); A.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); A.wait_for_timeout(300)
-    rec("Tales","the old tales list uses the curio sprites",A.locator(".otale li .g .cimg").count()>=1 and not EMOJI.search(A.inner_html(".otale")))
+    rec("Tales","the old tales list uses the curio sprites",A.locator(".otale .g .cimg").count()>=1 and not EMOJI.search(A.inner_html(".otales")))
     # gift unwrap
     g={"v":1,"g":"abcdef123456","s":"zzzzzz999999","c":"crystal","n":"Pip","t":0,"d":0,"r":2,"e":123456789,"k":3}
     code=base64.urlsafe_b64encode(json.dumps(g).encode()).decode().rstrip("=")

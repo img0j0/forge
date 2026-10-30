@@ -38,6 +38,7 @@ with sync_playwright() as p:
     tabto(pg,"today"); td=screens(pg); rec("Length","Today on a settled day fits about one and a half screens (was 2)",td<=1.5,td)
     # ---------- Today ----------
     rec("Today","the Map row is gone (its news lives on the Map)",pg.locator("#btnMapGo").count()==0)
+    s=st(pg); s["wstat"]["sent"]=max(1,s["wstat"].get("sent",0)); s["hearth"]["fseen"]=["rug","lights","tree","flies","hedge","stones","pond","kite","mail","stump","ball","lamp","menhir","bell","fence","fern"]; s["request"]=None; s["hearth"]["sleep"]=None; load(pg,s); tabto(pg,"today")
     rec("Today","…and the Hearth row only shows when something waits there",pg.locator("#btnHearth").count()==0,pg.inner_text("#view-today")[:200])
     # ---------- Hearth ----------
     tabto(pg,"hearth")
@@ -61,7 +62,7 @@ with sync_playwright() as p:
     tap(pg,"#hComp"); mm=mt(pg)
     rec("Sheets","the companion row opens bond, statue, story chapters and memories",pg.locator("#modal .bondbar").count()==1 and pg.locator("#modal [data-tale]").count()==1 and pg.locator("#modal [data-spre],#modal [data-statue]").count()>=1 and "Bond never fades" in mm,mm[:120])
     bad+=["comp: "+v for v in axe(pg)]
-    tap(pg,"#modal [data-tale]"); rec("Sheets","…and the story opens from there","chapter" in mt(pg).lower() or "Chapter" in mt(pg),mt(pg)[:80]); closemodals(pg)
+    pg.evaluate("document.querySelector('#modal [data-tale]').click()"); pg.wait_for_timeout(400); rec("Sheets","…and the story opens from there","chapter" in mt(pg).lower() or "Chapter" in mt(pg),mt(pg)[:80]); closemodals(pg)
     tap(pg,"#hWander"); rec("Wander","Wander opens the wander sheet",pg.locator("#modal [data-wrealm],#modal [data-wto],#modal .moodbtn").count()>=1,mt(pg)[:80]); closemodals(pg)
     s=st(pg); now=int(time.time()*1000); cid=s["hearth"]["slots"][0]; s["wander"]={"id":cid,"start":now-3600*1000,"ready":now+2*3600*1000,"seed":3,"notified":False,"realm":0}
     s["forge"]["made"]=list(set(s["forge"]["made"]+["bell"])); s["forge"]["bell"]=None; load(pg,s); tabto(pg,"hearth")

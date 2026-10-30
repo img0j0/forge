@@ -95,8 +95,8 @@ with sync_playwright() as p:
     other=[k for k in ("cinder","obsidian") if k not in st(pg)["curios"]][0]
     hsheet(pg,"shelf"); pg.tap(f"#modal [data-cur='{other}']"); pg.wait_for_timeout(400)
     rec("Shelf","an unfound Inferno curio says where it is and how to get there","across from Ember" in mt(pg) and "Chart Ember fully" in mt(pg),mt(pg)[:200]); closemodals(pg)
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
-    rec("Tales","Tales shows the other side: Bramble's tale begun, the rest untold","Tales from the other side" in t and "The Keepers of the Edge" in t and t.count("an untold tale")>=4,(t.find("Tales from"),t[:200]))
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300); pg.evaluate("document.querySelector('[data-tside=\"1\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
+    rec("Tales","Tales shows the other side: Bramble's tale begun, the rest untold","Other side" in t and "The Keepers of the Edge" in t and t.count("an untold tale")>=4,(t.find("Tales from"),t[:200]))
     settle(pg); bad+=["tales: "+v for v in axe(pg)]
     pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
     rec("Ribbons","with the lantern, Lantern Light is earned and Both Sides is listed","Lantern Light" in t and "Both Sides" in t and "cross1" in (st(pg).get("ribbons") or []))
