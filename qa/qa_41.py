@@ -93,7 +93,7 @@ with sync_playwright() as p:
     pg.tap(f"#modal [data-cur='{got[0]}']"); pg.wait_for_timeout(400); m=mt(pg)
     rec("Shelf","a Shade curio opens with its own art and tale page",pg.locator("#modal .cbig img").count()==1 and "The Keepers of the Edge" in m,m[:120]); closemodals(pg)
     other=[k for k in ("cinder","obsidian") if k not in st(pg)["curios"]][0]
-    pg.tap(f"#modal [data-cur='{other}']"); pg.wait_for_timeout(400)
+    hsheet(pg,"shelf"); pg.tap(f"#modal [data-cur='{other}']"); pg.wait_for_timeout(400)
     rec("Shelf","an unfound Inferno curio says where it is and how to get there","across from Ember" in mt(pg) and "Chart Ember fully" in mt(pg),mt(pg)[:200]); closemodals(pg)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
     rec("Tales","Tales shows the other side: Bramble's tale begun, the rest untold","Tales from the other side" in t and "The Keepers of the Edge" in t and t.count("an untold tale")>=4,(t.find("Tales from"),t[:200]))
