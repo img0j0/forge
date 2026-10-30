@@ -59,3 +59,5 @@ JavaScript parse check; first find is immutable after later finds; JSON round-tr
 These are targeted checks, not a substitute for full browser regression.
 Update 0.41.1: patches now read base411.html (= work.html); base41.html removed (git keeps it).
 Update 0.42.0: patches now read base42.html (= work.html); base411.html removed (git keeps it). qa_17 and qa_181 run over http in runall.sh.
+
+Update 0.43.0: patches now read base43.html (= work.html); base42.html removed (git keeps it). qa_43 caps page lengths; put new features in sheets.
