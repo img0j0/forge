@@ -7,6 +7,11 @@ REALM={"acorn":0,"flower":0,"feather":0,"mushroom":0,"leaf":1,"spark":1,"bone":1
 NAMES=["Meadow","Ember","Tide","Frost","Dusk"]
 def ready(pg,s): s.pop("disc",None); setst(pg,s); pg.reload(); pg.wait_for_timeout(800); closemodals(pg)  # each wander here stands for a new day (0.33: one new find a day)
 def found(s,ids): s["curios"]={k:{"n":1,"cid":s["cards"][0]["id"],"at":s["date"]} for k in ids}; return s
+def book(pg,ti):  # 0.43: a tale opens as a book; read all four pages
+    pg.evaluate(f"document.querySelector('[data-otale=\"{ti}\"]').click()"); pg.wait_for_timeout(300); out=[]
+    for i in range(4):
+        pg.evaluate(f"document.querySelector('#modal .tpg[data-tpage=\"{i}\"]').click()"); pg.wait_for_timeout(150); out.append(mt(pg))
+    closemodals(pg); return "\n".join(out)
 def tales(pg): tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400); return pg.inner_text("#view-chronicle")
 with sync_playwright() as p:
     b=p.chromium.launch(); ctx,pg=newpage(b,390,844); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); base=st(pg)
@@ -16,13 +21,14 @@ with sync_playwright() as p:
     rec("Tales","each of the 20 curios remembers exactly one page, four per realm, from its own realm",len(pages)==20 and len(set(pages))==20 and all(int(crealm[k])==i//4 for i,k in enumerate(pages)),pages)
     # Chronicle with nothing found
     s=build(base,[1,1,1,1,1]); s["seen"]=99; ready(pg,found(s,[])); t=tales(pg)
-    rec("Chronicle","the Tales tab opens with the old tales of all five realms","Old tales of the realms" in t and all(f"{n}: an untold tale" in t for n in NAMES) and t.count("0 of 4 pages")==5)
+    rec("Chronicle","the Tales tab opens with the old tales of all five realms","Old tales" in t and all(f"{n}: an untold tale" in t for n in NAMES) and t.count("0 of 4 pages")==5)
     rec("Chronicle","…and explains how to find pages","Each of its four curios remembers one page" in t and "Your first wander starts at the Hearth" in t)
     rec("Chronicle","your own Forgelings' tales still follow","Your Forgelings" in t)
     # some pages found, one tale whole
     ready(pg,found(s,["acorn","flower","feather","mushroom","shell","rain"])); t=tales(pg)
-    rec("Chronicle","found pages show, in story order, and a whole tale shows its ending","The Slow Hill" in t and "Meadow. 4 of 4 pages. The tale is whole." in t and "It still grows at its own speed" in t and t.index("Before Meadow had a name")<t.index("The first spring"))
-    rec("Chronicle","a missing page says another curio from that realm remembers it","Where the Tide Goes" in t and t.count("A page is missing. Another Tide curio remembers it.")==2 and "Tide. 2 of 4 pages" in t)
+    bm=book(pg,0); bt=book(pg,2)
+    rec("Chronicle","found pages show, in story order, and a whole tale shows its ending","The Slow Hill" in t and "Meadow. The tale is whole." in t and "It still grows at its own speed" in bm and bm.index("Before Meadow had a name")<bm.index("The first spring"))
+    rec("Chronicle","a missing page says another curio from that realm remembers it","Where the Tide Goes" in t and bt.count("A page is missing. Another Tide curio remembers it.")==2 and "Tide. 2 of 4 pages" in t)
     rec("Chronicle","the whole tale wears a gold frame",pg.locator(".otale.whole").count()==1)
     rec("Chronicle","no broken text",not JUNK.search(t))
     # ribbon
@@ -44,7 +50,7 @@ with sync_playwright() as p:
     rec("Realm","the Tide realm page shows its old tale's progress","Old tale: Where the Tide Goes. The tale is whole." in txt,[l for l in txt.split("\n") if "Old tale" in l][:2])
     # lore off hides tales
     s6=st(pg); s6["settings"]["lore"]=False; ready(pg,s6); t=tales(pg)
-    rec("Lore off","with lore off, the old tales are hidden and nothing else changes","Old tales of the realms" not in t and "Your Forgelings" not in t,t[:120])
+    rec("Lore off","with lore off, the old tales are hidden and nothing else changes","Old tales" not in t and "Your Forgelings' tales" in t,t[:120])
     # damaged curio records still render
     s7=st(pg); s7["settings"]["lore"]=True; s7["curios"]={"shell":{"n":1},"nonsense":{"n":3},"pebble":"x"}; ready(pg,s7); t=tales(pg)
     rec("Damaged","damaged curio records are repaired and tales still render","Where the Tide Goes" in t and not pg._errs and not JUNK.search(t),pg._errs[:1])
