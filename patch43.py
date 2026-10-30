@@ -94,7 +94,7 @@ modal.addEventListener('click',e=>{
   const k=s.dataset.k,keep=b.dataset.keep,bd=b.dataset.bd;
   if(b.id==='hCollect'){closeModal();wanderCollect();return;}
   hearthBtn(b);
-  if(s.isConnected&&!modal.hidden){const h=hSheetHTML(k);if(!h){closeModal();return;}s.innerHTML=h;
+  if(s.isConnected&&!modal.hidden){const h=hSheetHTML(k);if(!h){closeModal();return;}s.innerHTML=h;nameDialog();
     const f=keep!==undefined?s.querySelector(`[data-keep="${keep}"]`):bd!==undefined?s.querySelector(`[data-bd="${bd}"]`):null;if(f)f.focus({preventScroll:true});}
 });
 """
@@ -207,7 +207,7 @@ modal.addEventListener('click',e=>{if(e.target.closest('.csheet'))chronClick(e);
 function chronClick(e){
   const sh=e.target.closest('.csheet');
   const ins=e.target.closest('[data-insp]');if(ins){inspect(+ins.dataset.insp);return;}
-  const tp=e.target.closest('[data-tpage]');if(tp){tbk.p=Math.max(0,Math.min(3,+tp.dataset.tpage));const s=modal.querySelector('.sheet');if(s){s.innerHTML=taleBookHTML();const f=s.querySelector(`.tpg[data-tpage="${tbk.p}"]`);if(f)f.focus({preventScroll:true});}sfx('select');return;}
+  const tp=e.target.closest('[data-tpage]');if(tp){tbk.p=Math.max(0,Math.min(3,+tp.dataset.tpage));const s=modal.querySelector('.sheet');if(s){s.innerHTML=taleBookHTML();nameDialog();const f=s.querySelector(`.tpg[data-tpage="${tbk.p}"]`);if(f)f.focus({preventScroll:true});}sfx('select');return;}
   const ot=e.target.closest('[data-otale]');if(ot){openTaleBook(+ot.dataset.otale);return;}
   const ts=e.target.closest('[data-tside]');if(ts){ch.tside=ts.dataset.tside==='1';sfx('select');renderChronicle();const f=document.querySelector(`[data-tside="${ts.dataset.tside}"]`);if(f)f.focus({preventScroll:true});return;}
   const rb=e.target.closest('[data-rib]');if(rb){openSheet(jSheet('rib:'+rb.dataset.rib));return;}
@@ -215,7 +215,7 @@ function chronClick(e){
   if(e.target.closest('#jWeek')){openCSheet(jSheet('week'));return;}
   if(e.target.closest('#jMonth')){openSheet(jSheet('month'));return;}
   if(e.target.closest('#jLines')){openSheet(jSheet('lines'));return;}
-  if(sh&&e.target.closest('#chMore')){ch.more++;const s=modal.querySelector('.sheet');if(s){s.innerHTML=fgTalesHTML();hydrate(modal);}return;}""")
+  if(sh&&e.target.closest('#chMore')){ch.more++;const s=modal.querySelector('.sheet');if(s){s.innerHTML=fgTalesHTML();nameDialog();hydrate(modal);}return;}""")
 rep("""  else if(b.id==='chMore'){ch.more++;renderChronicle();}
   else if(b.dataset.edit)openEdit(+b.dataset.edit,'none');
 });""","""  else if(b.id==='chMore'){ch.more++;renderChronicle();}

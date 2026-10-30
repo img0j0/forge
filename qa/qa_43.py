@@ -63,6 +63,7 @@ with sync_playwright() as p:
     rec("Sheets","the companion row opens bond, statue, story chapters and memories",pg.locator("#modal .bondbar").count()==1 and pg.locator("#modal [data-tale]").count()==1 and pg.locator("#modal [data-spre],#modal [data-statue]").count()>=1 and "Bond never fades" in mm,mm[:120])
     bad+=["comp: "+v for v in axe(pg)]
     pg.evaluate("document.querySelector('#modal [data-tale]').click()"); pg.wait_for_timeout(400); rec("Sheets","…and the story opens from there","chapter" in mt(pg).lower() or "Chapter" in mt(pg),mt(pg)[:80]); closemodals(pg)
+    s=st(pg); s["wander"]=None; load(pg,s); tabto(pg,"hearth")
     tap(pg,"#hWander"); rec("Wander","Wander opens the wander sheet",pg.locator("#modal [data-wrealm],#modal [data-wto],#modal .moodbtn").count()>=1,mt(pg)[:80]); closemodals(pg)
     s=st(pg); now=int(time.time()*1000); cid=s["hearth"]["slots"][0]; s["wander"]={"id":cid,"start":now-3600*1000,"ready":now+2*3600*1000,"seed":3,"notified":False,"realm":0}
     s["forge"]["made"]=list(set(s["forge"]["made"]+["bell"])); s["forge"]["bell"]=None; load(pg,s); tabto(pg,"hearth")
