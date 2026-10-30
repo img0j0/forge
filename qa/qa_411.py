@@ -15,7 +15,7 @@ with sync_playwright() as p:
     # ---------- the owner shares a statue ----------
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); dev(pg,"week"); closemodals(pg)
     s=st(pg); c=s["cards"][0]; c["bond"]=30; c["keep"]="scarf"; c["statue"]={"at":s["date"],"keep":"scarf"}; c["nick"]="Pip"; hid=c["id"]; load(pg,s)
-    tabto(pg,"hearth"); pg.tap(f"#view-hearth .stline [data-statue='{hid}']"); pg.wait_for_timeout(1200)
+    hsheet(pg,"comp"); pg.tap(f"#modal .stline [data-statue='{hid}']"); pg.wait_for_timeout(1200)
     rec("Share","the statue viewer has a Share a link button",pg.locator("#stLink").count()==1 and pg.locator("#stLink").is_visible())
     pg.tap("#stLink"); pg.wait_for_timeout(600)
     clip=pg.evaluate("navigator.clipboard.readText()")

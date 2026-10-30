@@ -40,8 +40,8 @@ with sync_playwright() as p:
     # ---------- Meadow charted: the lantern comes first and the panel says so ----------
     s=st(pg); s["explore"]={"0":4}; days(s,8)
     for cid,n in [("acorn",2),("leaf",2),("snow",3),("flower",1)]: s["curios"][cid]={"n":n,"cid":0,"at":s["date"]}
-    load(pg,s); tabto(pg,"hearth"); t=pg.inner_text("#view-hearth .forgep")
-    rec("Lantern","a charted realm puts a line on the Forge panel","A charted realm is waiting for a lantern" in t and "You have what it needs" in t,t)
+    load(pg,s); tabto(pg,"hearth"); t=pg.inner_text("#hLantern")
+    rec("Lantern","a charted realm puts a line at the Hearth","A charted realm is waiting for a lantern" in t and "You have what it needs" in t,t)
     pg.tap("#hForge"); pg.wait_for_timeout(500)
     first=pg.evaluate("document.querySelector('#modal .forgel li b').textContent")
     rec("Lantern","…and lists the lantern first",first=="Crossing Lantern",first)
