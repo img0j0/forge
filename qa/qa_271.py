@@ -27,13 +27,14 @@ with sync_playwright() as p:
     tabto(pg,"chronicle")
     for sub in ["tales","journal"]:
         pg.evaluate(f"()=>document.querySelector('[data-sub=\"{sub}\"]').click()"); pg.wait_for_timeout(300); seen.append(vis(pg))
+    pg.evaluate("document.getElementById('jWeek').click()"); pg.wait_for_timeout(300); seen.append(mt(pg)); closemodals(pg)  # 0.43: This week opens as a sheet
     allt="\n".join(seen)
     rec("Copy","no player text says Chronicle","Chronicle" not in allt,[l for l in allt.split("\n") if "Chronicle" in l][:3])
     rec("Copy","no Morning nudge setting and no 'Prototype only' notes","Morning nudge" not in allt and "Prototype only" not in allt and pg.locator("[data-setnudge]").count()==0)
     rec("Copy","the lore switch is called Whispers and tales","Whispers and tales on" in allt)
     rec("Copy","the journal on day 1 says 'You showed up today.'","You showed up today." in allt and "of the last 1 day" not in allt)
     tales=seen[5]
-    rec("Copy","with no curios yet, the Tales tab says how to find pages once, not five times",tales.count("Send a Forgeling")==0 and tales.count("Your first wander starts at the Hearth.")==1 and tales.count("No pages yet.")==5,tales[:300])
+    rec("Copy","with no curios yet, the Tales tab says how to find pages once, not five times",tales.count("Send a Forgeling")==0 and tales.count("Your first wander starts at the Hearth.")==1 and tales.count("0 of 4 pages")==5,tales[:300])
     rec("Copy","no undefined, NaN or null on any tab",not JUNK.search(allt),JUNK.findall(allt)[:3])
     # ---------- one name per realm ----------
     base=st(pg)
