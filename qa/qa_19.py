@@ -19,7 +19,7 @@ with sync_playwright() as p:
     ready(pg,s)
     def chapters(pg,idx):
         s2=st(pg); s2["hearth"]["slots"]=[s2["cards"][idx]["id"]]; ready(pg,s2); tabto(pg,"hearth")
-        pg.evaluate("document.querySelector('#view-hearth [data-tale]').click()"); pg.wait_for_timeout(300)
+        hsheet(pg,"comp"); pg.evaluate("document.querySelector('#modal [data-tale]').click()"); pg.wait_for_timeout(300)
         ch=pg.evaluate("[...document.querySelectorAll('#modal .tale p')].map(p=>p.textContent)"); closemodals(pg)
         pg.evaluate("()=>{const b=document.getElementById('taleBack');if(b)b.click();}"); pg.wait_for_timeout(200); return ch
     names=[c.get("nick") or c["name"] for c in st(pg)["cards"]]
@@ -35,9 +35,9 @@ with sync_playwright() as p:
     rec("Story","cute and Shade Forgelings get different voices",chapters(pg,3)[1]!=all_ch[3][1])
     # sheet from the Hearth, chapters locked by bond level
     s=st(pg); s["cards"][0]["bond"]=8; s["hearth"]["slots"]=[s["cards"][0]["id"]]; ready(pg,s); tabto(pg,"hearth")
-    row=pg.inner_text("#view-hearth [data-tale]")
+    hsheet(pg,"comp"); row=pg.inner_text("#modal [data-tale]"); closemodals(pg)
     rec("Story","the Hearth shows the story row with the chapter count and what opens next","3 of 5 chapters" in row and "Devoted" in row,row)
-    pg.evaluate("document.querySelector('#view-hearth [data-tale]').click()"); pg.wait_for_timeout(400); m=mt(pg)
+    hsheet(pg,"comp"); pg.evaluate("document.querySelector('#modal [data-tale]').click()"); pg.wait_for_timeout(400); m=mt(pg)
     rec("Story","at bond level 3 the first three chapters are open and the last two are not",all(t in m for t in ("1. Where it began","2. What it loves","3. What it keeps")) and m.count("Opens when you are")==2,m[:200])
     pg.evaluate("document.getElementById('taleBack').click()"); pg.wait_for_timeout(300)
     rec("Story","…Close returns to the Hearth",pg.evaluate("document.getElementById('modal').hidden") and not pg.evaluate("document.getElementById('view-hearth').hidden"))
@@ -58,20 +58,20 @@ with sync_playwright() as p:
     closemodals(pg); pg.evaluate("()=>{const c=document.getElementById('ovClose');if(c)c.click();}"); pg.wait_for_timeout(300)
     # ---------- the Hearth grows ----------
     s=build(base,[1,1,1,0,0]); s["seen"]=99; s["hearth"]["slots"]=[c["id"] for c in s["cards"]]; s["hearth"]["fseen"]=[]; s["history"]=[]; ready(pg,s)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true"); t=pg.inner_text("#view-hearth")
+    tabto(pg,"hearth"); hsheet(pg,"furn"); t=mt(pg); closemodals(pg)
     rec("Hearth","the list says 0 of 16 and shows how to get the first thing","By the fire, 0 of 16" in t and "After your first calling. 0 so far." in t,t[-400:])
     s=hist(st(pg),[("done",2),("rest",5),("done",2),("skipped",4),("done",2)]); s["hearth"]["fseen"]=[]; ready(pg,s)
     tabto(pg,"today"); r=pg.inner_text("#btnHearth")
     rec("Hearth","Today's Hearth row says something new is waiting and is marked ready","Something new is waiting by the fire" in r and pg.evaluate("document.getElementById('btnHearth').classList.contains('ready')"),r)
     tabto(pg,"hearth"); msg=pg.inner_text("#hmsg")
     rec("Hearth","3 days done (rest and missed days not counted) bring the rug, and 3 Depth days the pond; opening the Hearth announces them once",msg=="2 new things by the fire. Have a look around." and sorted(st(pg)["hearth"]["fseen"])==["pond","rug"],msg)
-    tabto(pg,"today"); r=pg.inner_text("#btnHearth")
+    tabto(pg,"today"); r=pg.inner_text("#btnHearth") if pg.locator("#btnHearth").count() else ""
     rec("Hearth","…after that, Today's row goes back to normal","Something new" not in r and not pg.evaluate("document.getElementById('btnHearth').classList.contains('ready')"),r)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true"); t=pg.inner_text("#view-hearth")
+    tabto(pg,"hearth"); hsheet(pg,"furn"); t=mt(pg); closemodals(pg)
     rec("Hearth","the list explains each one in your own terms","You have given something your full attention 3 times." in t and "After 3 Clarity days. 0 so far." in t and "By the fire, 2 of 16" in t,t[-500:])
     s=st(pg); s["history"].append({"date":s["history"][-1]["date"],"status":"done","v":2}); ready(pg,s)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('By the fire')).open=true")
-    rec("Hearth","a doubled day in a damaged history counts once","After 5 callings done. 3 so far." in pg.inner_text("#view-hearth"))
+    tabto(pg,"hearth"); hsheet(pg,"furn")
+    rec("Hearth","a doubled day in a damaged history counts once","After 5 callings done. 3 so far." in mt(pg)); closemodals(pg)
     # one at a time: a single new thing gets its own name
     s=hist(st(pg),[("done",2)]*3+[("done",3)]*3); s["hearth"]["fseen"]=["pond","rug","lights"]; ready(pg,s); tabto(pg,"hearth")
     rec("Hearth","a single new thing is named",pg.inner_text("#hmsg")=="Something new by the fire: a paper kite.",pg.inner_text("#hmsg"))
@@ -92,7 +92,7 @@ with sync_playwright() as p:
         return n
     miss=[k for k,bx in BOX.items() if changed(bx)<4]
     rec("Hearth","every one of the 15 still things by the fire is visible in the scene",not miss,miss)
-    rec("Hearth","all 16 are counted once everything is earned","By the fire, 16 of 16" in pg.inner_text("#view-hearth"))
+    rec("Hearth","all 16 are counted once everything is earned","By the fire · 16 of 16" in pg.inner_text("#view-hearth"))
     # asleep: nothing is announced until they wake
     s=hist(st(pg),[("done",i%12) for i in range(36)]); s["hearth"]["fseen"]=[]; s["hearth"]["sleep"]={"tier":1,"since":s["date"],"dream":0}; ready(pg,s); tabto(pg,"hearth")
     rec("Hearth","while your Forgelings are asleep, new things wait to be announced",st(pg)["hearth"]["fseen"]==[] and not pg._errs,pg._errs[:1])
@@ -113,8 +113,8 @@ with sync_playwright() as p:
         setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg)
         for where in ("today","hearth","story"):
             if where=="today": tabto(pg,"today")
-            if where=="hearth": tabto(pg,"hearth"); pg.evaluate("document.querySelectorAll('#view-hearth details.more').forEach(d=>d.open=true)")
-            if where=="story": pg.evaluate("document.querySelector('#view-hearth [data-tale]').click()"); pg.wait_for_timeout(500)
+            if where=="hearth": tabto(pg,"hearth"); hsheet(pg,"furn")
+            if where=="story": hsheet(pg,"comp"); pg.evaluate("document.querySelector('#modal [data-tale]').click()"); pg.wait_for_timeout(500)
             pg.wait_for_function("!document.body.classList.contains('arrive')"); pg.evaluate(AXE); v=pg.evaluate("async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','best-practice']}});return r.violations.map(v=>v.id+':'+v.nodes[0].html.slice(0,80))}")
             bad+=[f"{scheme}/{where}: {x}" for x in v]
         ctx.close()

@@ -26,8 +26,8 @@ with sync_playwright() as p:
     rec("Wander","the wander button asks where, offering only realms on your map plus Anywhere",opts==["0","2","-1"] and "Meadow" in m and "Tide" in m and "Ember" not in m,(opts,m[:120]))
     rec("Wander","…and says how many of each realm's curios you have found","0 of 4 curios from here found" in m)
     pg.evaluate("document.querySelector('#modal [data-wgo=\"2\"]').click()"); pg.wait_for_timeout(400)
-    w=st(pg)["wander"]; t=pg.inner_text("#view-hearth")
-    rec("Wander","choosing Tide sends them to Tide and says so",w and w["realm"]==2 and "heads off toward Tide" in pg.inner_text("#hmsg") and "out wandering in Tide" in t,(w,pg.inner_text("#hmsg")))
+    w=st(pg)["wander"]; hm=pg.inner_text("#hmsg"); pg.evaluate("document.getElementById('hWOut').click()"); pg.wait_for_timeout(300); t=mt(pg); closemodals(pg)
+    rec("Wander","choosing Tide sends them to Tide and says so",w and w["realm"]==2 and "heads off toward Tide" in hm and "out wandering in Tide" in t,(w,hm))
     back_now(pg); m=collect(pg); cu=[k for k in st(pg)["curios"]]
     rec("Wander","they come back from Tide with a Tide curio",len(cu)==1 and CREALM[cu[0]]==2 and "Back from Tide" in m,(cu,m[:60]))
     pg.evaluate("document.getElementById('wcOk').click()"); pg.wait_for_timeout(400)
@@ -83,10 +83,10 @@ with sync_playwright() as p:
     rec("Request","anyone can answer it: the asker gains 3 bond and a thank-you keepsake arrives",f"{nm}’s request is done" in m and s2["cards"][0]["bond"]==b0+3 and K in s2["keepsR"] and KN in m,(who,m[-200:]))
     rec("Request","…the request is closed and dated",s2["request"] is None and s2["reqLast"]==s2["date"] and s2["reqDone"]==1)
     pg.evaluate("document.getElementById('wcOk').click()"); pg.wait_for_timeout(300)
-    tabto(pg,"hearth"); pg.evaluate("[...document.querySelectorAll('#view-hearth details.more')].find(d=>d.querySelector('summary').textContent.startsWith('Keepsakes')).open=true"); chips=pg.evaluate("[...document.querySelectorAll('#view-hearth [data-keep]')].map(b=>b.textContent)")
-    rec("Keepsake","the thank-you keepsake is in the keepsake list for every Forgeling, with no level needed",KN in chips and pg.evaluate(f"!document.querySelector('#view-hearth [data-keep=\"{K}\"]').disabled"),chips)
-    rec("Keepsake","…and the list says more come from requests","More keepsakes come as thank-yous" in pg.inner_text("#view-hearth"))
-    pg.evaluate(f"document.querySelector('#view-hearth [data-keep=\"{K}\"]').click()"); pg.wait_for_timeout(300)
+    hsheet(pg,"keeps"); chips=pg.evaluate("[...document.querySelectorAll('#modal [data-keep]')].map(b=>b.textContent)")
+    rec("Keepsake","the thank-you keepsake is in the keepsake list for every Forgeling, with no level needed",KN in chips and pg.evaluate(f"!document.querySelector('#modal [data-keep=\"{K}\"]').disabled"),chips)
+    rec("Keepsake","…and the list says more come from requests","More keepsakes come as thank-yous" in mt(pg))
+    pg.evaluate(f"document.querySelector('#modal [data-keep=\"{K}\"]').click()"); pg.wait_for_timeout(300); closemodals(pg)
     rec("Keepsake","wearing it is saved",any(c["keep"]==K for c in st(pg)["cards"]))
     # the sprite really changes for each new keepsake
     PX="()=>{const c=document.getElementById('hearthCv');return [...c.getContext('2d').getImageData(0,0,128,72).data]}"

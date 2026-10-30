@@ -51,5 +51,5 @@ def pick_calling(pg,v):
         pg.evaluate("v=>document.querySelector('[data-ftype=\"'+v+'\"]').click()",str(v)); pg.wait_for_timeout(300)
 def hsheet(pg,k):  # 0.43: the Hearth's lists open as sheets (shelf, furn, keeps, comp); tests read them in #modal
     ids={"shelf":"hShelf","furn":"hFurn","keeps":"hKeeps","comp":"hComp"}
-    pg.evaluate("t=>document.querySelector('.tab[data-tab=\"hearth\"]').click()","x"); pg.wait_for_timeout(300)
+    closemodals(pg); pg.evaluate("t=>document.querySelector('.tab[data-tab=\"hearth\"]').click()","x"); pg.wait_for_timeout(300)
     pg.evaluate("i=>document.getElementById(i).click()",ids[k]); pg.wait_for_timeout(350)
