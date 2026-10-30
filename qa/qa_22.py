@@ -62,9 +62,10 @@ with sync_playwright() as p:
     rec("Journal","days you showed up get a flame stamp, rest days a moon, other days nothing",done and rest and all(c[1] for c in done) and all(c[1] for c in rest) and not any(c[1] for c in miss),(len(done),len(rest),len(miss)))
     rec("Journal","…and each day still says what happened for screen readers",all("showed up" in c[2] for c in done) and all("rested" in c[2] for c in rest))
     rec("Journal","a small key explains the stamps",pg.locator(".calkey").count()==1 and "showed up" in pg.inner_text(".calkey"))
-    ribs=pg.evaluate("[...document.querySelectorAll('.rib')].map(r=>[r.classList.contains('on'),r.querySelector('.ico').getAttribute('aria-label'),r.querySelectorAll('.dots i').length,r.querySelectorAll('.dots i.on').length,(r.querySelector('.soft')||{}).textContent||'',r.querySelector('.pb')?1:0])")
-    rec("Journal","ribbons are rosettes: earned ones say so, the rest show quiet dots or a few words, never a progress bar",all(r[5]==0 for r in ribs) and all((r[1]=="Earned")==r[0] for r in ribs) and any(r[2]>0 for r in ribs) and any("so far" in r[4] for r in ribs),ribs[:4])
-    bad=[r for r in ribs if not r[0] and r[2] and not r[1].startswith(str(r[3])+" of "+str(r[2]))]
+    # 0.43: ribbons are medals; earned ones are gold and say so, the rest say how close; details open on tap, never a progress bar
+    ribs=pg.evaluate("[...document.querySelectorAll('#view-chronicle .medal')].map(r=>[r.classList.contains('on'),r.querySelector('.sr').textContent,r.offsetHeight,r.querySelector('.pb')?1:0])")
+    rec("Journal","ribbons are medals: earned ones say so, the rest say how close, never a progress bar",ribs and all(r[3]==0 for r in ribs) and all(r[1].endswith("Earned")==r[0] for r in ribs) and all(r[2]>=44 for r in ribs),ribs[:4])
+    bad=[r for r in ribs if not r[0] and not re.search(r"\d+ of \d+$",r[1])]
     rec("Journal","…and the dots match the count",not bad,bad[:2])
     # ---------- Binder ----------
     s=st(pg); s["cards"][0]["fav"]=True
