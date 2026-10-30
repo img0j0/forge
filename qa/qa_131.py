@@ -7,9 +7,9 @@ with sync_playwright() as p:
     rec("Fonts","all four bundled families load from the page itself",ok)
     s=build(base,[4,2,3,0,0]); s["seen"]=18; setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg)
     T=pg.inner_text("#view-today")
-    rec("Today","the Map card appears with a margin line and an Open button","The Map" in T and pg.locator("#btnMapGo").count()==1,T[T.find("The Map"):][:120].replace("\n"," | "))
-    pg.evaluate("document.getElementById('btnMapGo').click()"); pg.wait_for_timeout(300)
-    rec("Today","'Open the map' lands on the map",pg.evaluate("!!document.querySelector('.mapsvg')") and pg.inner_text("#title")=="The Map")
+    # 0.43: the Map row left Today; its news lives on the Map tab itself
+    rec("Today","no Map row on Today (0.43): the margin news is on the Map",pg.locator("#btnMapGo").count()==0,T[:120].replace("\n"," | "))
+    openmap(pg); rec("Today","the Map tab opens the map",pg.evaluate("!!document.querySelector('.mapsvg')") and pg.inner_text("#title")=="The Map")
     # not shown with no cards or lore off
     s2=build(base,[0,0,0,0,0]); s2["seen"]=17; setst(pg,s2); pg.reload(); pg.wait_for_timeout(600); closemodals(pg)
     rec("Today","no Map card before the first Forgeling",pg.locator("#btnMapGo").count()==0)
