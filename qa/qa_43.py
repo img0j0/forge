@@ -37,7 +37,7 @@ with sync_playwright() as p:
     tabto(pg,"settings",fold=True); sf=screens(pg); rec("Length","Settings opens with every section folded and fits one screen",sf<=1.1 and pg.evaluate("[...document.querySelectorAll('#view-settings details.setsec')].every(d=>!d.open)"),sf)
     tabto(pg,"today"); td=screens(pg); rec("Length","Today on a settled day fits about one and a half screens (was 2)",td<=1.5,td)
     # ---------- Today ----------
-    rec("Today","the Map row is gone (its news lives on the Map)",pg.locator("#btnMapGo").count()==0)
+    rec("Today","the Map row shows only on the day of a world event",pg.evaluate("(()=>{const b=document.getElementById('btnMapGo');return !b||b.textContent.includes('Today,')})()"))
     s=st(pg); s["wstat"]["sent"]=max(1,s["wstat"].get("sent",0)); s["hearth"]["fseen"]=["rug","lights","tree","flies","hedge","stones","pond","kite","mail","stump","ball","lamp","menhir","bell","fence","fern"]; s["request"]=None; s["hearth"]["sleep"]=None; load(pg,s); tabto(pg,"today")
     rec("Today","…and the Hearth row only shows when something waits there",pg.locator("#btnHearth").count()==0,pg.inner_text("#view-today")[:200])
     # ---------- Hearth ----------

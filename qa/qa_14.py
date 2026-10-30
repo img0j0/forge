@@ -24,8 +24,9 @@ with sync_playwright() as p:
     pg.evaluate("document.getElementById('ovClose').click()"); pg.wait_for_timeout(300)
     # tales entry
     tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300)
-    rec("Kept","Tales lists the Second reading button for the old card",pg.locator('#view-chronicle [data-kept]').count()==1)
-    pg.evaluate("document.querySelector('#view-chronicle [data-kept]').click()"); pg.wait_for_timeout(300)
+    pg.evaluate("document.getElementById('fgTales').click()"); pg.wait_for_timeout(400)
+    rec("Kept","Tales lists the Second reading button for the old card",pg.locator('#modal [data-kept]').count()==1)
+    pg.evaluate("document.querySelector('#modal [data-kept]').click()"); pg.wait_for_timeout(300)
     rec("Kept","opening from Tales then Close closes cleanly","Second reading" in mt(pg)); pg.evaluate("document.getElementById('keptBack').click()"); pg.wait_for_timeout(300)
     rec("Kept","…and does not pop a card open",pg.evaluate("document.getElementById('modal').hidden"))
     # no journal that day, no hour (legacy card), dark mood

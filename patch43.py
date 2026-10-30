@@ -19,7 +19,8 @@ rep("""  if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<
     const waits=state.hearth.sleep||nf.length||(state.request&&reqAsker())||(state.wander&&wCard()&&wReady())||!state.wstat.sent;
     if(waits)rows.push(""")
 rep("""  if(state.cards.length&&state.settings.lore!==false)rows.push(row('btnMapGo',IC.map,'The Map',esc(mapLatest()||'Nothing new in the margin today.')));
-""","")
+""","""  {const ml=state.cards.length&&state.settings.lore!==false?mapLatest():'';if(ml.startsWith('Today,'))rows.push(row('btnMapGo',IC.map,'The Map',esc(ml)));}
+""")
 rep("""${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:92,mini:true})}</button>`).join('')}""",
 """${latest.map(c=>`<button data-insp="${c.id}" aria-label="Look at ${esc(c.name)}">${cardHTML(c,{w:58,mini:true})}</button>`).join('')}""")
 rep("""<div class="group">${rows.join('')}</div>""","""${rows.length?`<div class="group">${rows.join('')}</div>`:''}""")
@@ -45,7 +46,7 @@ S=S[:i]+"""  const wd=state.wander,wc=wCard(),wn=wc?esc(wc.nick||wc.name):'',e=e
       <button class="act" id="hStory" ${left&&!away?'':'disabled'}>${HIC.story}Story<small>+2</small></button>
       <button class="act" id="hPlay" ${!away?'':'disabled'}>${HIC.play}Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       ${wbtn}
-      <button class="act" id="hForge">${HIC.forge}Forge<small id="hEmbers">${e} ${e===1?'ember':'embers'}</small></button>
+      <button class="act" id="hForge">${HIC.forge}The Forge<small id="hEmbers">${e} ${e===1?'ember':'embers'}</small></button>
     </div>
     <p class="muted small hvis">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>${notes}
     <div class="chips hmore">${fgMade('compass')&&fg.comp!==todayKey()?'<button class="chip" id="hCompass">Ask the compass</button>':''}<button class="chip" id="hShelf">Curio shelf · ${have} of ${shelfSet().length}</button><button class="chip" id="hFurn">By the fire · ${fh} of ${FURN.length}</button><button class="chip" id="hKeeps">Keepsakes</button><button class="chip" id="hChange">Change who is here</button></div>`;

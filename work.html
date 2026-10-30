@@ -1846,6 +1846,7 @@ function renderToday(){
   if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();
     const waits=state.hearth.sleep||nf.length||(state.request&&reqAsker())||(state.wander&&wCard()&&wReady())||!state.wstat.sent;
     if(waits)rows.push(row('btnHearth',IC.hearth,'The Hearth',(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'Your companions are here for company.'))+(wl?' '+wl:''),'',nf.length>0));}
+  {const ml=state.cards.length&&state.settings.lore!==false?mapLatest():'';if(ml.startsWith('Today,'))rows.push(row('btnMapGo',IC.map,'The Map',esc(ml)));}
   if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
   const jr=state.journal[state.date],fl=(state.feel||{})[state.date];if(s==='done')hero+=`<div class="feel"><p class="feelq">${fl?'Today felt '+fl+'.':'How did it feel?'}</p><div class="chips" role="group" aria-label="How did it feel?">${FEELS.map(f=>`<button class="facebtn" data-feel="${f}" aria-pressed="${fl===f}">${pixSVG(FACE[f][1],FACE[f][0],'feelface')}<span>${f[0].toUpperCase()+f.slice(1)}</span></button>`).join('')}</div></div>`;if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':s==='done'&&state.todayCard?'Add a line, and ink today’s Forgeling':'Add a line to your journal'}</button>`;const reflect='';
@@ -3302,7 +3303,7 @@ function renderHearth(){
       <button class="act" id="hStory" ${left&&!away?'':'disabled'}>${HIC.story}Story<small>+2</small></button>
       <button class="act" id="hPlay" ${!away?'':'disabled'}>${HIC.play}Play<small>${left?'+1 to +3':'Just for fun'}</small></button>
       ${wbtn}
-      <button class="act" id="hForge">${HIC.forge}Forge<small id="hEmbers">${e} ${e===1?'ember':'embers'}</small></button>
+      <button class="act" id="hForge">${HIC.forge}The Forge<small id="hEmbers">${e} ${e===1?'ember':'embers'}</small></button>
     </div>
     <p class="muted small hvis">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>${notes}
     <div class="chips hmore">${fgMade('compass')&&fg.comp!==todayKey()?'<button class="chip" id="hCompass">Ask the compass</button>':''}<button class="chip" id="hShelf">Curio shelf · ${have} of ${shelfSet().length}</button><button class="chip" id="hFurn">By the fire · ${fh} of ${FURN.length}</button><button class="chip" id="hKeeps">Keepsakes</button><button class="chip" id="hChange">Change who is here</button></div>`;
