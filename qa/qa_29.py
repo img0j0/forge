@@ -5,7 +5,7 @@ exec(open("qa_map.py").read().split("JUNK=")[0].split("from lib import *")[1])
 def load(pg,s):
     setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def openshelf(pg):
-    tabto(pg,"hearth"); pg.evaluate("()=>{document.querySelectorAll('#view-hearth details.more').forEach(d=>{if(/Curio shelf/.test(d.querySelector('summary').textContent))d.open=true})}"); pg.wait_for_timeout(200)
+    hsheet(pg,"shelf"); pg.wait_for_timeout(200)
 def enc(o): return base64.urlsafe_b64encode(json.dumps(o).encode()).decode().rstrip("=")
 def dec(code): return json.loads(base64.urlsafe_b64decode(code+"="*(-len(code)%4)))
 def goto_hash(pg,h):

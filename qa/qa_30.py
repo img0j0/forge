@@ -5,7 +5,7 @@ exec(open("qa_map.py").read().split("JUNK=")[0].split("from lib import *")[1])
 def load(pg,s):
     setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def openshelf(pg):
-    tabto(pg,"hearth"); pg.evaluate("()=>{document.querySelectorAll('#view-hearth details.more').forEach(d=>{if(/Curio shelf/.test(d.querySelector('summary').textContent))d.open=true})}"); pg.wait_for_timeout(250)
+    hsheet(pg,"shelf"); pg.wait_for_timeout(250)
 EMOJI=re.compile("[\U0001F300-\U0001FAFF✨❄⭐]")
 AXE=open(S+'/qa/node_modules/axe-core/axe.min.js').read()
 def axe(pg): pg.evaluate(AXE); return pg.evaluate("async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','best-practice']}});return r.violations.map(v=>v.id+':'+v.nodes[0].html.slice(0,80))}")
@@ -19,11 +19,11 @@ with sync_playwright() as p:
     load(A,s)
     rec("Room","the app stays under its size budget (1 MB, as qa_22)",len(open(P.replace("file://","")).read().encode())<1_000_000 if P.startswith("file://") else True)
     rec("Room","the unused Fredoka 400 face is gone, the used ones remain",A.evaluate("[...document.styleSheets].flatMap(s=>{try{return [...s.cssRules]}catch(e){return []}}).filter(r=>r.cssText&&r.cssText.startsWith('@font-face')&&r.cssText.includes('Fredoka')).map(r=>r.style.fontWeight).sort().join(',')")=="500,600")
-    openshelf(A); sh=A.inner_text("#view-hearth .shelf")
+    openshelf(A); sh=A.inner_text("#modal .shelf")
     rec("Shelf","the shelf has a shelf per realm with four places each",A.locator(".shelf .splank").count()==5 and A.locator(".shelf .scur").count()==20)
     rec("Shelf","found curios are drawn, missing ones are faint outlines",A.locator(".shelf .scur:not(.off)").count()==4 and A.locator(".shelf .scur.off").count()==16 and A.evaluate("[...document.querySelectorAll('.shelf .cimg')].every(i=>i.complete&&i.naturalWidth===16)"))
     rec("Shelf","realms you know are named the way the Map names them, others are not given away","Meadow" in sh and "Frost" in sh and "A realm not yet on your map" in sh and "Tide" not in sh and "Dusk" not in sh,sh[:200])
-    rec("Shelf","no emoji left on the shelf",not EMOJI.search(A.inner_html("#view-hearth .shelf")))
+    rec("Shelf","no emoji left on the shelf",not EMOJI.search(A.inner_html("#modal .shelf")))
     small=A.evaluate("[...document.querySelectorAll('.shelf .scur')].filter(b=>{const r=b.getBoundingClientRect();return r.height<44||r.width<44}).length")
     rec("Shelf","every curio on the shelf is easy to tap",small==0,small)
     bad+=["shelf: "+v for v in axe(A)]

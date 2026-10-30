@@ -48,10 +48,10 @@ with sync_playwright() as p:
     # ---------- spares (the prototype tool), then a charm ----------
     dev(pg,"spares"); closemodals(pg); s=st(pg); known=[ti for ti in range(5) if any(c["theme"]==ti for c in s["cards"])]
     rec("Spares","the tool gives two spares of each curio from realms on the map",all(v["n"]>=3 for v in s["curios"].values()) and len(s["curios"])==4*len(known),(len(s["curios"]),known))
-    tabto(pg,"hearth"); pg.evaluate("()=>{document.querySelectorAll('#view-hearth details.more').forEach(d=>{if(/Curio shelf/.test(d.querySelector('summary').textContent))d.open=true})}"); pg.wait_for_timeout(200)
-    sh=pg.inner_text("#view-hearth .shelf")
+    hsheet(pg,"shelf"); pg.wait_for_timeout(200)
+    sh=pg.inner_text("#modal .shelf")
     rec("Spares","the shelf shows no counts",not re.search(r"\d",sh),sh[:80])
-    cid=list(s["curios"].keys())[0]; pg.tap(f"#view-hearth [data-cur='{cid}']"); pg.wait_for_timeout(400); t=mt(pg)
+    cid=list(s["curios"].keys())[0]; pg.tap(f"#modal [data-cur='{cid}']"); pg.wait_for_timeout(400); t=mt(pg)
     rec("Spares","a curio's close-up says how many you have and how many are spare","You have 3, 2 spare" in t and "never your last one" in t,t[:160]); closemodals(pg)
     t=forge_sheet(pg); ti=known[0]; cname=names[ti]
     rec("Make","with spares and embers, that realm's charm, the bell, the kettle, the stand and the chimes can be made",pg.locator(f"#modal [data-fmake='charm{ti}']").count()==1 and pg.locator("#modal [data-fmake='bell']").count()==1 and pg.locator("#modal [data-fmake='kettle']").count()==1,t[:100])
