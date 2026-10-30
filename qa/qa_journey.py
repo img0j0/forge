@@ -3,8 +3,16 @@ from lib import *
 # Mixes doing, going all in, resting, skipping single days and multi-day gaps; opens packs, visits the Hearth,
 # sends wanderers, writes journal lines, follows echoes; checks the save stays consistent every day.
 import random
+# 0.44.1: over file:// this Chromium sometimes drops all of localStorage across the journey's many reloads (0.43.0 too),
+# so the journey serves the build over local http, as the live app is served.
+if P.startswith("file://"):
+    import http.server, threading, functools
+    _d,_f=os.path.split(P[len("file://"):])
+    _srv=http.server.ThreadingHTTPServer(("127.0.0.1",0),functools.partial(http.server.SimpleHTTPRequestHandler,directory=_d))
+    _srv.RequestHandlerClass.log_message=lambda *a:None
+    threading.Thread(target=_srv.serve_forever,daemon=True).start(); P=f"http://127.0.0.1:{_srv.server_address[1]}/{_f}"
 JUNK=re.compile(r"undefined|NaN|\[object|\bnull\b|Infinity")
-FAKE="""(()=>{const R=Date;let off=+(sessionStorage.getItem('__off')||localStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
+FAKE="""(()=>{const R=Date;let off=+(localStorage.getItem('__off')||sessionStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
 class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"""
 DAYS=int(os.environ.get("JOURNEY_DAYS","125")); SEED=int(os.environ.get("JOURNEY_SEED","7"))
 rng=random.Random(SEED)

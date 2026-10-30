@@ -1,6 +1,6 @@
 from lib import *
 # 0.18.1: the living sky. Colours per time of day and theme, the Sky setting, live changes, damaged settings.
-FAKE="""(()=>{const R=Date;let off=+(sessionStorage.getItem('__off')||localStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
+FAKE="""(()=>{const R=Date;let off=+(localStorage.getItem('__off')||sessionStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
 class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"""
 # 0.35.1 (Living Sky): the Light sky is now vivid (SKYV), so its top colours changed.
 TOP={("light","dawn"):"#F4B7A6",("light","day"):"#8FD3F2",("light","dusk"):"#3F357F",("light","night"):"#0B0F2A",

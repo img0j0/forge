@@ -1,7 +1,7 @@
 from lib import *
 import datetime
 exec(open("qa_map.py").read().split("JUNK=")[0].split("from lib import *")[1])
-FAKE="""(()=>{const R=Date;let off=+(sessionStorage.getItem('__off')||localStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
+FAKE="""(()=>{const R=Date;let off=+(localStorage.getItem('__off')||sessionStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
 class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"""
 def mk(b,tz="America/New_York"):
     ctx=b.new_context(viewport={"width":390,"height":844},has_touch=True,is_mobile=True,timezone_id=tz,locale="en-US")

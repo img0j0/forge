@@ -1,7 +1,7 @@
 from lib import *
 # 0.17.0: Echoes (anniversaries on Today), the mirror (what you have done), and the shared-world line.
 JUNK=re.compile(r"undefined|NaN|\[object|\bnull\b|Infinity")
-FAKE="""(()=>{const R=Date;let off=+(sessionStorage.getItem('__off')||localStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
+FAKE="""(()=>{const R=Date;let off=+(localStorage.getItem('__off')||sessionStorage.getItem('__off')||0);window.__setOff=v=>{off=v;sessionStorage.setItem('__off',String(v));localStorage.setItem('__off',String(v));};window.__real=()=>R.now();
 class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"""
 def mk(b):
     ctx,pg=newpage(b,timezone_id="America/New_York",locale="en-US"); pg.add_init_script(FAKE); pg.set_default_timeout(7000); return ctx,pg
