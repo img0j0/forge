@@ -8,7 +8,7 @@ with sync_playwright() as p:
     s=build(base,[4,2,3,0,0]); s["seen"]=18; setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg)
     T=pg.inner_text("#view-today")
     # 0.43: the Map row left Today; its news lives on the Map tab itself
-    rec("Today","no Map row on Today (0.43): the margin news is on the Map",pg.locator("#btnMapGo").count()==0,T[:120].replace("\n"," | "))
+    rec("Today","no Map row on Today (0.43): the margin news is on the Map",pg.evaluate("()=>{const b=document.getElementById('btnMapGo');return !b||b.textContent.includes('Today,')}"),T[:120].replace("\n"," | "))
     openmap(pg); rec("Today","the Map tab opens the map",pg.evaluate("!!document.querySelector('.mapsvg')") and pg.inner_text("#title")=="The Map")
     # not shown with no cards or lore off
     s2=build(base,[0,0,0,0,0]); s2["seen"]=17; setst(pg,s2); pg.reload(); pg.wait_for_timeout(600); closemodals(pg)

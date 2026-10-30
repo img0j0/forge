@@ -46,7 +46,7 @@ Never reset or clear player data as a deployment remedy.
 - qa/README.md has stale version notes. Several tests encode historical size/layout behavior and need interpretation.
 - qa/runall.sh records output but does not aggregate failures into a reliable nonzero exit code; improve before using it as a CI gate.
 - No repository-owned CI workflow was found on main/dev/ios-app. Pages deployment is not a gameplay test.
-- save() swallows storage errors; user-visible failure/recovery handling remains needed.
+- save() swallows storage errors; user-visible failure/recovery handling remains needed. (Addressed in 0.43.1: save() returns success, Update/Restore respect it, a daily safety copy and a recovery sheet cover unreadable saves, and a second tab steps the first aside.)
 - sw.js deletes all other origin caches on activation. Scope deletion to this app in the pwa.py generator, not only generated sw.js.
 - Network-first navigation falls back on thrown errors/timeouts, but an HTTP failure response can be returned directly. Test server-error fallback.
 - The navigation cache write is not extended with event.waitUntil; test interrupted navigation/offline persistence.
@@ -61,3 +61,4 @@ Update 0.41.1: patches now read base411.html (= work.html); base41.html removed 
 Update 0.42.0: patches now read base42.html (= work.html); base411.html removed (git keeps it). qa_17 and qa_181 run over http in runall.sh.
 
 Update 0.43.0: patches now read base43.html (= work.html); base42.html removed (git keeps it). qa_43 caps page lengths; put new features in sheets.
+Update 0.43.1: patches now read base431.html (= work.html); base43.html removed (git keeps it). runall.sh now also runs qa_431, qa_ref (fixed-seed appearance references in qa/ref; regenerate with REF_UPDATE=1 only when art changes on purpose, and say so in the handoff) and reliability.cjs.

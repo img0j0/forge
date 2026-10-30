@@ -150,6 +150,7 @@ CSS="""
 """
 rep(""".ribsheet .dots i.on{background:var(--plum);border-color:var(--plum)}""",""".ribsheet .dots i.on{background:var(--plum);border-color:var(--plum)}"""+CSS)
 
+rep("""<li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li>""","")  # keep eight notes
 open('work.html','w').write(S)
 js=re.findall(r'<script>([\s\S]*?)</script>',S)
 open('/tmp/chk431.js','w').write('\n;\n'.join(js))

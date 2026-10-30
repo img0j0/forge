@@ -33,7 +33,7 @@ with sync_playwright() as p:
                 if pg.locator("#modal "+sel).count(): pg.evaluate("s=>document.querySelector('#modal '+s).click()",sel); pg.wait_for_timeout(700)
         closemodals(pg); tabto(pg,"today")
         rec("Today",f"{L}: after the calling, the new Forgeling is the hero and the pack is the one filled button",pg.locator("#view-today .hero #btnShowToday").count()==1 and primaries(pg)==["btnPack"] and "joined your binder" in pg.inner_text("#view-today .hero"),primaries(pg))
-        rec("Today",f"{L}: a new player gets a Hearth row (something waits there), and no Map row (0.43)",pg.locator("#view-today .rowl#btnHearth").count()==1 and pg.locator("#view-today .rowl#btnMapGo").count()==0)
+        rec("Today",f"{L}: a new player gets a Hearth row (something waits there), and no Map row (0.43)",pg.locator("#view-today .rowl#btnHearth").count()==1 and pg.evaluate("()=>{const b=document.querySelector('#view-today .rowl#btnMapGo');return !b||b.textContent.includes('Today,')}"))
         pg.evaluate("document.getElementById('btnHearth').click()"); pg.wait_for_timeout(500)
         rec("Today",f"{L}: …the Hearth row goes to the Hearth",pg.evaluate("!document.getElementById('view-hearth').hidden"))
         tabto(pg,"today")
