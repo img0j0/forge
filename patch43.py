@@ -255,7 +255,7 @@ CSS="""
 .jbtns{margin:4px 0 10px}.tside{display:flex;gap:6px;flex-wrap:nowrap}
 .otales .rowl.otale{border:0;border-top:1px solid var(--line);border-radius:0;margin:0;background:none;box-shadow:none}
 #view-chronicle .cal span.c{aspect-ratio:auto;height:34px}.bookp .bookrow .book{width:52px;height:auto}.bookp{padding-top:10px;padding-bottom:10px}
-.medals{display:grid;grid-template-columns:repeat(8,1fr)}.medal{min-height:44px;background:none;border:0;padding:0;display:grid;place-items:center;color:var(--muted)}
+.medals{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}.medal{min-height:44px;background:none;border:0;padding:0;display:grid;place-items:center;color:var(--muted)}
 .medal i,.medal.big i{display:block;width:22px;height:22px;box-sizing:border-box;border-radius:50%;border:2px solid currentColor;position:relative}
 .medal i::after{content:'';position:absolute;left:3px;right:3px;top:17px;height:8px;background:linear-gradient(90deg,currentColor 0 40%,transparent 40% 60%,currentColor 60%)}
 .medal.on i{background:#FFD36B;border-color:#A8791E}.medal.on i::after{background:linear-gradient(90deg,#E2703A 0 40%,transparent 40% 60%,#E2703A 60%)}
