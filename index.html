@@ -595,6 +595,10 @@ html:not(.reduce) .mp-selglow{animation:mpBreath 1.5s ease-in-out 2}
 .medal.big{display:grid;place-items:center;margin:4px auto 12px;color:var(--muted)}.medal.big i{width:64px;height:64px;border-width:4px}.medal.big i::after{left:12px;right:12px;top:54px;height:20px}
 .medal.big.on i{background:#FFD36B;border-color:#A8791E}.ribsheet{text-align:center}.ribsheet .dots{justify-content:center;display:flex;gap:6px;margin:8px 0}
 .ribsheet .dots i{width:14px;height:14px;display:block;box-sizing:border-box;border:2px solid var(--muted)}.ribsheet .dots i.on{background:var(--plum);border-color:var(--plum)}
+/* 0.43.1 safe saves */
+.tabaway{position:fixed;inset:0;z-index:95;background:rgba(14,11,34,.86);display:flex;align-items:center;justify-content:center;padding:16px}
+.tabbox{background:#1C1840;color:#FFF7EC;border:3px solid #FFD36B;max-width:360px;width:100%;padding:20px;border-radius:16px;text-align:center}.tabbox h2{margin:0 0 8px;color:#FFF7EC}.tabbox p{margin:0 0 16px}.tabbox button{width:100%;min-height:48px}
+
 
 .mapwrap{position:relative}.mpfx{position:absolute;pointer-events:none}
 .mpplace{cursor:pointer;outline:none}.mpplace:focus-visible{stroke:var(--plum);stroke-width:1.6;stroke-dasharray:3 3}
@@ -1277,7 +1281,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.43.0',APPVER='1.0.0';
+const VERSION='prototype 0.43.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1463,14 +1467,31 @@ function sanitize(s){
   return s;
 }
 function migrate(s){sanitize(s);if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.forge)s.forge={spent:0,made:[],log:{},bell:'',comp:'',compTo:-1};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
+/* 0.43.1: a whole save loads as before; one missing its settings or version is filled in from a fresh one; anything else
+   is kept untouched (in -recovery) and the recovery sheet offers the daily safety copy instead of quietly starting over. */
+function loadParse(raw){
+  try{const s=JSON.parse(raw);if(!s||typeof s!=='object'||Array.isArray(s))return null;
+    if(s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object')return {s:migrate(s),fixed:false};
+    if(Array.isArray(s.cards)&&(s.v===1||s.v==null)){const f=fresh(),st=s.settings&&typeof s.settings==='object'&&!Array.isArray(s.settings)?s.settings:{};
+      return {s:migrate(Object.assign(f,s,{v:1,settings:Object.assign({},f.settings,st)})),fixed:true};}
+  }catch(e){}
+  return null;
+}
 function load(){
   let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){return null;}
   if(!raw)return null;
-  try{const s=JSON.parse(raw);if(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object')return migrate(s);}catch(e){}
+  const r=loadParse(raw);
+  if(r&&!r.fixed)return r.s;
   try{localStorage.setItem(KEY+'-recovery',raw);}catch(e){}
+  if(r){loadFixed=true;return r.s;}
+  let dr=null,d=null;try{dr=localStorage.getItem(KEY+'-daily');}catch(e){}
+  if(dr){const x=loadParse(dr);if(x)d={raw:dr,date:x.s.date,n:x.s.cards.length};}
+  loadBad={raw,daily:d};
   return null;
 }
+let loadFixed=false;
 const saveProblems=new Set();
+let tabAway=false,loadBad=null,dailyAt=null;
 function saveProblem(channel,failed){
   if(failed)saveProblems.add(channel);else saveProblems.delete(channel);
   let box=document.getElementById('saveWarning');
@@ -1483,13 +1504,19 @@ function saveProblem(channel,failed){
   const retry=document.createElement('button');retry.className='outline';retry.textContent='Try saving again';retry.onclick=()=>{save();nflush();};box.appendChild(retry);
   document.body.prepend(box);
 }
+/* 0.43.1: returns true only when this device kept the save. Another tab in charge, or an unreadable save still waiting on
+   the person's choice, means nothing is written. The first save of each session or day also keeps a safety copy;
+   when space runs short the safety copy gives way to the real save. */
 function save(){
-  try{let s=state;if(!s)return;s._sv=(s._sv||0)+1;
+  if(tabAway||loadBad)return false;
+  try{let s=state;if(!s)return false;s._sv=(s._sv||0)+1;
     if(sleepRun&&s.hearth&&s.hearth.sleep)s=Object.assign({},s,{hearth:Object.assign({},s.hearth,{sleep:null})});
-    const j=JSON.stringify(s);saveProblem('encode',false);
-    try{localStorage.setItem(KEY,j);saveProblem('web',false);}catch(e){saveProblem('web',true);}
-    nset(KEY,j);remindSoon();
-  }catch(e){saveProblem('encode',true);}
+    const j=JSON.stringify(s);saveProblem('encode',false);let ok=true;
+    try{localStorage.setItem(KEY,j);saveProblem('web',false);}
+    catch(e){try{localStorage.removeItem(KEY+'-daily');dailyAt=null;localStorage.setItem(KEY,j);saveProblem('web',false);}catch(e2){ok=false;saveProblem('web',true);}}
+    if(ok&&dailyAt!==s.date){try{localStorage.setItem(KEY+'-daily',j);dailyAt=s.date;}catch(e){}}
+    nset(KEY,j);remindSoon();return ok;
+  }catch(e){saveProblem('encode',true);return false;}
 }
 function rollover(){
   const k=todayKey();if(state.date===k)return;
@@ -3479,7 +3506,7 @@ function submitAge(){
   const m=+(($('#ageM')||{}).value||0),y=+(($('#ageY')||{}).value||0);
   if(!m||!y){sfx('no');toast('Please choose a month and a year.');return;}
   const a=ageFrom(m,y);
-  if(a<MIN_AGE){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}nset(BLOCK,String(Date.now()));nset(KEY,null);nflush();showBlocked();return;}
+  if(a<MIN_AGE){try{localStorage.setItem(BLOCK,String(Date.now()));localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(KEY+'-daily');}catch(e){}nset(BLOCK,String(Date.now()));nset(KEY,null);nflush();showBlocked();return;}
   state.ageBand=a<18?'teen':'adult';save();closeModal();
   if(!state.onboarded)openVector();else{render();if(state.seen<SEEN_V){state.seen=SEEN_V;save();openWhatsNew();}}
 }
@@ -3841,7 +3868,9 @@ function statueView(cv,c,o){
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);gl.bindBuffer(gl.ARRAY_BUFFER,pBuf);const la=gl.getAttribLocation(pp,'p'),ls=gl.getAttribLocation(pp,'s'),lk=gl.getAttribLocation(pp,'k');
       gl.enableVertexAttribArray(la);gl.vertexAttribPointer(la,3,gl.FLOAT,false,20,0);gl.enableVertexAttribArray(ls);gl.vertexAttribPointer(ls,1,gl.FLOAT,false,20,12);gl.enableVertexAttribArray(lk);gl.vertexAttribPointer(lk,1,gl.FLOAT,false,20,16);
       gl.drawArrays(gl.POINTS,0,pN);gl.disableVertexAttribArray(la);gl.disableVertexAttribArray(ls);gl.disableVertexAttribArray(lk);gl.depthMask(true);gl.disable(gl.BLEND);}
-    v.raf=requestAnimationFrame(draw);}
+    v.raf=0;if(!REDUCE||v.rise<1)v.raf=requestAnimationFrame(draw);}
+  /* 0.43.1: with reduced motion the statue is drawn once and again only when touched, turned or zoomed. */
+  const kick=()=>{if(!v.raf&&!v.dead)v.raf=requestAnimationFrame(draw);};
   const ptr=new Map();let p0=0,z0=1;
   cv.addEventListener('pointerdown',e=>{try{cv.setPointerCapture(e.pointerId);}catch(x){}ptr.set(e.pointerId,[e.clientX,e.clientY]);v.idle=0;if(ptr.size===2){const [a,b]=[...ptr.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);z0=v.zoom;}});
   cv.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;const q=ptr.get(e.pointerId);if(ptr.size===1){v.yaw-=(e.clientX-q[0])*.009;v.pitch=Math.max(-.15,Math.min(1.2,v.pitch+(e.clientY-q[1])*.006));}
@@ -3849,8 +3878,9 @@ function statueView(cv,c,o){
   const off=e=>{ptr.delete(e.pointerId);p0=0;};cv.addEventListener('pointerup',off);cv.addEventListener('pointercancel',off);
   cv.addEventListener('wheel',e=>{e.preventDefault();v.zoom=Math.max(.55,Math.min(2.2,v.zoom*Math.exp(-e.deltaY*.0012)));},{passive:false});
   cv.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft')v.yaw+=.15;else if(k==='ArrowRight')v.yaw-=.15;else if(k==='ArrowUp')v.pitch=Math.min(1.2,v.pitch+.08);else if(k==='ArrowDown')v.pitch=Math.max(-.15,v.pitch-.08);else if(k==='+'||k==='=')v.zoom=Math.min(2.2,v.zoom*1.1);else if(k==='-')v.zoom=Math.max(.55,v.zoom/1.1);else return;e.preventDefault();v.idle=0;});
+  ['pointerdown','pointermove','wheel','keydown'].forEach(n=>cv.addEventListener(n,kick));window.addEventListener('resize',kick);
   v.raf=requestAnimationFrame(draw);
-  return {v,stop(){v.dead=true;cancelAnimationFrame(v.raf);},frame(){draw(performance.now());cancelAnimationFrame(v.raf);v.raf=requestAnimationFrame(draw);}};
+  return {v,kick,stop(){window.removeEventListener('resize',kick);v.dead=true;cancelAnimationFrame(v.raf);},frame(){draw(performance.now());cancelAnimationFrame(v.raf);v.raf=requestAnimationFrame(draw);}};
 }
 function openStatue(id,o){
   o=o||{};const c=cardById(id);if(!c||!c.statue)return;if(stv){stv.stop();stv=null;}
@@ -3960,14 +3990,14 @@ function statueShelfHTML(){
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
+    <ul class="newlist"><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
     <li><b>A living map.</b> Every place on the map is now a little pixel landmark. Tap one to see it up close and send a Forgeling there. The realms are gently alive, with petals, smoke, glints, snow and fireflies, and while a Forgeling is out wandering you can watch it walk the trail, look around and come home.</li>
     <li><b>The other side.</b> Fully chart a realm, then forge a Crossing Lantern at the Hearth, and you can turn the map over. Each realm has a Shade twin on the back, with its own places, four new curios, an old tale told from the other side, and a ward to forge. The Shade names now live on the back of the map, so the front always shows the bright ones.</li>
     <li><b>A living Hearth.</b> Tap a Forgeling by the fire and it hops to say hello. After 10 pm everyone dozes, and a tap wakes one up. The weather follows whoever is sitting there: petals, embers, rain, snow or fireflies. Statues you have cast now stand at the edges of the scene. On a card, tap the art and the creature hops inside its frame.</li>
     <li><b>Voxel statues.</b> When a Forgeling becomes Forgebound, the Forge can cast it as a 3D statue for 6 embers, on a stand from its realm, wearing the keepsake it had on. Turn it with a finger, zoom in, and save a picture to share. Find statues on the Forge panel at the Hearth and on the card's close-up, and preview any Forgeling's statue in clay before it is Forgebound. Share a statue as a link, and a friend can turn it in 3D too.</li>
     <li><b>The Scribe.</b> Write sixty lines in your book, whenever you like, and a Scribe comes to your fire for good, with an ink-dipped quill. Now and then it reads one of your old lines back to you. And on days you do one of your own small things, your Forgelings notice.</li>
     <li><b>Ink.</b> After a done day, tap how it felt. Write a line too, and that day’s Forgeling is ink-touched, with your words on its back. Your Journal now opens with your book, which grows as you write, and a short note on your month, in words. Writing is never needed, and every line counts whenever you write it.</li>
-    <li><b>Your small things.</b> Tell Forgelings what you want more of, and your daily card leans that way. Add up to three small things of your own, like a walk or a message to someone you love, and some days the card you turn over is yours. Find it in Settings, under Your cards.</li></ul>
+    </ul>
     <div class="stack"><button class="primary" data-close>Got it</button></div>`);
 }
 
@@ -4334,11 +4364,19 @@ function openExport(){
     <textarea class="box" id="expText" readonly aria-label="Your saved copy as text">${esc(txt)}</textarea>
     <div class="stack"><button class="ghost" id="copyExp">Copy the text</button><button class="ghost" data-close>Close</button></div>`);
 }
+function openRecover(){
+  const d=loadBad&&loadBad.daily;
+  openSheet(`<h2>Your collection needs a moment</h2><p>This device could not read your saved collection. Nothing has been deleted.</p>
+    ${d?`<p>A safety copy from <b>${esc(dateLabel(d.date))}</b> is here, with ${d.n} ${d.n===1?'Forgeling':'Forgelings'}.</p><button class="primary" id="recUse" style="width:100%">Use the safety copy</button>`:''}
+    <p class="muted small" style="margin:14px 0 4px">If you saved a backup copy, you can restore it instead.</p>
+    <div class="stack"><button class="${d?'ghost':'primary'}" id="recRestore">Restore a backup</button><button class="ghost" id="recCopy">Copy the unreadable save</button><button class="ghost" id="recFresh">Start over</button></div>
+    <p class="muted small">Starting over keeps the unreadable save on this device, in case it can be mended later.</p>`,false);
+}
 function openRestore(){
   openSheet(`<h2>Restore a copy</h2><p class="muted small">Choose a saved file, or paste the text of a saved copy. This replaces what is on this device.</p>
     <label class="pill filepick">Choose a saved file<input type="file" id="resFile" accept=".json,application/json,text/plain"></label>
     <textarea class="box" id="resText" placeholder="Or paste your saved copy" aria-label="Saved copy text"></textarea>
-    <div class="stack"><button class="primary" id="doRestore">Restore</button><button class="ghost" data-close>Cancel</button></div>`);
+    <div class="stack"><button class="primary" id="doRestore">Restore</button>${loadBad?'<button class="ghost" id="recBack">Back</button>':'<button class="ghost" data-close>Cancel</button>'}</div>`,loadBad?false:undefined);
 }
 function copyText(txt,done){
   try{navigator.clipboard.writeText(txt).then(()=>toast(done),()=>toast('Select the text and copy it.'));}catch(e){toast('Select the text and copy it.');}
@@ -4464,10 +4502,18 @@ modal.addEventListener('click',e=>{
   else if(b.id==='inspShare')openShare(inspId);
   else if(b.id==='shDo')doShare();
   else if(b.id==='shBack'){const id=+b.dataset.cid;closeModal();inspect(id);}
+  else if(b.id==='recUse'&&loadBad&&loadBad.daily){let ok=true;try{localStorage.setItem(KEY,loadBad.daily.raw);}catch(e){ok=false;}if(ok)location.reload();else toast('This device is out of space. Restore a backup, or start over.');}
+  else if(b.id==='recRestore')openRestore();
+  else if(b.id==='recBack')openRecover();
+  else if(b.id==='recCopy'&&loadBad)shareOrCopy(loadBad.raw,'Copied. Keep it somewhere safe.','My Forgelings save');
+  else if(b.id==='recFresh'){
+    if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to start over';return;}
+    loadBad=null;closeModal();openAgeGate();
+  }
   else if(b.id==='doRestore'){
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to replace this device';return;}
-    const prevState=state;try{const s=JSON.parse($('#resText').value.trim());if(!(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object'))throw 0;s.ageBand=state.ageBand||s.ageBand;state=migrate(s);rollover();save();applySettings();closeModal();tab='today';render();toast('Restored.');}
-    catch(err){state=prevState;save();try{applySettings();render();}catch(e2){}b.dataset.armed='0';b.textContent='Restore';sfx('no');toast('That does not look like a saved copy. Nothing was changed.');}
+    const prevState=state,wasBad=loadBad;try{const s=JSON.parse($('#resText').value.trim());if(!(s&&typeof s==='object'&&s.v===1&&Array.isArray(s.cards)&&s.settings&&typeof s.settings==='object'))throw 0;s.ageBand=state.ageBand||s.ageBand;state=migrate(s);rollover();loadBad=null;if(!save())throw 'nosave';applySettings();closeModal();tab='today';render();toast('Restored.');if(!state.ageBand)openAgeGate();else if(!state.onboarded)openVector();}
+    catch(err){state=prevState;loadBad=wasBad;save();try{applySettings();render();}catch(e2){}b.dataset.armed='0';b.textContent='Restore';sfx('no');toast(err==='nosave'?'This device could not keep the restored copy, so nothing was changed. Free up a little space and try again.':'That does not look like a saved copy. Nothing was changed.');}
   }
 });
 modal.addEventListener('input',e=>{if(e.target.id==='nickIn')syncNick();});
@@ -4579,7 +4625,7 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.id==='btnTerms')openSheet(termsHTML());
   else if(b.id==='btnErase'){
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to erase everything. This cannot be undone.';return;}
-    try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(QSEEN);}catch(e){}
+    try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(KEY+'-daily');localStorage.removeItem(QSEEN);}catch(e){}
     nset(KEY,null);nflush();if(NATIVE&&PL.LocalNotifications){try{PL.LocalNotifications.cancel({notifications:[{id:1},{id:2}]}).catch(()=>{});}catch(e){}}
     state=migrate(fresh());bf={type:'all',mood:'all',sort:'new',page:0};tab='today';applySettings();render();openAgeGate();
   }
@@ -4612,7 +4658,7 @@ function runTool(name,btn){
   else if(name==='holo'||name==='legend'){const c=makeCard({rarity:name==='holo'?3:4,source:'pack'});state.cards.push(c);save();render();inspect(c.id);}
   else if(name==='reset'){
     if(btn.dataset.armed!=='1'){btn.dataset.armed='1';btn.querySelector('b').textContent='Tap again to erase everything';return;}
-    try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');}catch(e){}
+    try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(KEY+'-daily');}catch(e){}
     state=migrate(fresh());bf={type:'all',mood:'all',sort:'new',page:0};tab='today';applySettings();render();openAgeGate();
   }
 }
@@ -5038,12 +5084,26 @@ if(RELEASE){document.documentElement.classList.add('release');
       navigator.serviceWorker.getRegistration().then(r=>{if(r)return r.update();}).catch(()=>{});});
   }
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}}
+/* 0.43.1: the newest tab is in charge. Any other copy stops saving and offers to take over, by reloading the latest save. */
+const TAB_ID=Math.random().toString(36).slice(2);
+function tabAwayOn(){
+  if(tabAway||!document.body)return;tabAway=true;
+  const ub=document.getElementById('updBar');if(ub)ub.remove();
+  const o=document.createElement('div');o.id='tabAway';o.className='tabaway';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-labelledby','tabAwayH');
+  o.innerHTML='<div class="tabbox"><h2 id="tabAwayH">Forgelings is open somewhere else</h2><p>Only one copy keeps your progress at a time, so nothing gets written over.</p><button type="button" class="primary" id="tabHere">Use it here</button></div>';
+  document.body.appendChild(o);['.app','.tabs','#modal','#toast'].forEach(s=>{const e=document.querySelector(s);if(e)e.inert=true;});
+  o.querySelector('#tabHere').onclick=()=>location.reload();o.querySelector('#tabHere').focus({preventScroll:true});
+}
+function tabWatch(){
+  try{const ch=new BroadcastChannel('forgelings-tabs');ch.onmessage=e=>{if(e.data&&e.data.t==='here'&&e.data.id!==TAB_ID)tabAwayOn();};ch.postMessage({t:'here',id:TAB_ID});}catch(e){}
+  window.addEventListener('storage',e=>{if(e.key===KEY||e.key===null)tabAwayOn();});
+}
 function updBar(){
   if(document.getElementById('updBar')||!document.body)return;
   const b=document.createElement('div');b.id='updBar';b.className='updbar';b.setAttribute('role','status');
   b.innerHTML='<span>A new version of Forgelings is ready.</span><button type="button" id="updGo">Load it</button><button type="button" class="later" id="updLater">Later</button>';
   document.body.appendChild(b);
-  b.querySelector('#updGo').onclick=()=>{try{save();}catch(e){}location.reload();};
+  b.querySelector('#updGo').onclick=()=>{let ok=true;try{ok=tabAway||!!loadBad||save();}catch(e){ok=false;}if(!ok){toast('Your progress could not be saved just now, so the update will wait. Save a backup copy first.');return;}location.reload();};
   b.querySelector('#updLater').onclick=()=>b.remove();
 }
 function installTipHTML(){
@@ -5338,7 +5398,7 @@ function nshareFile(blob,name,title){
 }
 /* ================= Start ================= */
 function boot(){
-state=load()||migrate(fresh());
+state=load()||migrate(fresh());tabWatch();
 let blocked=false;try{blocked=!!localStorage.getItem(BLOCK);}catch(e){}
 if(blocked){showBlocked();}
 else{
@@ -5346,9 +5406,10 @@ else{
   quietTick();tickPairs();if(state.ageBand)save();
   applySettings();render();
   giftRead();statueLinkRead();
-  if(!state.ageBand)openAgeGate();else if(!state.onboarded)openVector();else if(state.seen<SEEN_V){state.seen=SEEN_V;save();openWhatsNew();}
-  if(stLinkIn&&!state.ageBand)statueLinkMaybe(true);
-  setTimeout(giftMaybe,1200);setTimeout(statueLinkMaybe,1300);window.addEventListener('hashchange',()=>{giftRead();giftMaybe();statueLinkRead();statueLinkMaybe(!state.ageBand);});
+  if(loadBad)openRecover();else if(!state.ageBand)openAgeGate();else if(!state.onboarded)openVector();else if(state.seen<SEEN_V){state.seen=SEEN_V;save();openWhatsNew();}
+  if(loadFixed&&!loadBad)setTimeout(()=>toast('Your save needed a small repair. Everything that could be read is here.'),900);
+  if(stLinkIn&&!state.ageBand&&!loadBad)statueLinkMaybe(true);
+  if(!loadBad){setTimeout(giftMaybe,1200);setTimeout(statueLinkMaybe,1300);}window.addEventListener('hashchange',()=>{giftRead();giftMaybe();statueLinkRead();statueLinkMaybe(!state.ageBand);});
   if(returned&&modal.hidden){tab='hearth';render();window.scrollTo(0,0);}
   if(state.ageBand)arrive();
   wanderTick();remindSync(false);
