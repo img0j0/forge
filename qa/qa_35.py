@@ -26,7 +26,7 @@ with sync_playwright() as p:
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg)
     # ---------- embers from showing up ----------
     tabto(pg,"hearth")
-    rec("Panel","the Forge panel sits at the Hearth, with the ember count and Open the Forge",pg.locator("#view-hearth #hForge").count()==1 and "The Forge" in pg.inner_text("#view-hearth .forgep") and embers(pg)==1,embers(pg))
+    rec("Panel","the Forge panel sits at the Hearth, with the ember count and Open the Forge",pg.locator("#view-hearth #hForge").count()==1 and "Forge" in pg.inner_text("#hForge") and embers(pg)==1,embers(pg))
     s=st(pg); rec("Panel","a fresh save carries the forge record",isinstance(s.get("forge"),dict) and s["forge"]["spent"]==0 and s["forge"]["made"]==[])
     dev(pg,"next"); closemodals(pg); t=do_day(pg); tabto(pg,"hearth")
     rec("Embers","a done day adds one ember, and the reveal says so","An ember for the Forge" in t and embers(pg)==2,(t[:80],embers(pg)))
@@ -108,7 +108,7 @@ with sync_playwright() as p:
         s=st(pg); s["forge"]["spent"]=0; load(pg,s)
         forge_sheet(pg); pg.tap(f"#modal [data-fmake='{pid}']"); pg.wait_for_timeout(500); closemodals(pg)
     s=st(pg); tabto(pg,"hearth")
-    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and "6 of 11 pieces made" in pg.inner_text("#view-hearth .forgep"))
+    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and ("6 of 11 pieces made" in (pg.evaluate("document.getElementById('hForge').click()") or "")+mt(pg)) and closemodals(pg) is None)
     pm=pg.evaluate("async()=>{const cv=document.getElementById('hearthCv'),x=cv.getContext('2d');const px=(X,Y)=>Array.from(x.getImageData(X,Y,1,1).data).slice(0,3);const diff=(a,b)=>Math.max(...a.map((v,i)=>Math.abs(v-b[i])));let best=0,kettle=false;for(let s=0;s<8;s++){let legs=0;for(let y=55;y<=57;y++){if(diff(px(57,y),px(55,y))>12&&diff(px(71,y),px(73,y))>12)legs++;}best=Math.max(best,legs);const k=px(78,58);if(k[0]>k[1]&&k[1]>k[2]&&k[0]<240)kettle=true;await new Promise(r=>setTimeout(r,120));}return [best,kettle]}")
     rec("Hearth","the iron stand's legs and the copper kettle are drawn into the fire scene (sampled over a second, past the sparks)",pm[0]==3 and pm[1],pm)
     t=forge_sheet(pg)

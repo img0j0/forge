@@ -11,7 +11,7 @@ with sync_playwright() as p:
     s=st(pg); s["opens"]+=[s["date"]]; setst(pg,s); pg.reload(); pg.wait_for_timeout(1000); closemodals(pg)
     tabto(pg,"hearth"); pg.wait_for_timeout(500)
     pos=pg.evaluate("()=>{const b=document.getElementById('hAffection'),cv=document.getElementById('hearthCv');if(!b)return null;return {txt:b.innerText,after:!!(cv.compareDocumentPosition(b)&Node.DOCUMENT_POSITION_FOLLOWING),gap:b.getBoundingClientRect().top-cv.getBoundingClientRect().bottom,h:b.offsetHeight,inPanel:!!b.closest('.panel-box')}}")
-    rec("Sit","the awake Hearth offers Sit with … right under the scene",pos and pos["txt"].startswith("Sit with ") and pos["after"] and 0<=pos["gap"]<40 and pos["h"]>=44 and not pos["inPanel"],pos)
+    rec("Sit","the awake Hearth offers Sit with … under the scene, first in the action grid (0.43)",pos and pos["txt"].startswith("Sit with") and pos["after"] and 0<=pos["gap"]<240 and pos["h"]>=44 and pg.evaluate("document.querySelector('.hgrid .act').id")=="hAffection",pos)
     s0=st(pg); c0=[c for c in s0["cards"] if c["id"]==s0["hearth"]["slots"][0]][0]
     for i in range(5): pg.tap("#hAffection"); pg.wait_for_timeout(150)
     s1=st(pg); c1=[c for c in s1["cards"] if c["id"]==c0["id"]][0]

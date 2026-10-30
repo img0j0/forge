@@ -65,7 +65,7 @@ with sync_playwright() as p:
     s["history"]=[h for h in s["history"] if not h["date"].startswith(ym)]+[{"date":d,"status":"done","v":4} for d in days[:5]]+[{"date":days[5],"status":"rest","v":2}]
     s["feel"]={days[0]:"good",days[1]:"good",days[2]:"hard",days[3]:"hard",days[4]:"good"}
     s["owns"]=[{"id":1,"text":"Text Mom","k":2,"days":days[:2]}]
-    load(pg,s); t=journal(pg)
+    load(pg,s); t=journal(pg); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
     rec("Month","the month reads in words: days shown up, rests, your own things, how it felt, the hardest week, lines",
         "Your month in words" in t and "you showed up on 5 days, and rested on 1" in t and "You did “Text Mom” twice." in t and "Most days felt good." in t and "Your hardest week was the first." in t,
         [l for l in t.split("\n") if "In " in l][:2])
