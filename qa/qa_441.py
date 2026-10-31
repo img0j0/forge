@@ -25,7 +25,8 @@ with sync_playwright() as p:
         tabto(pg,"binder")
         hit=pg.evaluate("""(()=>{const k=innerWidth/96,cx=innerWidth-15*k,cy=.17*innerHeight,R=5.5*k;const p=document.querySelector('#view-binder .summary');
           const rg=document.createRange();rg.selectNodeContents(p);return [...rg.getClientRects()].some(r=>r.right>cx-R&&r.left<cx+R&&r.bottom>cy-R&&r.top<cy+R)})()""")
-        rec("Sky",f"{W}: the Binder's summary text stays clear of the sun or moon",not hit)
+        sky=pg.evaluate("(()=>{const c=document.getElementById('skyCv');return !!c&&!c.hidden&&getComputedStyle(c).display!=='none'})()")
+        rec("Sky",f"{W}: the Binder's summary text stays clear of the sun or moon (0.46: only when a sky is drawn)",not sky or not hit,sky)
         # lantern hint
         tabto(pg,"hearth"); lb=pg.locator("#hLanternGo")
         rec("Lantern",f"{W}: the lantern hint is a 44-point button",lb.count()==1 and lb.bounding_box()["height"]>=44,lb.inner_text() if lb.count() else "")

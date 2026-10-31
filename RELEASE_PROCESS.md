@@ -70,3 +70,5 @@ Update 0.44.1: patches now read base441.html (= work.html); base44.html removed 
 Update 0.44.2: patches now read base442.html (= work.html); base441.html removed (git keeps it). runall.sh adds qa_contrast (day and night, light and dark text contrast on every screen).
 
 Update 0.45.0: patches now read base45.html (= work.html); base442.html removed (git keeps it). runall.sh adds qa_45.
+
+Update 0.46.0: patches now read base46.html (= work.html); base45.html removed (git keeps it). patch46.py reads journal46.css (kept in history/ with it) and the Caveat subset from the scratchpad at build time; base46.html already contains both, so later patches need neither. runall.sh adds qa_46.

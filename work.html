@@ -838,7 +838,7 @@ html.jr .app::before{content:'';position:absolute;left:14px;top:0;bottom:0;width
 /* three hands: yours (handwriting), the world's (italic world ink), the Forge's (stamped) */
 html.jr .top{padding:4px 0 10px}
 html.jr .top h1{font:700 calc(var(--hs)*44px)/1 var(--hand);letter-spacing:0;text-shadow:none;color:var(--ink)}
-html.jr .top #dateLabel{font:400 19px/1.1 var(--px2);letter-spacing:.06em;text-transform:uppercase;color:var(--stampink);margin-top:2px}
+html.jr .top #dateLabel{font:400 19px/1.1 var(--px2);letter-spacing:.04em;color:var(--stampink);margin-top:2px}
 html.jr .app .world{color:var(--world)}
 html.jr .app .muted{color:var(--muted)}
 /* panels become parts of the page */
@@ -862,8 +862,7 @@ html.jr .app :is(.chip,.fchip)[aria-pressed="true"]{background:#FFD36B;color:#2E
 html.jr :is(.primary,.outline,.chip,.fchip,.pill,.ghost,.rowl,.facebtn,.tab,.binder button,.herocard):focus-visible{outline:3px solid #FFD36B;outline-offset:2px;box-shadow:0 0 0 6px var(--jink)}
 /* sheets and toasts sit on the page too */
 html.jr .sheet{background:repeating-linear-gradient(transparent 0 33px,var(--jrule) 33px 34px),var(--jpaper);color:var(--ink);border-radius:0;box-shadow:0 -4px 0 var(--jedge)}
-html.jr .toast{border-radius:0;background:#2E2A47;color:#FBF5E6;bottom:calc(84px + env(safe-area-inset-bottom,0px));box-shadow:4px 4px 0 rgba(0,0,0,.25)}
-html.jr[data-page="lamp"] .toast{background:#FBF1D6;color:#2E2A47}
+html.jr .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* ribbons are the tabs */
 html.jr .tabs{background:var(--jdesk);border:0;left:0;right:0;bottom:0;padding:0 0 env(safe-area-inset-bottom,0px);box-shadow:0 -4px 0 var(--jedge2)}
 html.jr .tabs-in{max-width:440px;gap:8px;align-items:flex-start;padding:0 18px}
@@ -927,7 +926,7 @@ html.jr .app .binder>button:nth-child(3n){transform:rotate(-.8deg)}
 html.jr .app .binder .jcap{display:block;font:700 calc(var(--hs)*19px)/1.1 var(--hand);color:#2E2A47;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 2px 0}
 html.jr .app .binder .empty{border:2px dashed var(--line);border-radius:0;color:var(--muted);font:700 calc(var(--hs)*20px)/1 var(--hand)}
 html.jr .app .binder .empty::after{content:'not yet'}
-html.jr .app .pager .muted{font:400 19px/1 var(--px2);letter-spacing:.05em;text-transform:uppercase;color:var(--stampink)}
+html.jr .app .pager .muted{font:400 19px/1 var(--px2);letter-spacing:.04em;color:var(--stampink)}
 html.jr .app .favmark{color:#C98A12}
 /* the cover */
 .jcover,.jlabel,.jkick{display:none}

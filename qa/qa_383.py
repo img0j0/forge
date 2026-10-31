@@ -23,7 +23,7 @@ with sync_playwright() as p:
         pg.tap("#setMusic"); pg.wait_for_timeout(300)
         rec("Open",f"{scheme}: changing a setting keeps the section open, and the row updates","sound" in opened(pg) and summ(pg,"sound")=="On · no music · normal volume" and st(pg)["settings"]["music"]==False)
         pg.tap("#view-settings [data-sec='look']>summary"); pg.wait_for_timeout(300); pg.tap("[data-setsky='night']"); pg.wait_for_timeout(400)
-        rec("Open",f"{scheme}: Look and feel holds mood, comfort, appearance and sky","Always night" in summ(pg,"look") and all(pg.locator(x).count()==1 for x in ["[data-setmood='cute']","#setReduce","[data-settheme='dark']","#setLore"]))
+        rec("Open",f"{scheme}: Look and feel holds mood, comfort, appearance, the page and writing (0.46)","Always lamplit" in summ(pg,"look") and pg.locator("[data-sethand='0']").count()==1 and all(pg.locator(x).count()==1 for x in ["[data-setmood='cute']","#setReduce","[data-settheme='dark']","#setLore"]))
         pg.tap("[data-setsky='auto']"); pg.wait_for_timeout(300)
         bad+=[f"{scheme} open: "+v for v in axe(pg)]
         pg.tap("#view-settings [data-sec='sound']>summary"); pg.wait_for_timeout(300)
