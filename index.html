@@ -965,6 +965,74 @@ html.jr:not(.reduce) main>section.enter>*:nth-child(n+5){animation-delay:.16s}
 html.jr .app #view-today .hero{background:none !important;clip-path:none !important;box-shadow:none !important;border:0 !important}
 html.jr .app :is(.group,.panel-box,.setblock){background:none !important;box-shadow:none !important}
 
+
+/* ================= 0.47: the rest of the journal, and fixes from the 0.46 review ================= */
+/* Today: the tape no longer crosses the date line */
+html.jr .app .herocard{margin-top:14px !important}
+html.jr .app .herocard::before{left:-8px;top:-10px}
+html.jr .app .herocard::after{right:-8px;top:-10px}
+/* the Hearth: a taped-in photo, a letter, a note, hand-drawn boxes, an index */
+html.jr .app .hearthwrap{border:0 !important;border-radius:0 !important;clip-path:none !important;background:var(--jmount) !important;padding:7px;transform:rotate(-.8deg);box-shadow:0 6px 14px rgba(40,28,20,.28);position:relative;overflow:visible;margin:8px 4px 4px}
+html.jr .app .hearthwrap canvas{display:block;width:100%}
+html.jr .app .hearthwrap::before,html.jr .app .hearthwrap::after{content:'';position:absolute;width:56px;height:17px;background:var(--jtapec);top:-9px;z-index:2;pointer-events:none}
+html.jr .app .hearthwrap::before{left:-12px;transform:rotate(-30deg)}
+html.jr .app .hearthwrap::after{right:-12px;transform:rotate(28deg)}
+html.jr .app .tale.new{position:relative;border-radius:0;background:linear-gradient(180deg,#F3E8CC 0 49%,#E6D7B4 49% 51%,#F3E8CC 51%);color:#2E2A47;padding:12px 14px 12px 50px;box-shadow:0 3px 0 #D9C69C}
+html.jr .app .tale.new::before{content:'';position:absolute;left:12px;top:14px;width:26px;height:26px;border-radius:50%;background:#A8323F;box-shadow:inset 0 0 0 4px #8A2230,0 3px 0 #6E1A24}
+html.jr .app .tale.new :is(b,p,.muted){color:#2E2A47}
+html.jr .app .tale.new p:not(.muted){font-style:italic;color:#4B3C8C}
+html.jr .app .mecho{background:#FFF8DC !important;color:#2E2A47;transform:rotate(.8deg) !important;box-shadow:0 3px 8px rgba(40,28,20,.18);clip-path:polygon(0 3px,6% 0,13% 3px,20% 0,28% 3px,36% 0,44% 3px,52% 0,60% 3px,68% 0,76% 3px,84% 0,92% 3px,100% 0,100% 100%,0 100%)}
+html.jr .app .mecho :is(h2,p,.q){color:#2E2A47}
+html.jr .app .mecho .mine{color:#5A3A00;background:rgba(255,211,107,.35)}
+html.jr .app .mecho .chips button{background:#EFE2C4;color:#2E2A47}
+html.jr .app .act{border:2px solid var(--ink) !important;border-radius:0 !important;clip-path:none !important;background:none !important;color:var(--ink) !important;box-shadow:none !important;font:700 calc(var(--hs)*22px)/1 var(--hand) !important}
+html.jr .app .act small{font:700 12px/1.2 var(--body);color:var(--muted)}
+html.jr .app .act .hic{color:var(--ink) !important}
+html.jr .app .actions .act:nth-child(odd){transform:rotate(-.8deg)}
+html.jr .app .actions .act:nth-child(even){transform:rotate(.7deg)}
+html.jr .app .act.ready{background:#FFD36B !important;border-color:#C98A12 !important;color:#2E2A47 !important}
+html.jr .app .act.ready :is(small,.hic){color:#2E2A47 !important}
+html.jr .app .hmore{display:flex;flex-direction:column;gap:0;margin-top:4px}
+html.jr .app .hmore .chip{display:flex;width:100%;justify-content:space-between;background:none !important;box-shadow:none !important;border:0 !important;border-bottom:2px dotted var(--line) !important;border-radius:0;padding:0 2px;min-height:44px;font:700 calc(var(--hs)*21px)/1 var(--hand);color:var(--ink)}
+html.jr .app .hmore .chip::after{content:'\203A';font:400 22px/1 var(--body);color:var(--muted)}
+/* the Map: your lines and realm headers are written on the page */
+html.jr .app :is(.calling,.realm){background:none;border:0;border-left:4px solid var(--rc,var(--plum));border-radius:0;padding:4px 0 4px 12px;margin:10px 0 14px}
+html.jr .app :is(.calling,.realm) b{font:700 calc(var(--hs)*24px)/1 var(--hand)}
+html.jr .app .mine{border-radius:0}
+/* sheets: options are ink boxes, chips are paper tabs, fields are paper */
+html.jr .sheet :is(.chip,.fchip,.pill){border:0 !important;border-radius:0 !important;clip-path:none !important;background:#EFE2C4;color:#2E2A47;box-shadow:0 2px 0 #E3D3AE}
+html.jr[data-page="lamp"] .sheet :is(.chip,.fchip,.pill){background:rgba(255,255,255,.09);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+html.jr .sheet :is(.chip,.fchip,.pill)[aria-pressed="true"]{background:#FFD36B !important;color:#2E2A47 !important;box-shadow:0 2px 0 #C98A12 !important}
+html.jr .sheet .moodbtn{border:2px solid var(--ink);border-radius:0;background:var(--jpaper2);color:var(--ink);box-shadow:none}
+html.jr .sheet .moodbtn span{color:var(--muted)}
+html.jr :is(.sheet,.app) .field :is(input,textarea,select),html.jr :is(.sheet,.app) textarea.box{background:var(--jpaper2) !important;color:var(--ink) !important;border:2px solid var(--ink) !important;border-radius:0 !important;clip-path:none !important}
+html.jr :is(.sheet,.app) .field :is(input,textarea)::placeholder{color:var(--muted);opacity:1}
+html.jr .sheet .forgel li.fgsec{display:block;border:0;padding:12px 0 2px;font:700 calc(var(--hs)*24px)/1 var(--hand);color:var(--ink);min-height:0}
+html.jr .sheet .forgel li.can{background:rgba(255,211,107,.18);box-shadow:inset 3px 0 0 #E0A82E;padding-left:8px}
+html.jr .sheet .forgel [data-fmake]{background:#FFD36B !important;color:#2E2A47 !important;box-shadow:0 3px 0 #C98A12 !important}
+.fgsec{display:none}
+/* a Forgeling, close up: a page with the print taped in */
+.scrim.jinsp{background:var(--jdesk) !important}
+.scrim.jinsp .stageCv{display:none}
+.scrim.jinsp .ov{background:repeating-linear-gradient(transparent 0 33px,var(--jrule) 33px 34px),var(--jpaper);color:var(--ink);max-width:440px;min-height:100dvh;box-sizing:border-box;box-shadow:4px 4px 0 var(--jedge),8px 8px 0 var(--jedge2)}
+.scrim.jinsp .rv-title{font:700 calc(var(--hs)*36px)/1 var(--hand);color:var(--ink)}
+.scrim.jinsp .stage{background:var(--jmount);padding:9px;box-shadow:0 8px 16px rgba(40,28,20,.3)}
+.scrim.jinsp .stage::before{display:none}
+.scrim.jinsp .rv-hint{color:var(--world);font-style:italic}
+.scrim.jinsp .ghost{color:var(--ink) !important}
+.scrim.jinsp :is(p,.muted){color:var(--ink)}
+.scrim.jinsp .muted{color:var(--muted)}
+#ovClose{z-index:5}
+.scrim.jinsp #ovClose{color:var(--ink)}
+/* Settings: the inside cover */
+.jplate{display:none}
+html.jr .app .jplate{display:block;border:3px double var(--plum);padding:12px 14px;margin:2px 0 14px;text-align:center}
+html.jr .app .jplate .k{display:block;font:400 18px/1 var(--px2);letter-spacing:.08em;color:var(--stampink)}
+html.jr .app .jplate b{display:block;margin:6px 0 4px;font:700 calc(var(--hs)*28px)/1 var(--hand)}
+html.jr .app .jplate span:last-child{font-size:13px;color:var(--muted)}
+.scrim.jinsp .ghost{font:700 calc(var(--hs)*20px)/1 var(--hand);padding-left:3px;padding-right:3px;text-decoration:underline dashed;text-decoration-thickness:2px;text-underline-offset:5px}
+html.jr .sheet .moodbtn .home{background:#FFD36B;color:#2E2A47}
+
 </style>
 </head>
 <body>
@@ -1436,7 +1504,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.46.0',APPVER='1.0.0';
+const VERSION='prototype 0.47.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1972,6 +2040,7 @@ function inspect(id){
     <p class="rv-hint" id="inspHint">${inspHint(c)}</p>${keptAge(c)>=KEPT_DAYS?'':keptLine(c)}
     <div class="btnrow"><button class="primary" id="inspFlip">Flip card</button><button class="primary" id="inspName">Name and tale</button></div>
     <div class="row" style="justify-content:center;gap:4px 10px;flex-wrap:wrap"><button class="ghost" id="inspFav">${c.fav?'\u2605 Favorited':'\u2606 Favorite'}</button><button class="ghost" data-tale="${c.id}">Story</button><button class="ghost" id="inspShare">Share</button>${c.statue?`<button class="ghost" data-statue="${c.id}">See the statue</button>`:''}${keptAge(c)>=KEPT_DAYS?keptLine(c):''}<button class="ghost" id="ovClose">Close</button></div><div class="row" style="justify-content:center;margin-top:0"><button class="ghost" id="inspHome" aria-pressed="${state.homeFav===c.id}">${state.homeFav===c.id?'On Today \u2713':'Show on Today'}</button></div>`,true);
+  {const sc=modal.querySelector('.scrim');if(sc)sc.classList.toggle('jinsp',lsOn());}
   attachTilt($('#stage'));hydrate(modal);$('#ovClose').focus({preventScroll:true});
 }
 function talk(){
@@ -2085,7 +2154,7 @@ function renderSettings(){
   const S=state.settings,done=state.history.filter(h=>h.status==='done').length,rare=state.cards.filter(c=>c.rarity>=2).length;
   if(!setOpen)setOpen=new Set();
   const ML={cute:'Cute only',mix:'A mix',dark:'Dark only'},SK={auto:'Follows your day',day:'Always day',night:'Always lamplit',plain:'Plain'},TH={light:'Light',dark:'Dark'};
-  $('#view-settings').innerHTML=`
+  $('#view-settings').innerHTML=`<div class="jplate"><span class="k">This journal was started</span><b>${esc(dateLabel(state.startDate))}</b><span>${dayN()} ${dayN()===1?'day':'days'} kept · ${state.cards.length} ${state.cards.length===1?'Forgeling':'Forgelings'}</span></div>
     ${setSec('cards','Your cards',(state.want.length?state.want.map(i=>WANTS[i].n).join(', '):'Nothing picked yet')+(state.owns.length?' \u00B7 '+state.owns.length+' of your own':''),`<p class="muted small">What do you want more of? Pick up to three, and your daily card leans toward them.</p>
       <div class="chips" role="group" aria-label="What you want more of">${WANTS.map((w,i)=>`<button class="chip" data-swant="${i}" aria-pressed="${state.want.includes(i)}">${w.n}</button>`).join('')}</div>
       <div class="lbl2">Your own small things</div><p class="muted small">Up to three. Some days the card you turn over is one of yours, and doing it finds a Forgeling like any other day.</p>
@@ -3679,7 +3748,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=51;
+const SEEN_V=52;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -4235,10 +4304,10 @@ function statueShelfHTML(){
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>A field journal.</b> Forgelings is now your journal: a paper page by day and lamplight at night, ribbon bookmarks for the tabs, today’s find taped in with its calling stamped beside it, and your binder as an album of prints. Prefer the old look? Choose Plain under Look and feel. Handwriting can be switched to plain print there too.</li><li><b>Relics and gifts.</b> At the Forge, make a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b> Find all five places in a realm, and its page on the Map opens it as a small floating island you can turn. Tap a place to turn it into view.</li><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
+    <ul class="newlist"><li><b>The whole journal.</b> The Hearth is a taped-in photo with letters and notes beside it, the Forge lists what you can make first, a Forgeling opens on its own page, and Settings begins inside the cover. Every sheet is written on the same paper.</li><li><b>A field journal.</b> Forgelings is now your journal: a paper page by day and lamplight at night, ribbon bookmarks for the tabs, today’s find taped in with its calling stamped beside it, and your binder as an album of prints. Prefer the old look? Choose Plain under Look and feel. Handwriting can be switched to plain print there too.</li><li><b>Relics and gifts.</b> At the Forge, make a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b> Find all five places in a realm, and its page on the Map opens it as a small floating island you can turn. Tap a place to turn it into view.</li><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
     <li><b>A living map.</b> Every place on the map is now a little pixel landmark. Tap one to see it up close and send a Forgeling there. The realms are gently alive, with petals, smoke, glints, snow and fireflies, and while a Forgeling is out wandering you can watch it walk the trail, look around and come home.</li>
     <li><b>The other side.</b> Fully chart a realm, then forge a Crossing Lantern at the Hearth, and you can turn the map over. Each realm has a Shade twin on the back, with its own places, four new curios, an old tale told from the other side, and a ward to forge. The Shade names now live on the back of the map, so the front always shows the bright ones.</li>
-    <li><b>A living Hearth.</b> Tap a Forgeling by the fire and it hops to say hello. After 10 pm everyone dozes, and a tap wakes one up. The weather follows whoever is sitting there: petals, embers, rain, snow or fireflies. Statues you have cast now stand at the edges of the scene. On a card, tap the art and the creature hops inside its frame.</li>
+    
     
     
     
@@ -5175,8 +5244,9 @@ function fgNeeds(r){const sp=spareTotal(r.ti),e=embers(),rn=r.ti!==undefined?map
 function fgSmith(){const cs=slotCards(),c=cs[Math.min(hf.sel,cs.length-1)],out=wOut()?state.wander.id:-1;if(c&&c.id!==out)return c;return cs.find(x=>x.id!==out)||c||null;}
 function openForge(){
   const f=fgState(),s=fgSmith(),e=embers(),sp=spareTotal(),L=fgList(),made=L.filter(r=>fgMade(r.id)).length;
-  const rows=L.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id];
-    return `<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,30)}</span><span><b>${esc(r.name)}</b><small>${r.what?r.kind+'. '+esc(r.what):r.kind}</small><small>${ok?(L&&L.by?`${L.gift?'A gift from':'Forged by'} ${esc(L.by)}, ${esc(dateLabel(L.at))}.`:'Made.'):esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
+  const rk=r=>fgMade(r.id)?2:fgCan(r)?0:1,LS=L.slice().sort((a,b)=>rk(a)-rk(b));let lastRk=-1;
+  const rows=LS.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id],hd=rk(r)!==lastRk?(lastRk=rk(r),`<li class="fgsec">${['Ready to make','Still to make','Made'][lastRk]}</li>`):'';
+    return hd+`<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,30)}</span><span><b>${esc(r.name)}</b><small>${r.what?r.kind+'. '+esc(r.what):r.kind}</small><small>${ok?(L&&L.by?`${L.gift?'A gift from':'Forged by'} ${esc(L.by)}, ${esc(dateLabel(L.at))}.`:'Made.'):esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
   openSheet(`<h2>The Forge</h2><p class="muted small">${e} ${e===1?'ember':'embers'} and ${sp} spare ${sp===1?'curio':'curios'}. ${made} of ${L.length} pieces made.${s?` Whoever helps signs the piece. Today that is ${esc(s.nick||s.name)}.`:' Seat a Forgeling by the fire to help.'}</p>
     <p class="muted small">Embers come from the days you do your small thing, two on days you go all in, and they never fade. Spares are extra copies of a curio. The Forge never takes your last one, and nothing here is ever sold.</p>
     <p class="muted small" style="margin-top:6px">${esc(FG_KIND.Keepsake)}</p><ul class="furn forgel">${rows}</ul>${GIFT_F.some(fgMade)?'<button class="outline" id="fgGift" style="margin-top:8px;width:100%">Send a charm to a friend</button>':''}${statueForgeHTML()}
