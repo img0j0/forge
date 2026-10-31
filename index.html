@@ -901,7 +901,7 @@ html.jr .app .jstamp{display:flex;flex-direction:column;align-items:center;justi
 html.jr .app .jstamp b{font:400 21px/.9 var(--px2)}
 html.jr .app .jstamp i{font:700 10px/1.25 var(--body);font-style:normal;letter-spacing:.08em;max-width:76px}
 html.jr .app .feel .feelq{font:700 calc(var(--hs)*24px)/1 var(--hand);margin:6px 0 6px}
-html.jr .app .facebtn{clip-path:none;border-radius:50%;background:none;box-shadow:inset 0 0 0 3px currentColor;width:76px;height:76px;min-height:76px;padding:0;font:700 calc(var(--hs)*20px)/1 var(--hand);gap:2px}
+html.jr .app .facebtn{clip-path:none;border-radius:50%;background:none;box-shadow:inset 0 0 0 3px currentColor;width:76px;height:76px;min-height:76px;padding:4px 0 0;justify-content:center;box-sizing:border-box;font:700 calc(var(--hs)*20px)/1 var(--hand);gap:2px}
 html.jr .app .facebtn[data-feel="easy"]{color:#2F7A4A}
 html.jr .app .facebtn[data-feel="good"]{color:#8A5E0A}
 html.jr .app .facebtn[data-feel="hard"]{color:#B5313F}
@@ -909,7 +909,8 @@ html.jr[data-page="lamp"] .app .facebtn[data-feel="easy"]{color:#9FE0B0}
 html.jr[data-page="lamp"] .app .facebtn[data-feel="good"]{color:#FFD36B}
 html.jr[data-page="lamp"] .app .facebtn[data-feel="hard"]{color:#FF9B9B}
 html.jr .app .facebtn[aria-pressed="true"]{background:rgba(255,211,107,.28);box-shadow:inset 0 0 0 3px currentColor,0 0 0 4px rgba(255,211,107,.55)}
-html.jr .app .facebtn .feelface{width:30px;height:30px}
+html.jr .app .facebtn .feelface{width:30px;height:30px;flex:none}
+html.jr .app .facebtn[aria-pressed="true"] .feelface{transform:none}
 html.jr .app .mecho{border:0;border-radius:0;background:rgba(91,74,158,.09);transform:rotate(-.6deg);padding:10px 12px}
 html.jr[data-page="lamp"] .app .mecho{background:rgba(201,184,255,.09)}
 html.jr .app .mecho h2{font:700 calc(var(--hs)*22px)/1.05 var(--hand)}
@@ -1504,7 +1505,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.47.0',APPVER='1.0.0';
+const VERSION='prototype 0.47.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
