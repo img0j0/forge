@@ -46,7 +46,7 @@ with sync_playwright() as p:
     rec("Stage","closing it leaves no stage behind",pg.locator(".stageCv").count()==0)
     tabto(pg,"today"); pg.evaluate("()=>{const b=document.getElementById('btnPack');if(b)b.click();}"); pg.wait_for_timeout(700)
     rec("Stage","the pack opens on the same night stage",pg.evaluate(STAGEPX)>500)
-    rec("Card","the pack carries the campfire, not the old gem",pg.evaluate("()=>{const s=document.querySelector('#modal svg');return !!s&&s.innerHTML.includes('#FFD66A')&&!s.innerHTML.includes('M80 62l26 22')}"))
+    rec("Card","the pack carries the campfire, not the old gem (0.48: in the journal it is the sealed envelope)",pg.evaluate("()=>{const s=document.querySelector('#modal svg');return !!s&&(s.classList.contains('jenv')?!!s.querySelector('.e-seal'):s.innerHTML.includes('#FFD66A'))&&!s.innerHTML.includes('M80 62l26 22')}"))
     closemodals(pg); pg.keyboard.press("Escape"); pg.wait_for_timeout(300); pg.evaluate("()=>{if(!document.getElementById('modal').hidden){document.getElementById('modal').hidden=true;document.getElementById('modal').innerHTML='';}}")
     rec("All","no page errors through the card and the stage",not pg._errs,pg._errs[:2]); ctx.close()
     ctx,pg=newpage(b,reduced_motion="reduce"); pg.goto(P); pg.wait_for_selector("#ageGo, #titleGo"); first_card(pg); closemodals(pg)
