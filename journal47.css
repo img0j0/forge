@@ -1,0 +1,66 @@
+/* ================= 0.47: the rest of the journal, and fixes from the 0.46 review ================= */
+/* Today: the tape no longer crosses the date line */
+html.jr .app .herocard{margin-top:14px !important}
+html.jr .app .herocard::before{left:-8px;top:-10px}
+html.jr .app .herocard::after{right:-8px;top:-10px}
+/* the Hearth: a taped-in photo, a letter, a note, hand-drawn boxes, an index */
+html.jr .app .hearthwrap{border:0 !important;border-radius:0 !important;clip-path:none !important;background:var(--jmount) !important;padding:7px;transform:rotate(-.8deg);box-shadow:0 6px 14px rgba(40,28,20,.28);position:relative;overflow:visible;margin:8px 4px 4px}
+html.jr .app .hearthwrap canvas{display:block;width:100%}
+html.jr .app .hearthwrap::before,html.jr .app .hearthwrap::after{content:'';position:absolute;width:56px;height:17px;background:var(--jtapec);top:-9px;z-index:2;pointer-events:none}
+html.jr .app .hearthwrap::before{left:-12px;transform:rotate(-30deg)}
+html.jr .app .hearthwrap::after{right:-12px;transform:rotate(28deg)}
+html.jr .app .tale.new{position:relative;border-radius:0;background:linear-gradient(180deg,#F3E8CC 0 49%,#E6D7B4 49% 51%,#F3E8CC 51%);color:#2E2A47;padding:12px 14px 12px 50px;box-shadow:0 3px 0 #D9C69C}
+html.jr .app .tale.new::before{content:'';position:absolute;left:12px;top:14px;width:26px;height:26px;border-radius:50%;background:#A8323F;box-shadow:inset 0 0 0 4px #8A2230,0 3px 0 #6E1A24}
+html.jr .app .tale.new :is(b,p,.muted){color:#2E2A47}
+html.jr .app .tale.new p:not(.muted){font-style:italic;color:#4B3C8C}
+html.jr .app .mecho{background:#FFF8DC !important;color:#2E2A47;transform:rotate(.8deg) !important;box-shadow:0 3px 8px rgba(40,28,20,.18);clip-path:polygon(0 3px,6% 0,13% 3px,20% 0,28% 3px,36% 0,44% 3px,52% 0,60% 3px,68% 0,76% 3px,84% 0,92% 3px,100% 0,100% 100%,0 100%)}
+html.jr .app .mecho :is(h2,p,.q){color:#2E2A47}
+html.jr .app .mecho .mine{color:#5A3A00;background:rgba(255,211,107,.35)}
+html.jr .app .mecho .chips button{background:#EFE2C4;color:#2E2A47}
+html.jr .app .act{border:2px solid var(--ink) !important;border-radius:0 !important;clip-path:none !important;background:none !important;color:var(--ink) !important;box-shadow:none !important;font:700 calc(var(--hs)*22px)/1 var(--hand) !important}
+html.jr .app .act small{font:700 12px/1.2 var(--body);color:var(--muted)}
+html.jr .app .act .hic{color:var(--ink) !important}
+html.jr .app .actions .act:nth-child(odd){transform:rotate(-.8deg)}
+html.jr .app .actions .act:nth-child(even){transform:rotate(.7deg)}
+html.jr .app .act.ready{background:#FFD36B !important;border-color:#C98A12 !important;color:#2E2A47 !important}
+html.jr .app .act.ready :is(small,.hic){color:#2E2A47 !important}
+html.jr .app .hmore{display:flex;flex-direction:column;gap:0;margin-top:4px}
+html.jr .app .hmore .chip{display:flex;width:100%;justify-content:space-between;background:none !important;box-shadow:none !important;border:0 !important;border-bottom:2px dotted var(--line) !important;border-radius:0;padding:0 2px;min-height:44px;font:700 calc(var(--hs)*21px)/1 var(--hand);color:var(--ink)}
+html.jr .app .hmore .chip::after{content:'\203A';font:400 22px/1 var(--body);color:var(--muted)}
+/* the Map: your lines and realm headers are written on the page */
+html.jr .app :is(.calling,.realm){background:none;border:0;border-left:4px solid var(--rc,var(--plum));border-radius:0;padding:4px 0 4px 12px;margin:10px 0 14px}
+html.jr .app :is(.calling,.realm) b{font:700 calc(var(--hs)*24px)/1 var(--hand)}
+html.jr .app .mine{border-radius:0}
+/* sheets: options are ink boxes, chips are paper tabs, fields are paper */
+html.jr .sheet :is(.chip,.fchip,.pill){border:0 !important;border-radius:0 !important;clip-path:none !important;background:#EFE2C4;color:#2E2A47;box-shadow:0 2px 0 #E3D3AE}
+html.jr[data-page="lamp"] .sheet :is(.chip,.fchip,.pill){background:rgba(255,255,255,.09);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+html.jr .sheet :is(.chip,.fchip,.pill)[aria-pressed="true"]{background:#FFD36B !important;color:#2E2A47 !important;box-shadow:0 2px 0 #C98A12 !important}
+html.jr .sheet .moodbtn{border:2px solid var(--ink);border-radius:0;background:var(--jpaper2);color:var(--ink);box-shadow:none}
+html.jr .sheet .moodbtn span{color:var(--muted)}
+html.jr :is(.sheet,.app) .field :is(input,textarea,select),html.jr :is(.sheet,.app) textarea.box{background:var(--jpaper2) !important;color:var(--ink) !important;border:2px solid var(--ink) !important;border-radius:0 !important;clip-path:none !important}
+html.jr :is(.sheet,.app) .field :is(input,textarea)::placeholder{color:var(--muted);opacity:1}
+html.jr .sheet .forgel li.fgh{display:block;border:0;padding:12px 0 2px;font:700 calc(var(--hs)*24px)/1 var(--hand);color:var(--ink);min-height:0}
+html.jr .sheet .forgel li.can{background:rgba(255,211,107,.18);box-shadow:inset 3px 0 0 #E0A82E;padding-left:8px}
+html.jr .sheet .forgel [data-fmake]{background:#FFD36B !important;color:#2E2A47 !important;box-shadow:0 3px 0 #C98A12 !important}
+.fgh{display:none}
+/* a Forgeling, close up: a page with the print taped in */
+.scrim.jinsp{background:var(--jdesk) !important}
+.scrim.jinsp .stageCv{display:none}
+.scrim.jinsp .ov{background:repeating-linear-gradient(transparent 0 33px,var(--jrule) 33px 34px),var(--jpaper);color:var(--ink);max-width:440px;min-height:100dvh;box-sizing:border-box;box-shadow:4px 4px 0 var(--jedge),8px 8px 0 var(--jedge2)}
+.scrim.jinsp .rv-title{font:700 calc(var(--hs)*36px)/1 var(--hand);color:var(--ink)}
+.scrim.jinsp .stage{background:var(--jmount);padding:9px;box-shadow:0 8px 16px rgba(40,28,20,.3)}
+.scrim.jinsp .stage::before{display:none}
+.scrim.jinsp .rv-hint{color:var(--world);font-style:italic}
+.scrim.jinsp .ghost{color:var(--ink) !important}
+.scrim.jinsp :is(p,.muted){color:var(--ink)}
+.scrim.jinsp .muted{color:var(--muted)}
+#ovClose{z-index:5}
+.scrim.jinsp #ovClose{color:var(--ink)}
+/* Settings: the inside cover */
+.jplate{display:none}
+html.jr .app .jplate{display:block;border:3px double var(--plum);padding:12px 14px;margin:2px 0 14px;text-align:center}
+html.jr .app .jplate .k{display:block;font:400 18px/1 var(--px2);letter-spacing:.08em;color:var(--stampink)}
+html.jr .app .jplate b{display:block;margin:6px 0 4px;font:700 calc(var(--hs)*28px)/1 var(--hand)}
+html.jr .app .jplate span:last-child{font-size:13px;color:var(--muted)}
+.scrim.jinsp .ghost{font:700 calc(var(--hs)*22px)/1 var(--hand);text-decoration:underline dashed;text-decoration-thickness:2px;text-underline-offset:5px}
+html.jr .sheet .moodbtn .home{background:#FFD36B;color:#2E2A47}
