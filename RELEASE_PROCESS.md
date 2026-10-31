@@ -72,3 +72,4 @@ Update 0.44.2: patches now read base442.html (= work.html); base441.html removed
 Update 0.45.0: patches now read base45.html (= work.html); base442.html removed (git keeps it). runall.sh adds qa_45.
 
 Update 0.46.0: patches now read base46.html (= work.html); base45.html removed (git keeps it). patch46.py reads journal46.css (kept in history/ with it) and the Caveat subset from the scratchpad at build time; base46.html already contains both, so later patches need neither. runall.sh adds qa_46.
+Update 0.47.0: patches now read base47.html (= work.html); base46.html removed (git keeps it). patch47.py reads journal47.css (both in history/). qa_ref references regenerated on purpose (journal backdrop at the card corners; art unchanged).

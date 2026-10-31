@@ -1005,10 +1005,10 @@ html.jr .sheet .moodbtn{border:2px solid var(--ink);border-radius:0;background:v
 html.jr .sheet .moodbtn span{color:var(--muted)}
 html.jr :is(.sheet,.app) .field :is(input,textarea,select),html.jr :is(.sheet,.app) textarea.box{background:var(--jpaper2) !important;color:var(--ink) !important;border:2px solid var(--ink) !important;border-radius:0 !important;clip-path:none !important}
 html.jr :is(.sheet,.app) .field :is(input,textarea)::placeholder{color:var(--muted);opacity:1}
-html.jr .sheet .forgel li.fgh{display:block;border:0;padding:12px 0 2px;font:700 calc(var(--hs)*24px)/1 var(--hand);color:var(--ink);min-height:0}
+html.jr .sheet .forgel li.fgsec{display:block;border:0;padding:12px 0 2px;font:700 calc(var(--hs)*24px)/1 var(--hand);color:var(--ink);min-height:0}
 html.jr .sheet .forgel li.can{background:rgba(255,211,107,.18);box-shadow:inset 3px 0 0 #E0A82E;padding-left:8px}
 html.jr .sheet .forgel [data-fmake]{background:#FFD36B !important;color:#2E2A47 !important;box-shadow:0 3px 0 #C98A12 !important}
-.fgh{display:none}
+.fgsec{display:none}
 /* a Forgeling, close up: a page with the print taped in */
 .scrim.jinsp{background:var(--jdesk) !important}
 .scrim.jinsp .stageCv{display:none}
@@ -1028,7 +1028,7 @@ html.jr .app .jplate{display:block;border:3px double var(--plum);padding:12px 14
 html.jr .app .jplate .k{display:block;font:400 18px/1 var(--px2);letter-spacing:.08em;color:var(--stampink)}
 html.jr .app .jplate b{display:block;margin:6px 0 4px;font:700 calc(var(--hs)*28px)/1 var(--hand)}
 html.jr .app .jplate span:last-child{font-size:13px;color:var(--muted)}
-.scrim.jinsp .ghost{font:700 calc(var(--hs)*22px)/1 var(--hand);text-decoration:underline dashed;text-decoration-thickness:2px;text-underline-offset:5px}
+.scrim.jinsp .ghost{font:700 calc(var(--hs)*20px)/1 var(--hand);padding-left:3px;padding-right:3px;text-decoration:underline dashed;text-decoration-thickness:2px;text-underline-offset:5px}
 html.jr .sheet .moodbtn .home{background:#FFD36B;color:#2E2A47}
 
 </style>
@@ -5243,7 +5243,7 @@ function fgSmith(){const cs=slotCards(),c=cs[Math.min(hf.sel,cs.length-1)],out=w
 function openForge(){
   const f=fgState(),s=fgSmith(),e=embers(),sp=spareTotal(),L=fgList(),made=L.filter(r=>fgMade(r.id)).length;
   const rk=r=>fgMade(r.id)?2:fgCan(r)?0:1,LS=L.slice().sort((a,b)=>rk(a)-rk(b));let lastRk=-1;
-  const rows=LS.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id],hd=rk(r)!==lastRk?(lastRk=rk(r),`<li class="fgh">${['Ready to make','Still to make','Made'][lastRk]}</li>`):'';
+  const rows=LS.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id],hd=rk(r)!==lastRk?(lastRk=rk(r),`<li class="fgsec">${['Ready to make','Still to make','Made'][lastRk]}</li>`):'';
     return hd+`<li class="${ok?'on':can?'can':''}"><span class="fi" aria-hidden="true">${fgImg(r.id,30)}</span><span><b>${esc(r.name)}</b><small>${r.what?r.kind+'. '+esc(r.what):r.kind}</small><small>${ok?(L&&L.by?`${L.gift?'A gift from':'Forged by'} ${esc(L.by)}, ${esc(dateLabel(L.at))}.`:'Made.'):esc(fgNeeds(r))}</small></span>${!ok&&can&&s?`<button class="chip" data-fmake="${r.id}">Make it</button>`:''}</li>`;}).join('');
   openSheet(`<h2>The Forge</h2><p class="muted small">${e} ${e===1?'ember':'embers'} and ${sp} spare ${sp===1?'curio':'curios'}. ${made} of ${L.length} pieces made.${s?` Whoever helps signs the piece. Today that is ${esc(s.nick||s.name)}.`:' Seat a Forgeling by the fire to help.'}</p>
     <p class="muted small">Embers come from the days you do your small thing, two on days you go all in, and they never fade. Spares are extra copies of a curio. The Forge never takes your last one, and nothing here is ever sold.</p>

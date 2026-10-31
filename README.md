@@ -14,7 +14,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base46.html` | The current build, 0.46.0 (identical files) |
+| `work.html`, `base47.html` | The current build, 0.47.0 (identical files) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
 | `legal/` | `page.py` builds privacy, terms and support pages into `legal/out/` |
@@ -26,9 +26,9 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 ## Making the next version
 
-1. Write `patch47.py` at the top of this folder. It reads `base46.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch46.py` (its stylesheet is `journal46.css` beside it). Bump the title, `VERSION`, `SEEN_V` (to 52) and add a What's New entry.
+1. Write `patch48.py` at the top of this folder. It reads `base47.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch47.py` (its stylesheet is `journal47.css` beside it). Bump the title, `VERSION`, `SEEN_V` (to 53) and add a What's New entry.
 2. Check the script: extract the `<script>` and run `node --check` on it.
 3. Add `qa/qa_44.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
 4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.
 5. Copy `work.html` to the `ios-app` branch as `forgelings.html`, then run `python3 build-www.py` and `npx cap sync ios` there, and push.
-6. Here: `cp work.html base46.html`, `git rm` the previous base copy, move `patch46.py` into `history/`, update `forge-handoff.md`, and push this branch.
+6. Here: `cp work.html base48.html`, `git rm` the previous base copy, move `patch48.py` into `history/`, update `forge-handoff.md`, and push this branch.
