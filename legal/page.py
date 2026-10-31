@@ -1,7 +1,7 @@
 # Builds Forge's public pages (privacy, terms, support) for the website and App Store Connect.
 # Run from /home/claude/forge: python3 legal/page.py  -> writes legal/out/*.html, copied into pwa/ by pwa.py's caller.
 import os
-DATE = 'October 20, 2026'
+DATE = 'October 31, 2026'
 CONTACT = os.environ.get('FORGE_CONTACT', 'forgelings.app@gmail.com')  # set to the support email before App Store submission
 OUT = os.path.join(os.path.dirname(__file__), 'out'); os.makedirs(OUT, exist_ok=True)
 
@@ -58,14 +58,14 @@ page('privacy.html', 'Privacy policy', 'How Forgelings handles your data: it all
 <p>The web version of Forgelings is delivered by GitHub Pages. Like any website, GitHub receives basic technical details such as your IP address when it delivers the page, under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. Forgelings itself never receives them. If you install Forgelings from an app store, that store's own privacy policy covers the download.</p></section>
 <section><h2>Keeping or deleting your data</h2>
 <p>Because your data is only on your device, you are in control of it. To delete everything, use "Erase everything on this device" in the app's Settings, or delete the app (or clear this site's data in your browser). There is no other copy anywhere, so there is nothing for anyone to delete on a server.</p></section>
-<section><h2>Age</h2><p>While Forgelings is being tested, it is for adults 18 and up. It is not directed at children.</p></section>
+<section><h2>Age</h2><p>Forgelings is for adults 18 and up. It is not directed at children.</p></section>
 <section><h2>Changes</h2><p>If Forgelings ever changes how it handles data, for example by adding accounts or backups to a server, this policy will be updated first, and you will see the change in the app before anything new happens.</p></section>
 <section><h2>Contact</h2>{contact_line()}</section>
 ''')
 
 page('terms.html', 'Terms of use', 'The terms for using Forgelings, in plain English.', f'''
-<section><h2>An early version</h2><p>Forgelings is an early version shared for testing. It is free, it may change, and things may occasionally break. Save a copy of your collection from Settings now and then so you never lose your Forgelings.</p></section>
-<section><h2>For adults</h2><p>You need to be 18 or older to use Forgelings while it is being tested.</p></section>
+<section><h2>A small, independent app</h2><p>Forgelings is free to use. It is made by a small independent creator, it will keep growing and changing, and things may occasionally break. Save a copy of your collection from Settings now and then so you never lose your Forgelings.</p></section>
+<section><h2>For adults</h2><p>You need to be 18 or older to use Forgelings.</p></section>
 <section><h2>Nothing to buy</h2><p>Forgelings, packs, curios and keepsakes cannot be bought or sold and have no value outside the app. The odds for packs are shown in the app.</p></section>
 <section><h2>Small things, your judgment</h2><p>Daily callings are gentle suggestions, not medical, mental health or professional advice. Only do what is safe and right for you, and skip anything that is not. Rest days are always fine.</p></section>
 <section><h2>Your words are yours</h2><p>Anything you write in Forgelings stays yours and stays on your device. If you send feedback, it may be used to improve Forgelings.</p></section>
@@ -81,7 +81,7 @@ page('support.html', 'Support', 'Help with Forgelings.', f'''
 <section><h2>Get in touch</h2>{support_contact}</section>
 <section><h2>Common questions</h2>
 <p><b>Will I lose my Forgelings if I miss a day?</b> Never. Missed days and rest days don't reset anything.</p>
-<p><b>How do I move my collection to a new phone?</b> In Settings, under Backup, save a copy. On the new phone, use Restore and choose that file.</p>
+<p><b>How do I move my collection to a new phone?</b> In Settings, open Your collection and tap Save a copy. On the new phone, open the same section, tap Restore a copy and choose that file.</p>
 <p><b>Something looks wrong after an update.</b> Close Forgelings completely and open it again. On iPhone, swipe it away in the app switcher first.</p>
 <p><b>How do I delete everything?</b> Settings, then "Erase everything on this device". Forgelings keeps no copy anywhere else.</p></section>
 ''')
