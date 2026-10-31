@@ -18,14 +18,15 @@ run_suite() {
 if [ "$#" -gt 0 ]; then
   for t in "$@"; do if [ "$t" = qa_pwa ]; then run_suite qa_pwa 400 bash pwa_serve.sh; elif [ "$t" = reliability ]; then run_suite reliability 120 bash -c 'cd .. && node qa/reliability.cjs'; else run_suite "$t" 400 python3 "$t.py"; fi; done
 else
-  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_18 qa_19 qa_20 qa_21 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_402 qa_41 qa_411 qa_42 qa_43 qa_431 qa_44 qa_441 qa_ref qa_fit mo qa_odds qa_time qa_clock qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
+  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_18 qa_19 qa_20 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_402 qa_41 qa_411 qa_42 qa_43 qa_431 qa_44 qa_441 qa_ref qa_fit mo qa_odds qa_time qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
   run_suite qa_pwa 400 bash pwa_serve.sh
   # 0.43.1: the storage and service-worker unit checks join the gate.
   run_suite reliability 120 bash -c 'cd .. && node qa/reliability.cjs'
   # 0.41: the journey runs over http; some Chromium builds wipe file:// storage partway through a 125-day run.
   python3 -m http.server 8811 --bind 127.0.0.1 --directory .. >/dev/null 2>&1 & srv=$!; sleep 1
   # 0.42: qa_17 and qa_181 move a save across many days and lose it to the same file:// wipe (0.41.1 fails them too), so they run over http.
-  for t in qa_17 qa_181; do run_suite "$t" 400 env FORGE_HTML=http://127.0.0.1:8811/work.html python3 "$t.py"; done
+  # 0.44.1: qa_21 and qa_clock too; their "time-of-day flakes" were this wipe (36/36 and 12/12 over http).
+  for t in qa_17 qa_181 qa_21 qa_clock; do run_suite "$t" 400 env FORGE_HTML=http://127.0.0.1:8811/work.html python3 "$t.py"; done
   run_suite qa_journey 2400 env FORGE_HTML=http://127.0.0.1:8811/work.html JOURNEY_DAYS=125 JOURNEY_SEED=7 python3 qa_journey.py
   kill "$srv" 2>/dev/null
   for sd in 1 2 3 4 5 6; do run_suite "monkey$sd" 900 python3 monkey.py "$sd"; done
