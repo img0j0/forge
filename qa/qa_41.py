@@ -26,7 +26,7 @@ with sync_playwright() as p:
     load(pg,s); tabto(pg,"hearth"); pg.tap("#hForge"); pg.wait_for_timeout(500); m=mt(pg)
     rec("Lantern","a new player sees the Crossing Lantern in the Forge, saying it needs a charted realm","Crossing Lantern" in m and "a fully charted realm" in m and "no realm fully charted yet" in m,m[-400:])
     rec("Hidden","…but no wards before the lantern","Ward of" not in m)
-    rec("Forge","eleven pieces are listed (the lantern joins the ten)","0 of 11 pieces made" in m and m.count("Needs ")==11,m[:120])
+    rec("Forge","sixteen pieces are listed (the lantern joins the ten, and 0.45 adds five bright relics)","0 of 16 pieces made" in m and m.count("Needs ")==16,m[:120])
     closemodals(pg)
     rec("Hidden","no Turn the map over control before the lantern",(openmap(pg) or True) and pg.locator("#mapTurn").count()==0)
     labels=pg.evaluate("[...document.querySelectorAll('.mapsvg text')].map(t=>t.textContent)")
@@ -102,7 +102,7 @@ with sync_playwright() as p:
     rec("Ribbons","with the lantern, Lantern Light is earned and Both Sides is listed","Lantern Light" in t and "Both Sides" in t and "cross1" in (st(pg).get("ribbons") or []))
     # ---------- a ward ----------
     s=st(pg); s["curios"]["nest"]={"n":3,"cid":0,"at":s["date"]}; days(s,4); load(pg,s); tabto(pg,"hearth"); pg.tap("#hForge"); pg.wait_for_timeout(500); m=mt(pg)
-    rec("Ward","the Forge now lists five wards, made from Shade spares","Ward of Bramble" in m and "Ward of Void" in m and "Needs 2 Bramble spares" in m and "of 16 pieces made" in m,m[:120])
+    rec("Ward","the Forge now lists five wards, made from Shade spares","Ward of Bramble" in m and "Ward of Void" in m and "Needs 2 Bramble spares" in m and "of 26 pieces made" in m,m[:120])
     tapm(pg,"#modal [data-fmake='ward0']"); m=mt(pg)
     rec("Ward","the ward is forged and can be worn by whoever helped",pg.locator("#modal [data-equip='ward0']").count()==1,m[:160])
     tapm(pg,"#modal [data-equip='ward0']"); s=st(pg); wc=[c for c in s["cards"] if c.get("keep")=="ward0"]

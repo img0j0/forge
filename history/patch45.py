@@ -149,7 +149,7 @@ modal.addEventListener('click',e=>{if(e.target.closest('.csheet'))return;const o
 rep(".isgo{display:block;margin:8px 0 0;min-height:44px}",".isgo{display:block;margin:8px 0 0;min-height:44px}\n.relicline{display:flex;gap:8px;align-items:flex-start;margin-top:10px;padding-top:10px;border-top:1px dashed currentColor}.relicline .ri{flex:none}.relicline .ri img{image-rendering:pixelated}")
 
 # ---------- What's New: newest first, keep eight
-rep("""<ul class="newlist"><li><b>Realms in 3D.</b>""","""<ul class="newlist"><li><b>Relics and gifts.</b> Forge a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b>""")
+rep("""<ul class="newlist"><li><b>Realms in 3D.</b>""","""<ul class="newlist"><li><b>Relics and gifts.</b> At the Forge, make a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b>""")
 m=re.search(r'<ul class="newlist">(.*?)</ul>',S,re.S); items=re.findall(r'<li>.*?</li>',m.group(1),re.S)
 assert len(items)==9,len(items); rep(items[-1],"")
 
