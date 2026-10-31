@@ -127,7 +127,7 @@ with sync_playwright() as p:
     load(pg,s); tabto(pg,"hearth"); pg.tap("#hCompass"); pg.wait_for_timeout(400)
     rec("Compass","with only Void unfinished, the compass points across to Void","toward Void" in pg.inner_text("#hCompLine"),pg.inner_text("#hCompLine"))
     hsheet(pg,"shelf"); pg.tap("#hGift"); pg.wait_for_timeout(400)
-    rec("Gift","gift links offer front curios only",pg.locator("#modal [data-gcur]").count()==20 and pg.locator("#modal [data-gcur='thorn']").count()==0)
+    rec("Gift","gift links offer curios from both sides (0.45: Shade curios travel too)",pg.locator("#modal [data-gcur='acorn']").count()==1 and pg.locator("#modal [data-gcur='cinder']").count()==1)
     closemodals(pg)
     openmap(pg); pg.tap("#mapTurn"); pg.wait_for_timeout(400); labels=pg.evaluate("[...document.querySelectorAll('.mapsvg text')].map(t=>t.textContent)")
     rec("Map","with every realm charted, all five Shade realms are lit",all(x in labels for x in ("Bramble","Inferno","Abyss","Wraith","Void")),labels)

@@ -18,10 +18,10 @@ with sync_playwright() as p:
     cA,A=newpage(b); A.goto(P); A.wait_for_selector("#titleGo"); first_card(A); closemodals(A); base=st(A)
     s=build(base,[2,0,0,0,0]); s["seen"]=99; ids=[c["id"] for c in s["cards"]]; s["hearth"]["slots"]=ids; s["curios"]={"acorn":{"n":1,"cid":ids[0],"at":s["date"]},"mushroom":{"n":2,"cid":ids[0],"at":s["date"]}}
     s["cards"][1]["nick"]="Pip"; load(A,s); openshelf(A)
-    rec("Send","the curio shelf has a Send a curio to a friend button",A.locator("#hGift").is_visible())
+    rec("Send","the curio shelf has a send-a-gift button",A.locator("#hGift").is_visible())
     A.tap("#hGift"); A.wait_for_timeout(400); m=mt(A)
-    rec("Send","the sheet offers who sends it, your curios, and an optional note","Send a curio to a friend" in m and A.locator("[data-gsw]").count()==2 and A.locator("[data-gcur]").count()==2 and A.locator("#giftNote").count()==1,m[:200])
-    rec("Send","it says plainly what the link holds","holds only the curio" in m)
+    rec("Send","the sheet offers who sends it, your curios, and an optional note","Send a gift to a friend" in m and A.locator("[data-gsw]").count()==2 and A.locator("[data-gcur]").count()==2 and A.locator("#giftNote").count()==1,m[:200])
+    rec("Send","it says plainly what the link holds","holds only the gift" in m)
     small=A.evaluate("[...document.querySelectorAll('#modal button')].filter(b=>b.getBoundingClientRect().height<44).map(b=>b.textContent.trim().slice(0,20))")
     rec("Send","every choice is easy to tap",not small,small)
     bad+=["send: "+v for v in axe(A)]
