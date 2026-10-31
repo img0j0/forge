@@ -159,7 +159,7 @@ html.reduce .heroback{animation:none}
 .rowl .rs{display:block;color:var(--muted);font-size:14px;line-height:1.35;margin-top:2px}
 .rowl .chev{flex:none;color:var(--muted);font-size:22px;line-height:1}
 .rowl .pips{margin:6px 0 0;gap:5px}.rowl .pip{height:7px}
-.summary{color:var(--muted);font-size:15px;margin:0 2px 6px}
+.summary{color:var(--muted);font-size:15px;margin:0 2px 6px;padding-right:max(0px,calc(21vw - 14px))}
 details.more{margin-top:10px;border-top:1px solid var(--line)}
 details.more>summary{min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--plum);cursor:pointer;list-style:none}
 details.more>summary::-webkit-details-marker{display:none}
@@ -652,7 +652,7 @@ html.reduce .mk-ring{animation:none}
 .act[disabled]{opacity:.45}
 .shelf{margin-top:6px}.wdot{position:absolute;top:3px;left:calc(50% + 9px);width:11px;height:11px;border-radius:50%;background:#FFB347;box-shadow:0 0 0 2px rgba(0,0,0,.28)}
 .lbl2{font-weight:700;font-size:14px;color:var(--muted);margin:12px 0 2px}
-.pickgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;justify-items:center;margin:12px 0;max-height:46dvh;overflow:auto}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;justify-items:center;margin:12px 0;padding:3px;max-height:46dvh;overflow:auto}
 .pickbtn{background:none;border:3px solid transparent;border-radius:10px;padding:2px}
 .pickbtn.on{border-color:var(--plum);background:var(--chip)}
 .pg{position:relative;width:100%;max-width:320px;height:340px;border:3px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -1288,7 +1288,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.44.0',APPVER='1.0.0';
+const VERSION='prototype 0.44.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -3327,7 +3327,7 @@ function renderHearth(){
     :wd&&wc?`<button class="act" id="hWOut">${HIC.wander}Wandering<small>Back in <span id="wLeft">${wLeftText()}</span></small></button>`
     :`<button class="act" id="hWander">${HIC.wander}Wander<small>A few hours</small></button>`;
   let notes='';
-  if(chartedCount()>=1&&!fgMade('xlantern'))notes+=`<p class="small" id="hLantern">A charted realm is waiting for a lantern. ${fgCan(FORGE_R.find(r=>r.id==='xlantern'))?'You have what it needs.':'See what it needs in the Forge.'}</p>`;
+  if(chartedCount()>=1&&!fgMade('xlantern'))notes+=`<p class="small" id="hLantern">A charted realm is waiting for a lantern. <button type="button" class="ghost" id="hLanternGo">${fgCan(FORGE_R.find(r=>r.id==='xlantern'))?'You have what it needs. Open the Forge':'See what it needs in the Forge'}</button></p>`;
   if(fgMade('compass')&&fg.comp===todayKey())notes+=`<p class="small" id="hCompLine">${compassLine()}</p>`;
   el.innerHTML=`<div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
     <p class="hmsg" id="hmsg" aria-live="polite" aria-atomic="true">${esc(hf.msg||(!away&&memoryLine(c))||'The fire crackles. Everyone is settling in.')}</p>
@@ -3445,7 +3445,7 @@ function hearthBtn(b){
   else if(b.id==='hRelight')startWake();
   else if(b.id==='hWander'&&c)openWanderTo(c);
   else if(b.id==='hCollect')wanderCollect();
-  else if(b.id==='hForge')openForge();
+  else if(b.id==='hForge'||b.id==='hLanternGo')openForge();
   else if(b.id==='hBell')bellRing();
   else if(b.id==='hCompass')compassAsk();
   else if(b.id==='hAffection'&&c)affection(c);
