@@ -1,0 +1,68 @@
+/* ================= 0.48: ink and paper, moving (journal only; .reduce stops it all and leaves the final state) ================= */
+/* the pack is a sealed envelope */
+html.jr .packbtn svg.jenv{width:min(230px,62vw);height:auto;overflow:visible;animation:none;filter:drop-shadow(0 10px 14px rgba(40,28,20,.32))}
+html.jr .packbtn.opening svg.jenv{animation:none}
+.jenv .e-flo{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0)}
+.jenv .e-flc{transform-box:fill-box;transform-origin:top}
+.jenv .e-seal{transform-box:fill-box;transform-origin:center}
+.jenv .e-peek,.jenv .e-fan,.jenv .e-bits{opacity:0}
+.jenv .e-fan{transform-box:fill-box;transform-origin:bottom}
+.packbtn.opening .e-seal{animation:jseal .25s ease-in forwards}
+.packbtn.opening .e-bits{animation:jbits .6s .12s both}
+.packbtn.opening .e-flc{animation:jflc .14s .2s both ease-in}
+.packbtn.opening .e-flo{animation:jflo .16s .34s both ease-out}
+.packbtn.opening .e-peek{animation:jpeek .3s .38s both}
+.packbtn.opening .e-fan{animation:jfan .32s .52s both ease-out}
+@keyframes jseal{40%{transform:scale(.86)}100%{transform:scale(1.25);opacity:0}}
+@keyframes jbits{0%{opacity:0}20%{opacity:1}70%{opacity:1;transform:translateY(26px)}100%{opacity:0;transform:translateY(30px)}}
+@keyframes jflc{to{transform:scaleY(0)}}
+@keyframes jflo{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes jpeek{0%{opacity:0;transform:translateY(20px)}60%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(-14px)}}
+@keyframes jfan{from{opacity:0;transform:translateY(46px) scale(.8)}to{opacity:1;transform:none}}
+/* a new Forgeling is pencilled, inked, then coloured from the top down */
+.jghost{z-index:2;pointer-events:none;clip-path:inset(100% 0 0 0);animation:jghost 1.3s linear both}
+.jghost .jwet{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,211,107,.95);box-shadow:0 0 8px rgba(255,211,107,.85);opacity:0;animation:jwet 1.3s linear both}
+@keyframes jghost{0%,30%{clip-path:inset(0 0 0 0);filter:grayscale(1) brightness(2.1) contrast(.5)}45%{clip-path:inset(0 0 0 0);filter:grayscale(1) contrast(1.5) brightness(1.1)}90%,100%{clip-path:inset(100% 0 0 0);filter:grayscale(1) contrast(1.5) brightness(1.1)}}
+@keyframes jwet{0%,44.9%{opacity:0;top:0}45%{opacity:1;top:0}90%{opacity:1;top:calc(100% - 3px)}100%{opacity:0;top:calc(100% - 3px)}}
+/* then its rarity is stamped beside it, the same way for every card */
+.jrstamp{position:absolute;right:-14px;bottom:10px;z-index:6;width:84px;height:84px;box-sizing:border-box;border-radius:50%;border:3px solid #A8323F;color:#A8323F;background:rgba(251,245,230,.9);box-shadow:inset 0 0 0 3px #FBF5E6,inset 0 0 0 5px #A8323F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transform:rotate(-12deg);pointer-events:none;animation:jrstamp .3s 1.2s both cubic-bezier(.3,1.4,.5,1)}
+.jrstamp b{font:400 20px/.9 var(--px2);letter-spacing:.02em}
+.jrstamp span{font:700 8.5px/1.2 var(--body);letter-spacing:.1em;text-align:center;max-width:64px}
+html.jr[data-page="lamp"] .jrstamp{border-color:#FF9B9B;color:#FF9B9B;background:rgba(37,32,63,.92);box-shadow:inset 0 0 0 3px #25203F,inset 0 0 0 5px #FF9B9B}
+.jrstamp.jnow{animation:none}
+@keyframes jrstamp{from{opacity:0;transform:scale(1.8) rotate(-18deg)}to{opacity:1;transform:scale(1) rotate(-12deg)}}
+/* kept cards drift into the Binder ribbon, which dips */
+.jfly{position:fixed;z-index:9000;pointer-events:none;margin:0}
+html.jr .tab.jdip{animation:jdip .42s ease-out}
+@keyframes jdip{40%{transform:translateY(7px)}}
+.jplus{position:fixed;z-index:9001;pointer-events:none;font:700 calc(var(--hs)*24px)/1 var(--hand);color:#FFD36B;text-shadow:0 2px 0 rgba(0,0,0,.35);animation:jplus 1.5s ease-out both}
+@keyframes jplus{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:none}75%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(-12px)}}
+/* embers roll up like a meter on the Hearth */
+.jroll{position:relative;display:inline-block;overflow:visible;line-height:1.2em}
+.jroll>span{display:inline-block;overflow:hidden;height:1.2em;vertical-align:top}
+.jroll>span>i{display:inline-flex;flex-direction:column;font-style:normal;transform:translateY(-1.2em)}
+html.jr .jroll>span>i{animation:jroll .5s .45s both cubic-bezier(.3,1.2,.5,1)}
+.jroll>span>i::before{content:attr(data-from)}
+@keyframes jroll{from{transform:none}to{transform:translateY(-1.2em)}}
+.jroll::after{content:attr(data-add);position:absolute;left:100%;top:0;margin-left:5px;font:700 calc(var(--hs)*18px)/1 var(--hand);color:#C98A12;opacity:0;animation:jadd 1.4s .3s ease-out both}
+html.jr[data-page="lamp"] .jroll::after{color:#FFD36B}
+html:not(.jr) .jroll::after{display:none}
+@keyframes jadd{0%{opacity:0;transform:translateY(6px)}20%{opacity:1;transform:none}75%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(-10px)}}
+/* the Forge stamps what it makes */
+html.jr .cbig{position:relative}
+.jmade{display:none}
+html.jr .jmade{display:flex;flex-direction:column;align-items:center;position:absolute;left:calc(50% + 14px);top:2px;padding:4px 9px 3px;border:3px solid #A8323F;color:#A8323F;background:rgba(251,245,230,.82);transform:rotate(-10deg);pointer-events:none;animation:jmade .3s .35s both cubic-bezier(.3,1.4,.5,1)}
+html.jr[data-page="lamp"] .jmade{border-color:#FF9B9B;color:#FF9B9B;background:rgba(37,32,63,.88)}
+.jmade b{font:400 26px/1 var(--px2);letter-spacing:.08em}
+.jmade span{font:700 calc(var(--hs)*16px)/1 var(--hand);white-space:nowrap}
+@keyframes jmade{from{opacity:0;transform:scale(1.7) rotate(-16deg)}to{opacity:1;transform:rotate(-10deg)}}
+/* a newly found place is inked onto the map */
+html.jr .mp-place.jnew{transform-box:fill-box;transform-origin:center;animation:jplace .8s .25s both}
+@keyframes jplace{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:none}}
+.mp-ring{display:none}
+html.jr .mp-ring{display:inline;fill:none;stroke:#2E2A47;stroke-width:1.6;stroke-dasharray:64;stroke-dashoffset:0;opacity:0;animation:jring 1.4s .15s ease-out both}
+@keyframes jring{0%{opacity:.85;stroke-dashoffset:64}45%{opacity:.85;stroke-dashoffset:0}100%{opacity:0;stroke-dashoffset:0}}
+/* the pack and the reveal, on a journal page */
+.scrim.jrv .rv-title{color:var(--ink) !important}
+.scrim.jrv .whisper{color:var(--world)}
+.scrim.jrv .sumgrid .card{box-shadow:0 0 0 3px var(--jmount)}
