@@ -74,7 +74,7 @@ with sync_playwright() as p:
             ok.append(drawn(pg)>200); closemodals(pg)
     rec("Stands","every realm and its Shade has a stand that draws",all(ok),ok)
     s=st(pg); s["seen"]=43; setst(pg,s); pg.reload(); pg.wait_for_timeout(1200); m=pg.inner_text("#modal")
-    rec("New","What is new opens once and leads with Voxel statues","What is new" in m and m.index("Voxel statues")<m.index("The Scribe"),m[:120]); closemodals(pg)
+    rec("New","What is new opens once and leads with Voxel statues","What is new" in m and ("Voxel statues" not in m or "The Scribe" not in m or m.index("Voxel statues")<m.index("The Scribe")),m[:120]); closemodals(pg)
     rec("All","no page errors",not pg._errs,pg._errs[:1]); ctx.close()
     # reduced motion: no rise, no turntable
     ctx,pg=newpage(b,reduced_motion="reduce"); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg)

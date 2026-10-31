@@ -28,11 +28,11 @@ with sync_playwright() as p:
         v=axe(pg); rec("A11y",f"{tag}: the Hearth has no accessibility violations",not v,v)
         # Forge: Ready, Still, Made
         pg.evaluate("document.getElementById('hForge').click()"); pg.wait_for_timeout(500)
-        fo=pg.evaluate("()=>[...document.querySelectorAll('#modal .forgel li')].map(li=>li.classList.contains('fgh')?'#'+li.textContent:li.className||'-')")
+        fo=pg.evaluate("()=>[...document.querySelectorAll('#modal .forgel li')].map(li=>li.classList.contains('fgsec')?'#'+li.textContent:li.className||'-')")
         heads=[x for x in fo if x.startswith('#')]
         first_can=fo.index('can') if 'can' in fo else -1
         rec("Forge",f"{tag}: what you can make comes first, under Ready to make, then Still to make",heads[:2]==["#Ready to make","#Still to make"] and 0<first_can<fo.index("#Still to make") and all(x!='can' for x in fo[fo.index("#Still to make"):]),fo[:6])
-        rec("Forge",f"{tag}: the headings are not read as pieces",pg.evaluate("[...document.querySelectorAll('#modal .forgel li.fgh')].every(li=>!li.querySelector('b,button'))"))
+        rec("Forge",f"{tag}: the headings are not read as pieces",pg.evaluate("[...document.querySelectorAll('#modal .forgel li.fgsec')].every(li=>!li.querySelector('b,button'))"))
         v=axe(pg); rec("A11y",f"{tag}: the sorted Forge has no accessibility violations",not v,v)
         closemodals(pg)
         # the close-up

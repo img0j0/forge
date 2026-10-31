@@ -37,8 +37,8 @@ with sync_playwright() as p:
         rec("Toast",f"{ph}: a new ribbon arrives on a gold banner with a medal, and the words are unchanged","medal" in t["cls"] and t["bg"]=="rgb(255, 211, 107)" and t["txt"].startswith("New ribbon: ") and t["medal"],t)
         # fields
         tabto(pg,"today"); pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(500)
-        fi=pg.evaluate("()=>{const i=document.getElementById('jIn'),cs=getComputedStyle(i);return [cs.clipPath.startsWith('polygon'),cs.borderTopLeftRadius]}")
-        rec("Fields",f"{ph}: text fields have stepped pixel corners",fi[0] and fi[1]=="0px",fi)
+        fi=pg.evaluate("()=>{const i=document.getElementById('jIn'),cs=getComputedStyle(i);return [cs.clipPath.startsWith('polygon')||(document.documentElement.classList.contains('jr')&&cs.borderTopWidth==='2px'),cs.borderTopLeftRadius]}")
+        rec("Fields",f"{ph}: text fields have stepped pixel corners (0.47: square paper with an ink rule in the journal)",fi[0] and fi[1]=="0px",fi)
         bad+=[f"{ph} margin: "+v for v in axe(pg)]; closemodals(pg)
         rec("All",f"{ph}: no page errors",not pg._errs,pg._errs[:1]); ctx.close()
     ctx,pg=newpage(b,reduced_motion="reduce"); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"today")

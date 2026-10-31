@@ -23,7 +23,7 @@ rep("""  attachTilt($('#stage'));hydrate(modal);$('#ovClose').focus({preventScro
 rep("""  const rows=L.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id];
     return `<li class=""",
 """  const rk=r=>fgMade(r.id)?2:fgCan(r)?0:1,LS=L.slice().sort((a,b)=>rk(a)-rk(b));let lastRk=-1;
-  const rows=LS.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id],hd=rk(r)!==lastRk?(lastRk=rk(r),`<li class="fgh">${['Ready to make','Still to make','Made'][lastRk]}</li>`):'';
+  const rows=LS.map(r=>{const ok=fgMade(r.id),can=fgCan(r),L=f.log[r.id],hd=rk(r)!==lastRk?(lastRk=rk(r),`<li class="fgsec">${['Ready to make','Still to make','Made'][lastRk]}</li>`):'';
     return hd+`<li class=""")
 
 # Settings: the bookplate inside the cover
