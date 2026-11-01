@@ -76,6 +76,21 @@ def night():
 BACKS={'purple':purple(),'amber':amber(),'leather':leather(),'night':night()}
 SVGS={k:svg(v) for k,v in BACKS.items()}
 
+def leather_text():
+    # the backs that carry words (the daily calling card, a card's Moment side): the seal sits high, and the ribbon
+    # comes down from the top edge to the seal and ends in a notched tail, leaving the lower half clear for text
+    bg='#5A2C2A'; G=blank(bg)
+    for y in range(H):
+        for x in range(W):
+            if (x*7+y*13)%11==0: G[y][x]='#62322F'
+    for y in range(2,31):
+        for x in (18,19,20,21):
+            if y>=29 and x in (19,20): continue
+            if y==30 and x in (18,21): continue
+            G[y][x]='#E0A82E' if x in (19,20) else '#B9851E'
+    frame(G,'#2E1614','#C9A15A','#E9C77A'); put(G,SEAL,SP,8,4); return G
+BACKS['leather_text']=leather_text()
+
 def packed(G):
     by={}
     for y,row in enumerate(G):
