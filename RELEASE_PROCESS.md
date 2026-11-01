@@ -75,3 +75,4 @@ Update 0.46.0: patches now read base46.html (= work.html); base45.html removed (
 Update 0.47.0: patches now read base47.html (= work.html); base46.html removed (git keeps it). patch47.py reads journal47.css (both in history/). qa_ref references regenerated on purpose (journal backdrop at the card corners; art unchanged).
 Update 0.47.1: patches now read base471.html (= work.html); base47.html removed (git keeps it).
 Update 0.48.0: patches now read base48.html (= work.html); base471.html removed (git keeps it). patch48.py reads motion48.css (both in history/).
+Update 0.48.1: patches now read base481.html (= work.html); base48.html removed (git keeps it). Icons come from art/make_icons.py (run it after changing art/forgelings-icon.svg, before pwa.py; copy AppIcon-1024.png and splash-2732.png to the ios-app branch's art/).
