@@ -938,14 +938,14 @@ html.jr .app .favmark{color:#C98A12}
 .scrim.jcov .jcover{display:block;position:absolute;left:14px;right:10px;top:calc(16px + env(safe-area-inset-top,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));border-radius:4px 14px 14px 4px;background:radial-gradient(rgba(0,0,0,.08) 1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#6A3631,#4E2622);box-shadow:6px 6px 0 #E3D3AE,10px 10px 0 #2A1B0F}
 .scrim.jcov .jstitch{position:absolute;inset:14px;border:2px dashed rgba(255,211,107,.45);border-radius:2px 10px 10px 2px}
 .scrim.jcov .jband{position:absolute;right:38px;top:0;bottom:0;width:16px;background:#22140E}
-.scrim.jcov .title-top{z-index:2;top:calc(5vh + 26px + env(safe-area-inset-top,0px));bottom:calc(150px + env(safe-area-inset-bottom,0px));padding:0 64px 0 34px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.scrim.jcov .title-top{z-index:2;top:calc(5vh + 26px + env(safe-area-inset-top,0px));bottom:calc(172px + env(safe-area-inset-bottom,0px));padding:0 74px 0 34px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .scrim.jcov .jkick{display:block;margin:0;font:400 19px/1 var(--px2);letter-spacing:.14em;text-transform:uppercase;color:#E9C77A}
-.scrim.jcov .wordmark{color:#FFD36B;text-shadow:0 2px 0 #8A5A10;margin:0}
+.scrim.jcov .wordmark{color:#FFD36B;text-shadow:0 2px 0 #8A5A10;margin:0;font-size:min(64px,calc((100vw - 140px) / 4.6))}
 .scrim.jcov .jlabel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;flex:0 1 auto;min-height:0;max-height:400px;width:100%;max-width:300px;margin:auto 0;background:#FBF5E6;box-shadow:0 4px 0 #C9B48A;transform:rotate(-1.5deg);padding:14px 12px;box-sizing:border-box}
-.scrim.jcov .jlabel img{flex:0 1 auto;min-height:0;width:auto;height:min(190px,100%);max-height:100%;aspect-ratio:1;image-rendering:pixelated}
+.scrim.jcov .jlabel img{flex:none;width:auto;height:clamp(84px,min(22vh,46vw),180px);aspect-ratio:1;image-rendering:pixelated}
 .scrim.jcov .tagline{flex:none;margin:0;font:700 24px/1.05 'Caveat',var(--display);color:#2E2A47;text-align:center}
 html.plainhand .scrim.jcov .tagline{font:600 18px/1.25 var(--display)}
-.scrim.jcov .title-bottom{z-index:2;padding-left:40px;padding-right:74px}
+.scrim.jcov .title-bottom{z-index:2;padding-left:40px;padding-right:74px;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 .scrim.jcov .tsmall{color:#F3E7C2}
 .scrim.jcov .giftnote{color:#FFE9A8}
 html.jr .app :is(.hero,.herowrap,.group,.panel-box,.setblock,.setsec){border-image:none !important;border-width:0 !important;outline:0}
@@ -1575,7 +1575,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.48.1',APPVER='1.0.0';
+const VERSION='prototype 0.48.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -5487,8 +5487,16 @@ function drawTitle(t){
   ctx.putImageData(img,0,0);
 }
 function titleLoop(ts){if(!document.getElementById('titleCv')){titleRAF=0;return;}if(ts-titleLast>90){titleLast=ts;drawTitle(ts);}titleRAF=requestAnimationFrame(titleLoop);}
+/* 0.48.2: the cover's Forgeling: the first of a fixed run of seeds whose sprite stays clear of its frame's edges */
+let COVER_MATE=null;
+function coverMate(){
+  if(COVER_MATE)return COVER_MATE;const base={id:-1,seed:20261031,rarity:0,dark:false,theme:0,v:0,keep:'',bond:0,name:'',nick:''};
+  for(let s=20261031;s<20261031+60;s++){const c=Object.assign({},base,{seed:s});try{const e=prep(c);if(!e.sp[0])e.sp[0]=buildSprite(e.spec,0,0);const g=e.sp[0];let edge=false;
+    for(let i=0;i<32&&!edge;i++){if(g[i]||g[32+i]||g[i*32]||g[i*32+31])edge=true;}if(!edge)return COVER_MATE=c;}catch(err){}}
+  return COVER_MATE=base;
+}
 function openTitle(){
-  const cov=lsOn(),img=cov?`<img src="${spriteURL({id:-1,seed:20261031,rarity:0,dark:false,theme:0,v:0,keep:'',bond:0,name:'',nick:''})}" alt="A small Forgeling waving from the cover">`:'';
+  const cov=lsOn(),img=cov?`<img src="${spriteURL(coverMate())}" alt="A small Forgeling waving from the cover">`:'';
   openOverlay(`<canvas id="titleCv" aria-hidden="true"></canvas>${cov?'<div class="jcover" aria-hidden="true"><span class="jstitch"></span><span class="jband"></span></div>':''}
     <div class="title-top">${cov?'<p class="jkick">The Keeper’s journal</p>':''}<h1 class="wordmark" id="dlgTitle">Forgelings</h1>${cov?'<div class="jlabel">'+img:''}<p class="tagline">One small thing a day.<br>A small creature to keep it.</p>${cov?'</div>':''}${(()=>{const g=giftPending();return g?`<p class="giftnote" id="titleGift">${esc(g.n)} sent you a gift. Begin, and it will be waiting.</p>`:'';})()}</div>
     <div class="title-bottom" id="titleBottom"><button class="primary" id="titleGo">Begin</button><p class="tsmall">No account. Everything stays on this phone. For adults 18 and up.</p></div>`,false);
