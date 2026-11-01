@@ -77,3 +77,4 @@ Update 0.47.1: patches now read base471.html (= work.html); base47.html removed 
 Update 0.48.0: patches now read base48.html (= work.html); base471.html removed (git keeps it). patch48.py reads motion48.css (both in history/).
 Update 0.48.1: patches now read base481.html (= work.html); base48.html removed (git keeps it). Icons come from art/make_icons.py (run it after changing art/forgelings-icon.svg, before pwa.py; copy AppIcon-1024.png and splash-2732.png to the ios-app branch's art/).
 Update 0.48.2: patches now read base482.html (= work.html); base481.html removed (git keeps it).
+Update 0.48.3: patches now read base483.html (= work.html); base482.html removed (git keeps it). The card back art comes from art/cardback.py.
