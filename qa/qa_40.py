@@ -52,7 +52,9 @@ with sync_playwright() as p:
     rec("All","day: no page errors",not pg._errs,pg._errs[:1]); ctx.close()
     # night
     ctx,pg=setup(b,23); realm(pg,4,False)
-    rec("Doze","after 10 pm everyone by the fire dozes, with drifting Zs",pg.evaluate(COUNT,[220,232,255])>=2)
+    zs=[]
+    for _ in range(8): zs.append(pg.evaluate(COUNT,[220,232,255])); pg.clock.run_for(350); pg.wait_for_timeout(60)
+    rec("Doze","after 10 pm everyone by the fire dozes, with drifting Zs (0.48.4: the best of eight frames, as Zs come and go)",max(zs)>=2,zs)
     m=tap_forgeling(pg)
     rec("Doze","a tap wakes one, who says hello",bool(m) and "opens one eye" in m,m)
     bad+=["hearth night: "+v for v in axe(pg)]
