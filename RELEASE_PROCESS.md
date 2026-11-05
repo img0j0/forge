@@ -79,3 +79,4 @@ Update 0.48.1: patches now read base481.html (= work.html); base48.html removed 
 Update 0.48.2: patches now read base482.html (= work.html); base481.html removed (git keeps it).
 Update 0.48.3: patches now read base483.html (= work.html); base482.html removed (git keeps it). The card back art comes from art/cardback.py.
 Update 0.48.4: patches now read base484.html (= work.html); base483.html removed (git keeps it).
+Update 0.49.0: patches now read base49.html (= work.html); base484.html and base485.html removed (git keeps them). 0.48.5 (the day fix) shipped inside 0.49.
