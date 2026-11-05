@@ -1104,6 +1104,10 @@ html.jr .mp-ring{display:inline;fill:none;stroke:#2E2A47;stroke-width:1.6;stroke
 .scrim.jrv .whisper{color:var(--world)}
 .scrim.jrv .sumgrid .card{box-shadow:0 0 0 3px var(--jmount)}
 
+
+/* 0.49: the home-screen steps */
+.htsteps{margin:10px 0 14px;padding-left:22px;display:grid;gap:8px;text-align:left}
+.htsteps li{line-height:1.45}
 </style>
 </head>
 <body>
@@ -1575,7 +1579,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.48.4',APPVER='1.0.0';
+const VERSION='prototype 0.49.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1654,7 +1658,7 @@ const p2=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
 let state=null,tab='today',bf={type:'all',mood:'all',sort:'new',page:0},rv=null,pk=null,pendingAllIn=false,pgT=null;
 function nowDate(){const d=new Date();d.setDate(d.getDate()+((state&&state.offset)||0));return d;}
-const todayKey=()=>dkey(nowDate());
+const todayKey=()=>{const k=dkey(nowDate());return state&&state.date&&k<state.date&&dayDiff(k,state.date)<=2?state.date:k;}; /* 0.48.5: a day or two back (travel, a clock change) holds the journal's day */
 const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
 const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
@@ -1750,7 +1754,7 @@ function sanitize(s){
   {const g=s.games&&typeof s.games==='object'&&!Array.isArray(s.games)?s.games:{};const b=g.best&&typeof g.best==='object'&&!Array.isArray(g.best)?g.best:{};const ok={};['meadow','ember','tide','frost','dusk'].forEach(k=>{if(Number.isFinite(b[k])&&b[k]>0)ok[k]=Math.min(999,Math.round(b[k]));});s.games={best:ok,played:int(g.played,0,1e7,0),curioDay:typeof g.curioDay==='string'?g.curioDay:''};}
   {const o=s.own&&typeof s.own==='object'&&!Array.isArray(s.own)?s.own:{};const DK=/^\d{4}-\d{2}-\d{2}$/;s.own={text:typeof o.text==='string'?o.text.trim().slice(0,60):'',days:(Array.isArray(o.days)?o.days:[]).filter((d,i,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===i).sort().slice(-800)};
    const bk=s.backup&&typeof s.backup==='object'&&!Array.isArray(s.backup)?s.backup:{};s.backup={at:typeof bk.at==='string'&&DK.test(bk.at)?bk.at:'',ask:typeof bk.ask==='string'&&DK.test(bk.ask)?bk.ask:''};}
-  {const DK=/^\d{4}-\d{2}-\d{2}$/;s.want=(Array.isArray(s.want)?s.want:[]).filter((x,i,a)=>Number.isInteger(x)&&x>=0&&x<WANTS.length&&a.indexOf(x)===i).slice(0,3);s.wantAsked=!!s.wantAsked;
+  {const DK=/^\d{4}-\d{2}-\d{2}$/;s.want=(Array.isArray(s.want)?s.want:[]).filter((x,i,a)=>Number.isInteger(x)&&x>=0&&x<WANTS.length&&a.indexOf(x)===i).slice(0,3);s.wantAsked=!!s.wantAsked;if(typeof s.homeTip!=='string')s.homeTip='';
    const ow=(Array.isArray(s.owns)?s.owns:[]).filter(o=>o&&typeof o==='object'&&typeof o.text==='string'&&o.text.trim()).slice(0,3).map((o,i)=>({id:Number.isInteger(o.id)&&o.id>0?o.id:i+1,text:o.text.trim().slice(0,60),k:Number.isInteger(o.k)&&o.k>=0&&o.k<WANTS.length?o.k:-1,days:(Array.isArray(o.days)?o.days:[]).filter((d,j,a)=>typeof d==='string'&&DK.test(d)&&a.indexOf(d)===j).sort().slice(-800)}));
    ow.forEach((o,i)=>{if(ow.findIndex(x=>x.id===o.id)!==i)o.id=Math.max(...ow.map(x=>x.id))+1;});
    if(!ow.length&&s.own&&s.own.text){ow.push({id:1,text:s.own.text,k:-1,days:s.own.days.slice()});s.own={text:'',days:[]};}
@@ -2169,7 +2173,8 @@ function renderToday(){
     pack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 7h16M12 11l2.5 2-2.5 4-2.5-4z"/></svg>',
     tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M7.5 12.5l3 3 6-7"/></svg>',
     ring:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/></svg>',
-    save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>'};
+    save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>',
+    home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><rect x="9" y="6" width="2.5" height="2.5" rx=".6"/><rect x="12.5" y="6" width="2.5" height="2.5" rx=".6"/><rect x="9" y="9.5" width="2.5" height="2.5" rx=".6"/><path d="M10.5 18h3"/></svg>'};
   let hero='';
   if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
   else if(s==='revealed')hero=`<div class="taskface" style="--cc:${todayLook().c}"><div class="tfart">${todayLook().sig}</div><div class="tfmain"><div class="band"><span>${esc(todayBand())}</span></div><p>${todayOwnObj()?PEN:''}${esc(todayTask())}</p></div></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
@@ -2187,6 +2192,7 @@ function renderToday(){
   {const ml=state.cards.length&&state.settings.lore!==false?mapLatest():'';if(ml.startsWith('Today,'))rows.push(row('btnMapGo',IC.map,'The Map',esc(ml)));}
   if(!state.wantAsked&&state.cards.length&&state.status!=='fresh')rows.unshift(row('btnWant',PEN.replace('width="14" height="14"','width="21" height="21"'),'Make your cards yours','What do you want more of? Pick up to three, and add your own small things.','',true));
   if(backupDue())rows.push(row('btnBackup',IC.save,'Save a copy of your collection','It all lives on this phone. A copy once a month keeps it safe.'));
+  if(homeTipDue())rows.push(row('btnHomeTip',IC.home,'Keep Forgelings on your home screen','A browser can clear a website\u2019s saved data if it sits unopened for a while. On your home screen, your collection is kept.'));
   const jr=state.journal[state.date],fl=(state.feel||{})[state.date];if(s==='done')hero+=`<div class="feel"><p class="feelq">${fl?'Today felt '+fl+'.':'How did it feel?'}</p><div class="chips" role="group" aria-label="How did it feel?">${FEELS.map(f=>`<button class="facebtn" data-feel="${f}" aria-pressed="${fl===f}">${pixSVG(FACE[f][1],FACE[f][0],'feelface')}<span>${f[0].toUpperCase()+f.slice(1)}</span></button>`).join('')}</div></div>`;if(s==='done'||s==='rest')hero+=`<button class="ghost marginlink" id="btnMargin">${jr?'Edit today’s line':s==='done'&&state.todayCard?'Add a line, and ink today’s Forgeling':'Add a line to your journal'}</button>`;const reflect='';
   const latest=state.cards.slice(-5).reverse(),done=state.history.filter(h=>h.status==='done').length;
   el.innerHTML=`<div class="herowrap"><div class="hero pixcut">${hero}</div></div>${reflect}${rows.length?`<div class="group">${rows.join('')}</div>`:''}
@@ -2196,16 +2202,17 @@ function renderToday(){
 }
 function renderBinder(){
   const el=$('#view-binder'),counts={};state.cards.forEach(c=>counts[c.v]=(counts[c.v]||0)+1);
-  let list=state.cards.filter(c=>(bf.type==='all'||c.v===+bf.type)&&(bf.mood==='all'||(bf.mood==='dark')===c.dark)&&(!bf.fav||c.fav));
+  let list=state.cards.filter(bMatch);
   list=list.slice().sort((a,b)=>bf.sort==='new'?b.id-a.id:(b.rarity-a.rarity||b.id-a.id));
   const pages=Math.max(1,Math.ceil(list.length/9));bf.page=Math.min(bf.page,pages-1);
   const jrb=document.documentElement.classList.contains('jr'),slice=list.slice(bf.page*9,bf.page*9+9),w=Math.floor((vw()-32-24-20-(jrb?36:0))/3),slots=[];
-  for(let i=0;i<9;i++){const c=slice[i];slots.push(c?`<button data-insp="${c.id}" aria-label="Look at ${c.nick?esc(c.nick)+' ('+esc(c.name)+')':esc(c.name)}, ${RAR[c.rarity].name}">${cardHTML(c,{w,mini:true})}${c.fav?'<span class="favmark" aria-hidden="true">\u2605</span>':''}<span class="jcap" aria-hidden="true">${esc(c.nick||c.name)}</span></button>`:`<div class="empty" style="width:${w}px;height:${Math.round(w*1.4)}px" aria-hidden="true">?</div>`);}
+  for(let i=0;i<(filtN()?slice.length:9);i++){const c=slice[i];slots.push(c?`<button data-insp="${c.id}" aria-label="Look at ${c.nick?esc(c.nick)+' ('+esc(c.name)+')':esc(c.name)}, ${RAR[c.rarity].name}">${cardHTML(c,{w,mini:true})}${c.fav?'<span class="favmark" aria-hidden="true">\u2605</span>':''}<span class="jcap" aria-hidden="true">${esc(c.nick||c.name)}</span></button>`:`<div class="empty" style="width:${w}px;height:${Math.round(w*1.4)}px" aria-hidden="true">?</div>`);}
   const rareUp=state.cards.filter(c=>c.rarity>=2).length,types=Object.keys(counts).length,themes=new Set(state.cards.map(c=>c.theme+'-'+c.dark)).size;
   el.innerHTML=`<p class="summary">${state.cards.length} ${state.cards.length===1?'Forgeling':'Forgelings'}, ${rareUp} rare or better. ${types} of 12 callings and ${themes} of ${THEMES.length*2} realms found.</p>
     <div class="row" style="margin:4px 0 10px"><button class="pill" id="btnFilter" aria-haspopup="dialog">Filter${filtN()?' \u00B7 '+filtN():''}</button><button class="pill" id="btnSort">Sort: ${bf.sort==='new'?'Newest':'Rarest'}</button></div>
     ${filtN()?`<p class="muted small" style="margin:-4px 0 10px">Showing ${esc(filtText())}. <button class="ghost" id="fClear" style="padding:0 4px;min-height:44px">Show all</button></p>`:''}
     ${state.cards.length?'':'<p class="muted" style="margin:6px 0 12px">Your binder is empty. Turn over today\u2019s card to find your first Forgeling.</p>'}
+    ${state.cards.length&&filtN()&&!list.length?'<p class="muted" style="margin:6px 0 12px">No Forgelings match this yet. Try another name, or show them all.</p>':''}
     ${bf.type!=='all'&&VECTORS[+bf.type]?callingNoteHTML(+bf.type):''}
     <div class="binder">${slots.join('')}</div>
     <div class="pager"><button class="pill" id="pgPrev" ${bf.page===0?'disabled style="opacity:.45"':''}>Previous</button><span class="muted small">Page ${bf.page+1} of ${pages}</span><button class="pill" id="pgNext" ${bf.page>=pages-1?'disabled style="opacity:.45"':''}>Next</button></div>`;
@@ -3835,7 +3842,7 @@ function submitAge(){
 
 
 /* ================= Journal, Journey, Ribbons ================= */
-const SEEN_V=53;
+const SEEN_V=54;
 let ui={editJ:false,showFind:false,want:[],ownK:null};
 const ownK=()=>ui.ownK!=null?ui.ownK:((state.want||[])[0]!=null?state.want[0]:0);
 function openWant(){
@@ -4391,8 +4398,8 @@ function statueShelfHTML(){
 
 function openWhatsNew(){
   openSheet(`<h2>What is new</h2><p class="muted small">A few things to explore after your daily find.</p>
-    <ul class="newlist"><li><b>Ink and paper, moving.</b> A pack is a sealed envelope now: press the seal and the cards slide out. A new Forgeling is pencilled, inked and coloured in, then stamped. Kept cards drift into your binder, embers roll up on the Hearth, the Forge stamps what it makes, and new places are inked onto the map. A tap skips any of it, and it all stays still if you turn motion down.</li><li><b>The whole journal.</b> The Hearth is a taped-in photo with letters and notes beside it, the Forge lists what you can make first, a Forgeling opens on its own page, and Settings begins inside the cover. Every sheet is written on the same paper.</li><li><b>A field journal.</b> Forgelings is now your journal: a paper page by day and lamplight at night, ribbon bookmarks for the tabs, today’s find taped in with its calling stamped beside it, and your binder as an album of prints. Prefer the old look? Choose Plain under Look and feel. Handwriting can be switched to plain print there too.</li><li><b>Relics and gifts.</b> At the Forge, make a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b> Find all five places in a realm, and its page on the Map opens it as a small floating island you can turn. Tap a place to turn it into view.</li><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
-    <li><b>A living map.</b> Every place on the map is now a little pixel landmark. Tap one to see it up close and send a Forgeling there. The realms are gently alive, with petals, smoke, glints, snow and fireflies, and while a Forgeling is out wandering you can watch it walk the trail, look around and come home.</li>
+    <ul class="newlist"><li><b>Find any Forgeling.</b> The binder's Filter has a name search and a realm filter, so a Forgeling from months ago is a few letters away. On the website, Today now offers once to keep Forgelings on your home screen, where your collection is kept safe.</li><li><b>Ink and paper, moving.</b> A pack is a sealed envelope now: press the seal and the cards slide out. A new Forgeling is pencilled, inked and coloured in, then stamped. Kept cards drift into your binder, embers roll up on the Hearth, the Forge stamps what it makes, and new places are inked onto the map. A tap skips any of it, and it all stays still if you turn motion down.</li><li><b>The whole journal.</b> The Hearth is a taped-in photo with letters and notes beside it, the Forge lists what you can make first, a Forgeling opens on its own page, and Settings begins inside the cover. Every sheet is written on the same paper.</li><li><b>A field journal.</b> Forgelings is now your journal: a paper page by day and lamplight at night, ribbon bookmarks for the tabs, today’s find taped in with its calling stamped beside it, and your binder as an album of prints. Prefer the old look? Choose Plain under Look and feel. Handwriting can be switched to plain print there too.</li><li><b>Relics and gifts.</b> At the Forge, make a relic from a spare of each of a realm’s four curios. It sits on a shelf by the fire for good and adds a closing line to that realm’s old tale. You can now send a charm you forged to a friend, and curios from the other side travel too.</li><li><b>Realms in 3D.</b> Find all five places in a realm, and its page on the Map opens it as a small floating island you can turn. Tap a place to turn it into view.</li><li><b>Safer saving.</b> If Forgelings is open in two places, only one keeps your progress, so nothing gets written over. Updates and restores wait until your progress is safely saved, and if a save ever can't be read, a daily safety copy is there to bring it back.</li><li><b>Tidier pages.</b> Each page now fits on about one screen. At the Hearth, everything you do with a Forgeling is one row of buttons under the fire, and the shelf, the things by the fire and keepsakes open on their own. Old tales sit on a bookshelf and open like a book, one page at a time, and ribbons are a row of medals you can tap.</li>
+    
     
     
     
@@ -4946,6 +4953,7 @@ $('#view-today').addEventListener('click',e=>{
   if(b.id==='btnWant'){openWant();return;}
   if(b.dataset.feel){const f=b.dataset.feel;if(!FEELS.includes(f))return;state.feel=state.feel||{};if(state.feel[state.date]===f)delete state.feel[state.date];else{state.feel[state.date]=f;chime(0);}save();renderToday();renderChronicle();const n=$(`#view-today [data-feel="${f}"]`);if(n)n.focus({preventScroll:true});return;}
   if(b.id==='btnBackup'){openBackupNudge();return;}
+  if(b.id==='btnHomeTip'){openHomeTip();return;}
   if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard')openVector();
   else if(b.id==='btnDone')startDone(false);
   else if(b.id==='btnAll')startDone(true);
@@ -4966,7 +4974,7 @@ $('#view-binder').addEventListener('click',e=>{
   const ins=e.target.closest('[data-insp]');if(ins){inspect(+ins.dataset.insp);return;}
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='btnFilter'){openFilter();return;}
-  if(b.id==='fClear'){bf.type='all';bf.mood='all';bf.fav=false;bf.page=0;renderBinder();return;}
+  if(b.id==='fClear'){bf.type='all';bf.mood='all';bf.fav=false;bf.realm='all';bf.q='';bf.page=0;renderBinder();return;}
   if(b.dataset.ftype!==undefined){bf.type=b.dataset.ftype;bf.page=0;renderBinder();}
   else if(b.dataset.fmood){bf.mood=b.dataset.fmood;bf.page=0;renderBinder();}
   else if(b.id==='fFav'){bf.fav=!bf.fav;bf.page=0;renderBinder();}
@@ -5509,21 +5517,45 @@ function greeting(){const h=new Date().getHours();return h>=5&&h<12?'Good mornin
 let arriveT=0,hiddenAt=0;
 function arrive(){if(REDUCE)return;document.body.classList.remove('arrive');void document.body.offsetWidth;document.body.classList.add('arrive');clearTimeout(arriveT);arriveT=setTimeout(()=>document.body.classList.remove('arrive'),1300);}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(hiddenAt&&Date.now()-hiddenAt>10*60*1000&&state&&state.ageBand&&modal.hidden){renderNav();arrive();}});
-const filtN=()=>(bf.type!=='all'?1:0)+(bf.mood!=='all'?1:0)+(bf.fav?1:0);
-function filtText(){const p=[];if(bf.type!=='all'&&VECTORS[+bf.type])p.push(VECTORS[+bf.type].name);if(bf.mood!=='all')p.push(bf.mood==='dark'?'Dark':'Cute');if(bf.fav)p.push('favourites');return p.join(', ')+' only';}
+const filtN=()=>(bf.type!=='all'?1:0)+(bf.mood!=='all'?1:0)+(bf.fav?1:0)+(bf.realm&&bf.realm!=='all'?1:0)+(bf.q?1:0);
+function filtText(){const p=[];if(bf.q)p.push(`names with “${bf.q}”`);if(bf.realm&&bf.realm!=='all')p.push(realmLabel(bf.realm));if(bf.type!=='all'&&VECTORS[+bf.type])p.push(VECTORS[+bf.type].name);if(bf.mood!=='all')p.push(bf.mood==='dark'?'Dark':'Cute');if(bf.fav)p.push('favourites');return p.join(', ')+' only';}
 function filterSheetHTML(){
   const counts={};state.cards.forEach(c=>counts[c.v]=(counts[c.v]||0)+1);
-  return `<h2>Filter your binder</h2><div class="lbl2">Calling</div><div class="chips" role="group" aria-label="Filter by calling"><button class="fchip" data-ftype="all" aria-pressed="${bf.type==='all'}">All</button>${VECTORS.map((V,i)=>`<button class="fchip" data-ftype="${i}" aria-pressed="${String(bf.type)===String(i)}"><i style="background:${V.color}"></i>${V.name} ${counts[i]||0}</button>`).join('')}</div>
+  const rc={};state.cards.forEach(c=>{const k=realmKey(c);rc[k]=(rc[k]||0)+1;});
+  const rks=Object.keys(rc).sort((a,b)=>{const [ta,da]=a.split('-').map(Number),[tb,db]=b.split('-').map(Number);return da-db||ta-tb;});
+  return `<h2>Filter your binder</h2><div class="field"><label for="fName">Find by name</label><input id="fName" type="search" autocomplete="off" autocapitalize="words" enterkeyhint="done" maxlength="24" placeholder="A name or nickname" value="${esc(bf.q||'')}"></div>
+    ${rks.length>1?`<div class="lbl2">Realm</div><div class="chips" role="group" aria-label="Filter by realm"><button class="chip" data-frealm="all" aria-pressed="${!bf.realm||bf.realm==='all'}">All</button>${rks.map(k=>`<button class="chip" data-frealm="${k}" aria-pressed="${bf.realm===k}">${esc(realmLabel(k))} ${rc[k]}</button>`).join('')}</div>`:''}
+    <div class="lbl2">Calling</div><div class="chips" role="group" aria-label="Filter by calling"><button class="fchip" data-ftype="all" aria-pressed="${bf.type==='all'}">All</button>${VECTORS.map((V,i)=>`<button class="fchip" data-ftype="${i}" aria-pressed="${String(bf.type)===String(i)}"><i style="background:${V.color}"></i>${V.name} ${counts[i]||0}</button>`).join('')}</div>
     <div class="lbl2">Mood</div><div class="chips" role="group" aria-label="Filter by mood">${[['all','All'],['cute','Cute'],['dark','Dark']].map(a=>`<button class="chip" data-fmood="${a[0]}" aria-pressed="${bf.mood===a[0]}">${a[1]}</button>`).join('')}<button class="chip" id="fFav" aria-pressed="${!!bf.fav}">\u2605 Favorites</button></div>
-    <div class="stack"><button class="primary" data-close>Show ${binderCount()} ${binderCount()===1?'Forgeling':'Forgelings'}</button></div>`;
+    <div class="stack"><button class="primary" id="fShow" data-close>${showLabel()}</button></div>`;
 }
-const binderCount=()=>state.cards.filter(c=>(bf.type==='all'||c.v===+bf.type)&&(bf.mood==='all'||(bf.mood==='dark')===c.dark)&&(!bf.fav||c.fav)).length;
+const realmKey=c=>c.theme+'-'+(c.dark?1:0),realmLabel=k=>{const [t,d]=k.split('-').map(Number),T=THEMES[t];return T?(d?T.dark.name:T.name):'';};
+const bMatch=c=>(bf.type==='all'||c.v===+bf.type)&&(bf.mood==='all'||(bf.mood==='dark')===c.dark)&&(!bf.fav||c.fav)&&(!bf.realm||bf.realm==='all'||bf.realm===realmKey(c))&&(!bf.q||((c.nick||'')+' '+c.name).toLowerCase().includes(bf.q.toLowerCase()));
+const binderCount=()=>state.cards.filter(bMatch).length;
+const showLabel=()=>{const n=binderCount();return n?`Show ${n} ${n===1?'Forgeling':'Forgelings'}`:'Nothing matches yet';};
 function openFilter(){openSheet(filterSheetHTML());}
+/* 0.49: keep Forgelings on the home screen. Only on the website in a browser tab, from the third Forgeling, until done. */
+const IOSDEV=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function homeTipDue(){return RELEASE&&!NATIVE&&!STANDALONE()&&state.cards.length>=3&&state.homeTip!=='done'&&!(state.homeTip&&state.homeTip>todayKey());}
+function openHomeTip(){
+  const ios=IOSDEV();
+  openSheet(`<h2>Keep Forgelings on your home screen</h2><p class="muted">On the home screen it opens like an app, works offline, and your collection is kept. In a browser tab, the browser may clear a website\u2019s data if it sits unopened for a while.</p>
+    ${ios?`<ol class="htsteps"><li><b>Save a copy first.</b> On iPhone, the home screen app keeps its own collection, so you will bring yours across.</li><li>In Safari, tap the <b>Share</b> button, then <b>Add to Home Screen</b>, then <b>Add</b>.</li><li>Open Forgelings from your home screen, go to <b>Settings</b>, then <b>Your collection</b>, and tap <b>Restore a copy</b>.</li></ol>`
+    :`<ol class="htsteps"><li>Open your browser\u2019s menu and tap <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Open Forgelings from your home screen. Your collection comes with it.</li></ol>`}
+    <div class="stack">${ios?'<button class="primary" id="htSave">Save a copy first</button>':''}<button class="${ios?'outline':'primary'}" id="htDone">It\u2019s on my home screen</button><button class="ghost" id="htLater">Not now</button></div>`);
+}
+modal.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#htSave,#htDone,#htLater');if(!b)return;
+  if(b.id==='htSave'){closeModal();openExport();return;}
+  if(b.id==='htDone')state.homeTip='done';else{const d=new Date(state.date+'T12:00:00');d.setDate(d.getDate()+7);state.homeTip=dkey(d);}
+  save();closeModal();renderToday();});
+/* 0.49: the name field narrows the binder as you type; the sheet stays put so the keyboard never drops */
+document.addEventListener('input',e=>{if(!e.target||e.target.id!=='fName')return;bf.q=e.target.value.trim().slice(0,24);bf.page=0;renderBinder();const s=modal.querySelector('#fShow');if(s)s.textContent=showLabel();});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='fName'){e.preventDefault();e.target.blur();}});
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('#modal button');if(!b||!modal.querySelector('#fFav'))return;
   let hit=false;
-  if(b.dataset.ftype!==undefined){bf.type=b.dataset.ftype;hit=true;}else if(b.dataset.fmood){bf.mood=b.dataset.fmood;hit=true;}else if(b.id==='fFav'){bf.fav=!bf.fav;hit=true;}
-  if(hit){bf.page=0;renderBinder();const d=modal.querySelector('[role=dialog]');if(d){const y=d.scrollTop;d.innerHTML=filterSheetHTML();d.scrollTop=y;nameDialog();}const f=modal.querySelector(b.id?'#'+b.id:b.dataset.ftype!==undefined?`[data-ftype="${b.dataset.ftype}"]`:`[data-fmood="${b.dataset.fmood}"]`);if(f)f.focus({preventScroll:true});}
+  if(b.dataset.ftype!==undefined){bf.type=b.dataset.ftype;hit=true;}else if(b.dataset.fmood){bf.mood=b.dataset.fmood;hit=true;}else if(b.dataset.frealm){bf.realm=b.dataset.frealm;hit=true;}else if(b.id==='fFav'){bf.fav=!bf.fav;hit=true;}
+  if(hit){bf.page=0;renderBinder();const d=modal.querySelector('[role=dialog]');if(d){const y=d.scrollTop;d.innerHTML=filterSheetHTML();d.scrollTop=y;nameDialog();}const f=modal.querySelector(b.id?'#'+b.id:b.dataset.ftype!==undefined?`[data-ftype="${b.dataset.ftype}"]`:b.dataset.frealm?`[data-frealm="${b.dataset.frealm}"]`:`[data-fmood="${b.dataset.fmood}"]`);if(f)f.focus({preventScroll:true});}
 });
 
 /* ---- The stage: big moments (the reveal, packs, a card up close) happen at night by the fire.
