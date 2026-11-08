@@ -81,3 +81,4 @@ Update 0.48.3: patches now read base483.html (= work.html); base482.html removed
 Update 0.48.4: patches now read base484.html (= work.html); base483.html removed (git keeps it).
 Update 0.49.0: patches now read base49.html (= work.html); base484.html and base485.html removed (git keeps them). 0.48.5 (the day fix) shipped inside 0.49.
 Update 0.50.0: patches now read base50.html (= work.html); base49.html removed (git keeps it). qa_50 joins runall.sh. Monkey seeds 4–6 can push the full run past two hours; if the background run stops at its time limit, run `python3 monkey.py N` for the remaining seeds. Shipped: main/gh-pages 670236c (Pages deploy success, live blob matches), ios-app 9c24a3b, Claude page version 92.
+Update 0.50.1: patches now read base501.html (= work.html); base50.html removed (git keeps it). qa_501 joins runall.sh. `MONKEYS="1 2 3" bash runall.sh` keeps the main run under two hours; run `python3 monkey.py N` for 4, 5 and 6 afterwards.

@@ -18,7 +18,7 @@ run_suite() {
 if [ "$#" -gt 0 ]; then
   for t in "$@"; do if [ "$t" = qa_pwa ]; then run_suite qa_pwa 400 bash pwa_serve.sh; elif [ "$t" = reliability ]; then run_suite reliability 120 bash -c 'cd .. && node qa/reliability.cjs'; else run_suite "$t" 400 python3 "$t.py"; fi; done
 else
-  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_18 qa_19 qa_20 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_402 qa_41 qa_411 qa_42 qa_43 qa_431 qa_44 qa_441 qa_45 qa_46 qa_47 qa_471 qa_48 qa_482 qa_485 qa_49 qa_50 qa_contrast qa_ref qa_fit mo qa_odds qa_time qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
+  for t in qa_core qa_layout qa_axe qa_axe2 qa_map qa_map2 qa_13 qa_131 qa_14 qa_15 qa_18 qa_19 qa_20 qa_22 qa_222 qa_223 qa_23 qa_24 qa_241 qa_242 qa_25 qa_251 qa_26 qa_27 qa_271 qa_28 qa_281 qa_29 qa_30 qa_301 qa_31 qa_32 qa_33 qa_34 qa_35 qa_351 qa_36 qa_37 qa_38 qa_383 qa_384 qa_385 qa_386 qa_389 qa_39 qa_40 qa_401 qa_402 qa_41 qa_411 qa_42 qa_43 qa_431 qa_44 qa_441 qa_45 qa_46 qa_47 qa_471 qa_48 qa_482 qa_485 qa_49 qa_50 qa_501 qa_contrast qa_ref qa_fit mo qa_odds qa_time qa_mig; do run_suite "$t" 400 python3 "$t.py"; done
   run_suite qa_pwa 400 bash pwa_serve.sh
   # 0.43.1: the storage and service-worker unit checks join the gate.
   run_suite reliability 120 bash -c 'cd .. && node qa/reliability.cjs'
@@ -29,7 +29,7 @@ else
   for t in qa_17 qa_181 qa_21 qa_clock; do run_suite "$t" 400 env FORGE_HTML=http://127.0.0.1:8811/work.html python3 "$t.py"; done
   run_suite qa_journey 2400 env FORGE_HTML=http://127.0.0.1:8811/work.html JOURNEY_DAYS=125 JOURNEY_SEED=7 python3 qa_journey.py
   kill "$srv" 2>/dev/null
-  for sd in 1 2 3 4 5 6; do run_suite "monkey$sd" 900 python3 monkey.py "$sd"; done
+  for sd in ${MONKEYS:-1 2 3 4 5 6}; do run_suite "monkey$sd" 900 python3 monkey.py "$sd"; done
 fi
 if [ "$failed" -eq 0 ]; then echo 'PASS ALL' >> full_summary.txt; else echo 'FAILED: inspect suite logs' >> full_summary.txt; fi
 cat full_summary.txt
