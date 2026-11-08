@@ -80,3 +80,4 @@ Update 0.48.2: patches now read base482.html (= work.html); base481.html removed
 Update 0.48.3: patches now read base483.html (= work.html); base482.html removed (git keeps it). The card back art comes from art/cardback.py.
 Update 0.48.4: patches now read base484.html (= work.html); base483.html removed (git keeps it).
 Update 0.49.0: patches now read base49.html (= work.html); base484.html and base485.html removed (git keeps them). 0.48.5 (the day fix) shipped inside 0.49.
+Update 0.50.0: patches now read base50.html (= work.html); base49.html removed (git keeps it). qa_50 joins runall.sh. Monkey seeds 4–6 can push the full run past two hours; if the background run stops at its time limit, run `python3 monkey.py N` for the remaining seeds.
