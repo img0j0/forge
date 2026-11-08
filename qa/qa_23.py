@@ -18,7 +18,12 @@ def bot(pg,gid,secs=23,rounds=4,blunder=True):
             if st_[0]=="Your turn.":
                 seq=pg.evaluate("window.__seq.slice()"); pg.evaluate("window.__seq=[]")
                 if blunder and len(seq)>rounds:
-                    wrong=(seq[0]+1)%4; pg.evaluate("v=>document.querySelector('#pg [data-lant=\"'+v+'\"]').click()",wrong); pg.wait_for_timeout(1200); break
+                    # 0.50: the first slip plays the tune once more, slower; the second ends the game
+                    for _ in range(2):
+                        pg.wait_for_function("()=>!document.getElementById('pg')||document.getElementById('pgMsg').textContent==='Your turn.'",timeout=15000)
+                        if not pg.locator("#pg").count(): break
+                        wrong=(seq[0]+1)%4; pg.evaluate("v=>document.querySelector('#pg [data-lant=\"'+v+'\"]').click()",wrong); pg.wait_for_timeout(1300)
+                    break
                 for v in seq: pg.evaluate("v=>document.querySelector('#pg [data-lant=\"'+v+'\"]').click()",v); pg.wait_for_timeout(90)
             pg.wait_for_timeout(60); continue
         pg.wait_for_timeout(40 if gid in (2,3) else 110)

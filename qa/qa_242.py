@@ -37,7 +37,11 @@ def play(pg,cdp,g,secs=23,rounds=3):
             if pg.evaluate("document.getElementById('pgMsg').textContent")=="Your turn.":
                 seq=pg.evaluate("window.__seq.slice()"); pg.evaluate("window.__seq=[]")
                 if len(seq)>rounds:
-                    pg.touchscreen.tap(*center(pg,f"#pg [data-lant='{(seq[0]+1)%4}']")); pg.wait_for_timeout(1200); break
+                    for _ in range(2):  # 0.50: the first slip replays the tune, slower
+                        pg.wait_for_function("()=>!document.getElementById('pg')||document.getElementById('pgMsg').textContent==='Your turn.'",timeout=15000)
+                        if not pg.locator("#pg").count(): break
+                        pg.touchscreen.tap(*center(pg,f"#pg [data-lant='{(seq[0]+1)%4}']")); pg.wait_for_timeout(1300)
+                    break
                 for v in seq: pg.touchscreen.tap(*center(pg,f"#pg [data-lant='{v}']")); pg.wait_for_timeout(90)
             pg.wait_for_timeout(60); continue
         pg.wait_for_timeout(40)
