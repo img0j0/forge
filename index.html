@@ -324,8 +324,8 @@ html.release details.dev{display:none}
 .seed.gold::before{background:radial-gradient(circle,#FFF6C8 0 3px,transparent 3.5px),conic-gradient(from 0deg,#FFD36B 0 10%,transparent 10% 25%,#FFD36B 25% 35%,transparent 35% 50%,#FFD36B 50% 60%,transparent 60% 75%,#FFD36B 75% 85%,transparent 85%);box-shadow:0 0 10px 3px rgba(255,211,107,.55)}
 .seed.thorn::before{background:#6B4A2E;box-shadow:0 0 0 2px #2E1E12;clip-path:polygon(50% 0,60% 30%,95% 20%,72% 48%,100% 70%,64% 68%,55% 100%,42% 70%,8% 82%,30% 52%,0 28%,38% 32%)}
 .seed.thorn::after{background:#4B331F}
-.seed.puff{width:64px;height:64px;z-index:2}
-.seed.gold{z-index:1}
+.seed.puff{width:64px;height:64px;z-index:4}
+.seed.gold{z-index:3}
 .seed.puff::before{left:12px;top:6px;width:40px;height:40px;background:radial-gradient(circle,#FFFFFF 0 5px,transparent 5.5px),repeating-conic-gradient(#F4F0E8 0 6deg,transparent 6deg 20deg);box-shadow:0 0 12px 4px rgba(255,255,255,.35)}
 .seed.puff::after{left:31px;top:44px;height:18px}
 .emb.log::before{inset:14px 6px;background:#9A6A3E;box-shadow:inset 0 -4px 0 #6B4A2E,0 0 0 3px #4B331F;clip-path:none;border-radius:2px}
@@ -1153,16 +1153,16 @@ html.jr .mp-ring{display:inline;fill:none;stroke:#2E2A47;stroke-width:1.6;stroke
 .pg-dusk .lant::before{width:30px;height:44px;margin-top:12px;opacity:.45}
 .pg-dusk .lant.on{background:transparent;box-shadow:none;filter:drop-shadow(0 0 12px var(--lc))}
 .pg-dusk .lant.on::before{opacity:1}
-.skyl{position:absolute;bottom:42%;width:10px;height:13px;background:#FFB04A;clip-path:polygon(20% 0,80% 0,100% 30%,90% 100%,10% 100%,0 30%);pointer-events:none;z-index:0;animation:skyl 3s ease-out forwards}
-@keyframes skyl{from{transform:translateY(0);opacity:.2}to{transform:translateY(var(--up));opacity:.9}}
+.skyl{position:absolute;width:10px;height:13px;background:var(--lc,#FFB04A);box-shadow:0 0 8px 2px var(--lc,#FFB04A);clip-path:polygon(20% 0,80% 0,100% 30%,90% 100%,10% 100%,0 30%);pointer-events:none;z-index:0;opacity:.9;animation:skyl 1.6s cubic-bezier(.3,.7,.4,1) both}
+@keyframes skyl{from{transform:translate(var(--fx),var(--fy)) scale(2.2);opacity:.3}to{transform:none;opacity:.9}}
 .pgzz{position:absolute;z-index:3;font:700 22px/1 var(--hand);color:#FFF3C4;text-shadow:0 1px 0 #000;pointer-events:none;animation:pgzz 2.6s ease-out forwards}
 @keyframes pgzz{from{opacity:0;transform:translateY(8px)}20%{opacity:1}to{opacity:0;transform:translateY(-14px)}}
 .pgmate.cheer{animation:mateCheer .8s ease-out}
 @keyframes mateCheer{30%{transform:translateY(-16px) scale(1.08)}60%{transform:none}80%{transform:translateY(-6px)}}
-@media (prefers-reduced-motion: reduce){.gsway,.pgink polyline{transition:none}.ripr{animation:none;opacity:.6}.skyl{animation:none;transform:translateY(var(--up));opacity:.9}.pgzz,.pgmate.cheer{animation:none}}
+@media (prefers-reduced-motion: reduce){.gsway,.pgink polyline{transition:none}.ripr{animation:none;opacity:.6}.skyl{animation:none}.pgzz,.pgmate.cheer{animation:none}}
 html.reduce .gsway,html.reduce .pgink polyline{transition:none}
 html.reduce .ripr{animation:none;opacity:.6}
-html.reduce .skyl{animation:none;transform:translateY(var(--up));opacity:.9}
+html.reduce .skyl{animation:none}
 html.reduce .pgzz,html.reduce .pgmate.cheer{animation:none}
 /* the game sheet: postcards */
 #modal .pcard{background:#FBF5E6;color:#2E2A47;border:0;box-shadow:3px 3px 0 #D9C69C;transform:rotate(var(--r,0deg));margin-bottom:4px}
@@ -1206,6 +1206,13 @@ html.reduce .mp-cloud,html.reduce .mp-smoke{animation:none}
 .flk5{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges' fill='%23FFFFFF'%3E<rect x='0' y='0' width='1' height='1'/><rect x='2' y='0' width='1' height='1'/><rect x='4' y='0' width='1' height='1'/><rect x='0' y='2' width='1' height='1'/><rect x='2' y='2' width='1' height='1'/><rect x='4' y='2' width='1' height='1'/><rect x='0' y='4' width='1' height='1'/><rect x='2' y='4' width='1' height='1'/><rect x='4' y='4' width='1' height='1'/>%3C/svg%3E") center/contain no-repeat}
 .flake.flk5{clip-path:none}
 .flake.rare{clip-path:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges' fill='%23FFD36B'%3E<rect x='2' y='0' width='1' height='1'/><rect x='4' y='0' width='1' height='1'/><rect x='0' y='1' width='1' height='1'/><rect x='2' y='1' width='1' height='1'/><rect x='4' y='1' width='1' height='1'/><rect x='6' y='1' width='1' height='1'/><rect x='1' y='2' width='1' height='1'/><rect x='2' y='2' width='1' height='1'/><rect x='3' y='2' width='1' height='1'/><rect x='4' y='2' width='1' height='1'/><rect x='5' y='2' width='1' height='1'/><rect x='0' y='3' width='1' height='1'/><rect x='1' y='3' width='1' height='1'/><rect x='3' y='3' width='1' height='1'/><rect x='5' y='3' width='1' height='1'/><rect x='6' y='3' width='1' height='1'/><rect x='1' y='4' width='1' height='1'/><rect x='2' y='4' width='1' height='1'/><rect x='3' y='4' width='1' height='1'/><rect x='4' y='4' width='1' height='1'/><rect x='5' y='4' width='1' height='1'/><rect x='0' y='5' width='1' height='1'/><rect x='2' y='5' width='1' height='1'/><rect x='4' y='5' width='1' height='1'/><rect x='6' y='5' width='1' height='1'/><rect x='2' y='6' width='1' height='1'/><rect x='4' y='6' width='1' height='1'/>%3C/svg%3E") center/contain no-repeat}
+
+/* 0.50.1: play pieces draw in front of the Forgeling; by the fire it sits clear of the flames */
+.pg .seed,.pg .emb{z-index:2}
+.pg .seed.gold{z-index:3}
+.pg .seed.puff{z-index:4}
+.pg-ember .fire{z-index:2}
+.pg-ember .pgmate{left:max(2px,calc(50% - 138px))}
 </style>
 </head>
 <body>
@@ -1688,7 +1695,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.50.0',APPVER='1.0.0';
+const VERSION='prototype 0.50.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -6079,13 +6086,14 @@ function gDusk(){
       g.timers.push(setTimeout(()=>{if(!gOn())return;seq.push(Math.floor(Math.random()*L.length));play();},1200));return;}
     seq.push(Math.floor(Math.random()*L.length));play();};
   /* each finished round lets a sky lantern float up */
-  const skyL=()=>{if(sky>=12)return;sky++;const e=document.createElement('i');e.className='skyl';e.setAttribute('aria-hidden','true');e.style.left=(8+Math.random()*80)+'%';e.style.setProperty('--up',-Math.round(area.clientHeight*(.18+Math.random()*.3))+'px');area.appendChild(e);};
+  const skyL=i=>{if(sky>=12)return;const k=sky++,W=area.clientWidth,j=k>>1,x=Math.round((k&1?W*(1-(j+.5)*.055):W*(j+.5)*.055)-5),y=8,p=gPos(L[i]),e=document.createElement('i');e.className='skyl';e.setAttribute('aria-hidden','true');
+    e.style.left=x+'px';e.style.top=y+'px';e.style.setProperty('--lc',cols[i]);e.style.setProperty('--fx',Math.round(p[0]-5-x)+'px');e.style.setProperty('--fy',Math.round(p[1]-6-y)+'px');area.appendChild(e);};
   const pick=i=>{if(!input||!gOn())return;flash(i,220);
     if(i!==seq[step]){input=false;g.combo=0;
       if(star){star=0;gMsg('The evening star forgives you. Watch again.');g.timers.push(setTimeout(()=>{if(gOn())play();},1300));return;}
       if(spare){spare=0;slow=1.5;gMsg('The lanterns flicker. Once more, slower.');g.timers.push(setTimeout(()=>{if(gOn())play();},1300));return;}
       gMsg('The lanterns flicker out.');sfx('no');gEnd(null);return;}
-    step++;if(step===seq.length){gScore(seq.length);const p=gPos(L[i]);gBurst(p[0],p[1],cols[i]);gFloat(p[0],p[1],seq.length+'!');skyL();
+    step++;if(step===seq.length){gScore(seq.length);const p=gPos(L[i]);gBurst(p[0],p[1],cols[i]);gFloat(p[0],p[1],seq.length+'!');skyL(i);
       if(seq.length>=12){gEnd('All twelve!');return;}input=false;g.timers.push(setTimeout(round,700));}};
   L.forEach(wire);
   round();
