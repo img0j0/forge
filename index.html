@@ -1213,6 +1213,12 @@ html.reduce .mp-cloud,html.reduce .mp-smoke{animation:none}
 .pg .seed.puff{z-index:4}
 .pg-ember .fire{z-index:2}
 .pg-ember .pgmate{left:max(2px,calc(50% - 138px))}
+
+/* 0.50.2: the update note uses the journal's paper and ink (its --bg is the dark desk) */
+html.jr .updbar{background:var(--jink);color:var(--jpaper)}
+html.jr .updbar{box-shadow:0 0 0 2px var(--jpaper),0 6px 18px rgba(0,0,0,.32)}
+html.jr .updbar button{background:var(--jpaper);color:var(--jink)}
+html.jr .updbar button.later{background:transparent;color:var(--jpaper)}
 </style>
 </head>
 <body>
@@ -1695,7 +1701,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.50.1',APPVER='1.0.0';
+const VERSION='prototype 0.50.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
