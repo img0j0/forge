@@ -50,7 +50,7 @@ with sync_playwright() as p:
     closemodals(pg); pg.wait_for_timeout(200); t=pg.inner_text("#view-binder")
     rec("Find","the binder says what it is showing, with a way back",'names with “zzz”' in t and "No Forgelings match this yet" in t and pg.locator("#fClear").count()==1,t[:160])
     pg.evaluate("document.getElementById('fClear').click()"); pg.wait_for_timeout(250)
-    rec("Find","Show all clears the name and the realm too",pg.locator("#view-binder .binder [data-insp]").count()==9 and pg.locator("#fClear").count()==0)
+    rec("Find","Show all clears the name and the realm too",pg.locator("#view-binder .binder [data-insp]").count()==min(24,len(st(pg)["cards"])) and pg.locator("#fClear").count()==0)
     rec("All","binder: no page errors",not pg._errs,pg._errs[:2]); ctx.close()
     # ---------- home screen tip ----------
     def home(ua=None,release=True,n=3,stand=False):
