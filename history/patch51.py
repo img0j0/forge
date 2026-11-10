@@ -68,9 +68,10 @@ html.jr .app .binder .empty.quiet::after{content:none}
 .app .chips.seg::before{content:'';position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/3);border-radius:10px;background:#FFD36B;box-shadow:0 1px 0 #C98A12,0 2px 6px rgba(0,0,0,.12);transform:translateX(calc(var(--i)*100%));animation:segsl .24s cubic-bezier(.3,.7,.4,1)}
 @keyframes segsl{from{transform:translateX(calc(var(--p)*100%))}}
 html .app .chips.seg .chip{position:relative;z-index:1;margin:0;background:transparent !important;border:0 !important;box-shadow:none !important;clip-path:none !important;border-radius:10px !important;color:var(--ink) !important;font-weight:700}
-html .app .chips.seg .chip[aria-pressed="true"]{color:#2E2A47 !important}
-@media (prefers-reduced-motion:reduce){.app .chips.seg::before{animation:none}}
-html.reduce .app .chips.seg::before{animation:none}
+html .app .chips.seg .chip[aria-pressed="true"]{color:#2E2A47 !important;background:#FFD36B !important;animation:segfill .01s linear .24s backwards}
+@keyframes segfill{from{background:transparent}}
+@media (prefers-reduced-motion:reduce){.app .chips.seg::before,html .app .chips.seg .chip{animation:none !important}}
+html.reduce .app .chips.seg::before,html.reduce .app .chips.seg .chip{animation:none !important}
 /* 0.51: toasts drop in from the top instead of covering rows above the tab bar */
 .toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto;transform:translate(-50%,-16px);width:max-content;max-width:min(94vw,440px)}
 html.ls .toast,html.jr .toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto}

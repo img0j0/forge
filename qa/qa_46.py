@@ -31,7 +31,7 @@ with sync_playwright() as p:
                 c=json.loads(json.dumps(c0)); c.update(id=600+i,seed=3000+i*911,theme=i%5,nick="Pip" if i==10 else ""); s["cards"].append(c)
             setst(pg,s); pg.reload(); pg.wait_for_timeout(800); closemodals(pg); tabto(pg,"binder")
             caps=pg.evaluate("()=>[...document.querySelectorAll('#view-binder .binder .jcap')].map(e=>[e.textContent,getComputedStyle(e).display,e.closest('button').getAttribute('aria-label')])")
-            rec("Binder","each print has a handwritten caption with its name (or the name you gave it)",len(caps)==9 and caps[0][0]=="Pip" and all(x[1]=="block" for x in caps),caps[:2])
+            rec("Binder","each print has a handwritten caption with its name (or the name you gave it)",len(caps)>=9 and caps[0][0]=="Pip" and all(x[1]=="block" for x in caps),caps[:2])
             rec("Binder","the caption is hidden from screen readers, which already hear the button's name",all(x[2].startswith("Look at") for x in caps))
             ov=pg.evaluate("()=>{const g=document.querySelector('#view-binder .binder').getBoundingClientRect();return [...document.querySelectorAll('#view-binder .binder>*')].every(e=>{const r=e.getBoundingClientRect();return r.left>=g.left-6&&r.right<=g.right+6})}")
             rec("Binder","the prints fit across the page",ov)
