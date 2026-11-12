@@ -17,17 +17,21 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   /* wings */
   if(S.wings){const w=mask();both(f=>fillEll(w,16-rx-2.5,cy-3,5,3.6,f));commit(g,w,{b:5,s:12,h:7});}
   /* ears (the mushroom wears its cap instead; the drop has a point) */
-  const e=mask();let eo=duo;
   if(S.shape==='drop'){const d=mask();fillPoly(d,[[16-rx*.62,cy-ry*.55],[16,top-5],[16+rx*.62,cy-ry*.55]]);fillEll(M,16,cy,rx,ry);commit(g,d,{});top-=4;}
-  if(S.ears==='pointy')both(f=>fillPoly(e,[[16-rx*.85,top+4],[16-rx*.7,top-6],[16-rx*.2,top+1]],f));
-  else if(S.ears==='round')both(f=>fillEll(e,16-rx*.62,top+1.5,3.4,3.4,f));
-  else if(S.ears==='bunny')both(f=>fillEll(e,16-rx*.38,top-3,2.6,6.5,f));
-  else if(S.ears==='floppy')both(f=>fillEll(e,16-rx-.5,cy-ry*.25,2.6,5,f));
-  else if(S.ears==='nubs'){both(f=>fillPoly(e,[[16-rx*.55,top+2],[16-rx*.45,top-3],[16-rx*.2,top+1]],f));eo={b:6,s:13,h:null};}
-  else if(S.ears==='antenna'){both(f=>curve(e,[[13,top+2],[11,top-4],[9,top-8]],2,2,f));}
-  else if(S.ears==='tuft'){fillEll(e,16,top-2.5,1.8,4);both(f=>fillEll(e,12.5,top-1.5,1.6,3.2,f));eo={b:6,s:13,h:null};}
-  if(S.ears!=='none')commit(g,e,eo);
-  if(S.ears==='antenna'){const bl=mask();both(f=>fillEll(bl,9,top-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+  /* 0.56: tall ears and antennae sit lower on tall bodies, just enough that they fit the 40x40 frame with their
+     outline (nothing cut) */
+  const ears=(e,t)=>{let o=duo;
+    if(S.ears==='pointy')both(f=>fillPoly(e,[[16-rx*.85,t+4],[16-rx*.7,t-6],[16-rx*.2,t+1]],f));
+    else if(S.ears==='round')both(f=>fillEll(e,16-rx*.62,t+1.5,3.4,3.4,f));
+    else if(S.ears==='bunny')both(f=>fillEll(e,16-rx*.38,t-3,2.6,6.5,f));
+    else if(S.ears==='floppy')both(f=>fillEll(e,16-rx-.5,cy-ry*.25,2.6,5,f));
+    else if(S.ears==='nubs'){both(f=>fillPoly(e,[[16-rx*.55,t+2],[16-rx*.45,t-3],[16-rx*.2,t+1]],f));o={b:6,s:13,h:null};}
+    else if(S.ears==='antenna'){both(f=>curve(e,[[13,t+2],[11,t-4],[9,t-8]],2,2,f));both(f=>fillEll(e,9,t-9,2.1,2.1,f));}
+    else if(S.ears==='tuft'){fillEll(e,16,t-2.5,1.8,4);both(f=>fillEll(e,12.5,t-1.5,1.6,3.2,f));o={b:6,s:13,h:null};}
+    return o;};
+  let et=top;for(let k=0;k<8;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;et+=1;}
+  if(S.ears==='antenna'){const st=mask();both(f=>curve(st,[[13,et+2],[11,et-4],[9,et-8]],2,2,f));commit(g,st,duo);const bl=mask();both(f=>fillEll(bl,9,et-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+  else{const e=mask(),eo=ears(e,et);if(S.ears!=='none')commit(g,e,eo);}
   /* feet (not bobbing); blobs and loaves sit on the ground */
   if(S.shape!=='blob'&&S.shape!=='loaf'){both(f=>fillEll(FOOT,16-Math.round(Math.max(rx,7)*.45),27.5,3.2,2.2,f));commit(g,FOOT,S.mark==='socks'?{b:7,s:15,h:null}:{});}
   /* body */
@@ -40,15 +44,15 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   /* belly */
   if(S.mark!=='belly0'){const bx=16,by=cy+ry*.35+(S.shape==='pear'?2:0),brx=rx*.58,bry=ry*.52;
     const inB=(x,y)=>{const dx=(x+.5-bx)/brx,dy=(y+.5-by)/bry;return dx*dx+dy*dy<=1;};
-    for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(M[y*N+x]&&inB(x,y)&&g[y*N+x]!==1)g[y*N+x]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}}
+    for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++){if(M[SPI(x,y)]&&inB(x,y)&&g[SPI(x,y)]!==1)g[SPI(x,y)]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}}
   /* mushroom cap */
-  if(S.shape==='mush'){const cm=mask(),cty=cy-ry+1;fillEll(cm,16,cty,12.5,7.5);for(let y=Math.ceil(cty+2);y<N;y++)for(let x=0;x<N;x++)cm[y*N+x]=0;commit(g,cm,{b:6,s:13,h:7});
-    [[11,cty-3],[19,cty-4],[15,cty-1],[22,cty]].forEach(p=>{const X=Math.round(p[0]),Y=Math.round(p[1]);[[0,0],[1,0],[0,1],[1,1]].forEach(d=>{const i=(Y+d[1])*N+X+d[0];if(g[i]===6||g[i]===13)g[i]=7;});});
+  if(S.shape==='mush'){const cm=mask(),cty=cy-ry+1;fillEll(cm,16,cty,12.5,7.5);for(let y=Math.ceil(cty+2);y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++)cm[SPI(x,y)]=0;commit(g,cm,{b:6,s:13,h:7});
+    [[11,cty-3],[19,cty-4],[15,cty-1],[22,cty]].forEach(p=>{const X=Math.round(p[0]),Y=Math.round(p[1]);[[0,0],[1,0],[0,1],[1,1]].forEach(d=>{const i=SPI(X+d[0],Y+d[1]);if(g[i]===6||g[i]===13)g[i]=7;});});
     top=cty-7;}
   /* markings */
-  if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(cy-ry+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[Y*N+X]&&g[Y*N+X]!==1&&g[Y*N+X]!==5)g[Y*N+X]=3;}}}
-  else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=cy-ry+1;Y<=cy-ry+3;Y++){if(M[Y*N+X]&&g[Y*N+X]!==1)g[Y*N+X]=3;}});}
-  else if(S.mark==='patch'){const px=fl?19:11,py=Math.round(cy-ry*.35);for(let y=py-2;y<=py+2;y++)for(let x=px-2;x<=px+2;x++){const d=(x-px)*(x-px)+(y-py)*(y-py);const i=y*N+x;if(d<=5&&M[i]&&g[i]!==1&&g[i]!==5&&g[i]!==12)g[i]=6;}}
+  if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(cy-ry+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1&&g[SPI(X,Y)]!==5)g[SPI(X,Y)]=3;}}}
+  else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=cy-ry+1;Y<=cy-ry+3;Y++){if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1)g[SPI(X,Y)]=3;}});}
+  else if(S.mark==='patch'){const px=fl?19:11,py=Math.round(cy-ry*.35);for(let y=py-2;y<=py+2;y++)for(let x=px-2;x<=px+2;x++){const d=(x-px)*(x-px)+(y-py)*(y-py);const i=SPI(x,y);if(d<=5&&M[i]&&g[i]!==1&&g[i]!==5&&g[i]!==12)g[i]=6;}}
   /* cheek fluff */
   if(S.fluff){const fm=mask();both(f=>fillPoly(fm,[[16-rx+1,cy-1],[16-rx-3,cy+1],[16-rx+1,cy+3]],f));for(let i=0;i<N*N;i++)if(fm[i]&&!M[i]&&g[i]!==1)g[i]=0;commit(g,fm,{});}
   /* face: laid out first, fitted to this body (every face pixel has body on all four sides), so the arms can be
@@ -69,14 +73,14 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
     return {ok,FG,FI,draw,eyeY,eh,moY};};
   let eY0=Math.round(cy-ry*.22)+(S.ey||0);
   if(S.shape==='mush')eY0=Math.max(eY0,Math.round(cy-ry+1)+4);
-  let hw=0;while(hw<15&&M[eY0*N+16-hw-1])hw++;
+  let hw=0;while(hw<15&&M[SPI(16-hw-1,eY0)])hw++;
   const gp0=Math.max(2,Math.min(5,Math.round(rx*.3)+1+(S.ex||0),Math.floor(hw*.42)));
   let F=null;
   search:for(const eyes of [S.eyes,'round','dot'])for(const blush of S.blush?[true,false]:[false])for(let gp=gp0;gp>=1;gp--)for(const d of [0,1,-1,2,-2,3,4]){
     const t=lay(gp,eyes,eY0+d,blush);if(t.ok){F=t;break search;}}
   if(!F)F=lay(1,'dot',eY0,false);
   const {FG,FI,eyeY,moY}=F,face=F.draw,gp=Math.max(1,gp0);
-  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=0;x<N;x++){const i=y*N+x;if(M[i]&&M[i-1]&&M[i+1]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
+  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=-SPP;x<SPC+SPP;x++){const i=SPI(x,y);if(M[i]&&M[i-1]&&M[i+1]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
   /* arms: the chosen pose if it stays clear of the face (a pixel of body between), else a calmer one */
   /* each pose has a few placements (lower, further out); the first that keeps a pixel of body between the arm's
      outline and the face wins, else a calmer pose, else the arms stay tucked away */

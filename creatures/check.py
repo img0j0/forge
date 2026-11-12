@@ -6,12 +6,12 @@ import sys,os,subprocess,json
 H=os.path.dirname(os.path.abspath(__file__)); subprocess.run(['python3',H+'/mk.py'],check=True)
 from playwright.sync_api import sync_playwright
 n=int(sys.argv[1]) if len(sys.argv)>1 else 3000
-JS="""(n)=>{const KEEPS=['','hat','scarf','flower','daisies','charm','shells','cap','lantern','charm1','ward2'];const bad=[],swaps={};let total=0;
+JS="""(n)=>{const GN=__H.N||32;const KEEPS=['','hat','scarf','flower','daisies','charm','shells','cap','lantern','charm1','ward2'];const bad=[],swaps={};let total=0;
  for(let i=0;i<n;i++){const c={id:i,seed:(777+i*2654435761)>>>0,rarity:i%5,dark:i%3===2,theme:i%5,v:i%12,keep:KEEPS[i%KEEPS.length],bond:0,gen:2};
   const S=__H.genSpec(c);for(const bob of [0,1]){globalThis.__FDBG=[];const g=__H.buildSprite(S,bob,0);const r=__FDBG.pop();total++;if(!r){bad.push({i,why:'no record'});continue;}
    if(r.arms!==r.want)swaps[r.want+'>'+r.arms]=(swaps[r.want+'>'+r.arms]||0)+1;
-   const why=[];r.FI.forEach((p,k)=>{if(g[p]!==r.FV[k])why.push('covered');if(r.PV[k]===1)why.push('on-a-line');const x=p%32,y=(p-x)/32;
-     if(!r.M[p])why.push('off-body');else if(!r.dark&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>!r.M[(y+dy)*32+x+dx]))why.push('edge');});
+   const why=[];r.FI.forEach((p,k)=>{if(g[p]!==r.FV[k])why.push('covered');if(r.PV[k]===1)why.push('on-a-line');const x=p%GN,y=(p-x)/GN;
+     if(!r.M[p])why.push('off-body');else if(!r.dark&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>!r.M[(y+dy)*GN+x+dx]))why.push('edge');});
    if(why.length)bad.push({i,bob,shape:S.shape,arms:r.arms,eyes:S.eyes,mouth:S.mouth,keep:c.keep,dark:c.dark,crown:S.crown,why:[...new Set(why)].join(',')});}}
  globalThis.__FDBG=null;return {total,bad,swaps};}"""
 with sync_playwright() as p:

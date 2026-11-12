@@ -14,7 +14,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base551.html` | The current build, 0.55.1 (identical files) |
+| `work.html`, `base56.html` | The current build, 0.56.0 (identical files) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
 | `legal/` | `page.py` builds privacy, terms and support pages into `legal/out/` |
@@ -26,9 +26,9 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 ## Making the next version
 
-1. Write `patch56.py` at the top of this folder. It reads `base551.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch551.py`. Bump the title, `VERSION`, `SEEN_V` (to 56) and add a What's New entry.
+1. Write `patch57.py` at the top of this folder. It reads `base56.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch56.py`. Bump the title, `VERSION`, `SEEN_V` (to 57) and add a What's New entry.
 2. Check the script: extract the `<script>` and run `node --check` on it.
 3. Add `qa/qa_44.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
 4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.
 5. Copy `work.html` to the `ios-app` branch as `forgelings.html`, then run `npm run sync` (and `npm run sync:android`) there, and push. GitHub's Native builds then builds the Android app and compiles the iPhone app.
-6. Here: `cp work.html base56.html`, `git rm` the previous base copy, move `patch56.py` into `history/`, update `forge-handoff.md`, and push this branch.
+6. Here: `cp work.html base57.html`, `git rm` the previous base copy, move `patch57.py` into `history/`, update `forge-handoff.md`, and push this branch.

@@ -2,12 +2,12 @@
 import sys,os,subprocess,base64
 H=os.path.dirname(os.path.abspath(__file__)); subprocess.run(['python3',H+'/mk.py'],check=True)
 s=open(os.environ.get('BEFORE',H+'/../work.html')).read(); i=s.find('function buildSprite('); j=s.find('\n}',i)+2
-open('/tmp/cur.html','w').write(s[:j]+'\nwindow.__H={genSpec,buildSprite,makePal};'+s[j:])
+open('/tmp/cur.html','w').write(s[:j]+'\nwindow.__H={genSpec,buildSprite,makePal,N};'+s[j:])
 from playwright.sync_api import sync_playwright
 out=sys.argv[1];dark=len(sys.argv)>2 and sys.argv[2]=='1';gen=int(sys.argv[3]) if len(sys.argv)>3 else 1
-JS="""([dark,gen])=>{const Z=6,n=8,cv=document.createElement('canvas');cv.width=n*34*Z;cv.height=34*Z;const x=cv.getContext('2d');x.fillStyle='#F3EAD3';x.fillRect(0,0,cv.width,cv.height);
+JS="""([dark,gen])=>{const GN=__H.N||32,O=(GN-32)/2;const Z=6,n=8,cv=document.createElement('canvas');cv.width=n*42*Z;cv.height=42*Z;const x=cv.getContext('2d');x.fillStyle='#F3EAD3';x.fillRect(0,0,cv.width,cv.height);
  for(let i=0;i<n;i++){const c={id:i,seed:(4242+i*7919)>>>0,rarity:[0,1,2,3,4,1,2,0][i],dark,theme:i%5,v:i%12,keep:'',bond:0,gen};const S=__H.genSpec(c),pl=__H.makePal(S,c).pal,g=__H.buildSprite(S,0,0);
-  for(let k=0;k<1024;k++){const sl=g[k];if(!sl)continue;const q=pl[sl];x.fillStyle=`rgb(${q[0]},${q[1]},${q[2]})`;x.fillRect(i*34*Z+Z+(k%32)*Z,Z+Math.floor(k/32)*Z,Z,Z);}}return cv.toDataURL();}"""
+  for(let k=0;k<GN*GN;k++){const sl=g[k];if(!sl)continue;const q=pl[sl];x.fillStyle=`rgb(${q[0]},${q[1]},${q[2]})`;x.fillRect(i*42*Z+5*Z+((k%GN)-O)*Z,5*Z+(Math.floor(k/GN)-O)*Z,Z,Z);}}return cv.toDataURL();}"""
 imgs=[]
 with sync_playwright() as p:
     b=p.chromium.launch()
