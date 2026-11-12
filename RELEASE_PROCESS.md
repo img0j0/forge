@@ -109,3 +109,4 @@ Shipped 0.67.0: main/gh-pages f0488f3 (Pages success, live blob 250db0d matches)
 Update 0.68.0: patches read base68.html; base67.html removed. Checked: a road postcard mid-wander and on the wall after return (English bright, Japanese dark), On this day row and sheet, axe clean on each.
 Shipped 0.68.0: main/gh-pages 9adb0b7 (Pages success, live blob d362b05 matches), ios-app cca1759 (Native builds success), Claude copy version 119.
 Update 0.69.0: patches read base69.html; base68.html removed. Checked: pocket a card, it waits on top the next day with the same words, choosing it empties the pocket; the welcome back page in both languages; axe clean.
+Update 0.70.0: patches read base70.html; base69.html removed. Checked: Close the day at 10 pm (Dubai time zone) in English and Japanese, dark theme, Goodnight clears it; a habit after five answers; axe clean.
