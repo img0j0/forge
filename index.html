@@ -1370,13 +1370,18 @@ const pad=n=>String(n).padStart(4,'0');
 const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
 
 /* ================= Pixel drawing toolkit (32x32 sprite grid) ================= */
-const N=32;
+/* 0.56: Forgelings are drawn on a 40x40 grid: the creature's own 32x32 coordinates with a 4-pixel margin all
+   round (SPP), so ear tips, crowns, hats, wings and tails that reach past the old frame are drawn instead of cut.
+   Shapes use creature coordinates (SPC=32 wide, mirrored about its middle); SPI(x,y) is a creature pixel's grid index.
+   Every place that shows a sprite places the 40x40 grid 4 pixels up and left of where the 32x32 one went. */
+const SPC=32,SPP=4,N=SPC+2*SPP,SPN=N;
+const SPI=(x,y)=>(y+SPP)*N+x+SPP;
 const mask=()=>new Uint8Array(N*N);
-function setp(m,x,y,fl){x=Math.floor(x);if(fl)x=N-1-x;y=Math.floor(y);if(x>=0&&y>=0&&x<N&&y<N)m[y*N+x]=1;}
-function fillEll(m,cx,cy,rx,ry,fl){for(let y=Math.max(0,Math.floor(cy-ry));y<=Math.min(N-1,Math.ceil(cy+ry));y++)for(let x=0;x<N;x++){const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry;if(dx*dx+dy*dy<=1)setp(m,x,y,fl);}}
-function fillPoly(m,pts,fl){const n=pts.length;for(let y=0;y<N;y++)for(let x=0;x<N;x++){const px=x+.5,py=y+.5;let ins=false;for(let i=0,j=n-1;i<n;j=i++){const xi=pts[i][0],yi=pts[i][1],xj=pts[j][0],yj=pts[j][1];if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))ins=!ins;}if(ins)setp(m,x,y,fl);}}
+function setp(m,x,y,fl){x=Math.floor(x);if(fl)x=SPC-1-x;y=Math.floor(y);const X=x+SPP,Y=y+SPP;if(X>=0&&Y>=0&&X<N&&Y<N)m[Y*N+X]=1;}
+function fillEll(m,cx,cy,rx,ry,fl){for(let y=Math.max(-SPP,Math.floor(cy-ry));y<=Math.min(SPC+SPP-1,Math.ceil(cy+ry));y++)for(let x=-SPP;x<SPC+SPP;x++){const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry;if(dx*dx+dy*dy<=1)setp(m,x,y,fl);}}
+function fillPoly(m,pts,fl){const n=pts.length;for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++){const px=x+.5,py=y+.5;let ins=false;for(let i=0,j=n-1;i<n;j=i++){const xi=pts[i][0],yi=pts[i][1],xj=pts[j][0],yj=pts[j][1];if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))ins=!ins;}if(ins)setp(m,x,y,fl);}}
 function bez(pts,t){let p=pts.slice();while(p.length>1){const q=[];for(let i=0;i<p.length-1;i++)q.push([p[i][0]+(p[i+1][0]-p[i][0])*t,p[i][1]+(p[i+1][1]-p[i][1])*t]);p=q;}return p[0];}
-function curve(m,pts,t0,t1,fl){for(let s=0;s<=48;s++){const t=s/48,p=bez(pts,t),th=t0+(t1-t0)*t,r=th/2;for(let y=Math.max(0,Math.floor(p[1]-r-1));y<=Math.min(N-1,Math.ceil(p[1]+r+1));y++)for(let x=0;x<N;x++){const dx=x+.5-p[0],dy=y+.5-p[1];if(dx*dx+dy*dy<=r*r+.15)setp(m,x,y,fl);}}}
+function curve(m,pts,t0,t1,fl){for(let s=0;s<=48;s++){const t=s/48,p=bez(pts,t),th=t0+(t1-t0)*t,r=th/2;for(let y=Math.max(-SPP,Math.floor(p[1]-r-1));y<=Math.min(SPC+SPP-1,Math.ceil(p[1]+r+1));y++)for(let x=-SPP;x<SPC+SPP;x++){const dx=x+.5-p[0],dy=y+.5-p[1];if(dx*dx+dy*dy<=r*r+.15)setp(m,x,y,fl);}}}
 /* Paint a mask into the grid: base fill, shade on the lower-right rim, highlight on the upper-left rim, auto outline */
 /* 0.55: finer rendering for every Forgeling (same shapes, faces and colours).
    commit(): round form shading. Light comes from the upper left; each pixel measures how far the part reaches
@@ -1424,7 +1429,7 @@ function selout(g){
   return g;
 }
 const CH={o:1,b:2,s:3,h:4,l:5,a:6,w:7,p:8,g:9,G:10,k:11,c:16,t:14,y:17,A:19,B:20,C:21,D:22,E:23,F:24,H:25,I:26,J:27,K:28};
-function stamp(g,x,y,rows,flipH){rows.forEach((row,j)=>{const r=flipH?row.split('').reverse().join(''):row;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;const px=x+i,py=y+j;if(px>=0&&py>=0&&px<N&&py<N)g[py*N+px]=CH[ch];}});}
+function stamp(g,x,y,rows,flipH){rows.forEach((row,j)=>{const r=flipH?row.split('').reverse().join(''):row;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;const px=x+i,py=y+j;if(px>=-SPP&&py>=-SPP&&px<SPC+SPP&&py<SPC+SPP)g[SPI(px,py)]=CH[ch];}});}
 const both=fn=>{fn(false);fn(true);};
 
 /* ================= Creature specification ================= */
@@ -1525,17 +1530,21 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   /* wings */
   if(S.wings){const w=mask();both(f=>fillEll(w,16-rx-2.5,cy-3,5,3.6,f));commit(g,w,{b:5,s:12,h:7});}
   /* ears (the mushroom wears its cap instead; the drop has a point) */
-  const e=mask();let eo=duo;
   if(S.shape==='drop'){const d=mask();fillPoly(d,[[16-rx*.62,cy-ry*.55],[16,top-5],[16+rx*.62,cy-ry*.55]]);fillEll(M,16,cy,rx,ry);commit(g,d,{});top-=4;}
-  if(S.ears==='pointy')both(f=>fillPoly(e,[[16-rx*.85,top+4],[16-rx*.7,top-6],[16-rx*.2,top+1]],f));
-  else if(S.ears==='round')both(f=>fillEll(e,16-rx*.62,top+1.5,3.4,3.4,f));
-  else if(S.ears==='bunny')both(f=>fillEll(e,16-rx*.38,top-3,2.6,6.5,f));
-  else if(S.ears==='floppy')both(f=>fillEll(e,16-rx-.5,cy-ry*.25,2.6,5,f));
-  else if(S.ears==='nubs'){both(f=>fillPoly(e,[[16-rx*.55,top+2],[16-rx*.45,top-3],[16-rx*.2,top+1]],f));eo={b:6,s:13,h:null};}
-  else if(S.ears==='antenna'){both(f=>curve(e,[[13,top+2],[11,top-4],[9,top-8]],2,2,f));}
-  else if(S.ears==='tuft'){fillEll(e,16,top-2.5,1.8,4);both(f=>fillEll(e,12.5,top-1.5,1.6,3.2,f));eo={b:6,s:13,h:null};}
-  if(S.ears!=='none')commit(g,e,eo);
-  if(S.ears==='antenna'){const bl=mask();both(f=>fillEll(bl,9,top-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+  /* 0.56: tall ears and antennae sit lower on tall bodies, just enough that they fit the 40x40 frame with their
+     outline (nothing cut) */
+  const ears=(e,t)=>{let o=duo;
+    if(S.ears==='pointy')both(f=>fillPoly(e,[[16-rx*.85,t+4],[16-rx*.7,t-6],[16-rx*.2,t+1]],f));
+    else if(S.ears==='round')both(f=>fillEll(e,16-rx*.62,t+1.5,3.4,3.4,f));
+    else if(S.ears==='bunny')both(f=>fillEll(e,16-rx*.38,t-3,2.6,6.5,f));
+    else if(S.ears==='floppy')both(f=>fillEll(e,16-rx-.5,cy-ry*.25,2.6,5,f));
+    else if(S.ears==='nubs'){both(f=>fillPoly(e,[[16-rx*.55,t+2],[16-rx*.45,t-3],[16-rx*.2,t+1]],f));o={b:6,s:13,h:null};}
+    else if(S.ears==='antenna'){both(f=>curve(e,[[13,t+2],[11,t-4],[9,t-8]],2,2,f));both(f=>fillEll(e,9,t-9,2.1,2.1,f));}
+    else if(S.ears==='tuft'){fillEll(e,16,t-2.5,1.8,4);both(f=>fillEll(e,12.5,t-1.5,1.6,3.2,f));o={b:6,s:13,h:null};}
+    return o;};
+  let et=top;for(let k=0;k<8;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;et+=1;}
+  if(S.ears==='antenna'){const st=mask();both(f=>curve(st,[[13,et+2],[11,et-4],[9,et-8]],2,2,f));commit(g,st,duo);const bl=mask();both(f=>fillEll(bl,9,et-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+  else{const e=mask(),eo=ears(e,et);if(S.ears!=='none')commit(g,e,eo);}
   /* feet (not bobbing); blobs and loaves sit on the ground */
   if(S.shape!=='blob'&&S.shape!=='loaf'){both(f=>fillEll(FOOT,16-Math.round(Math.max(rx,7)*.45),27.5,3.2,2.2,f));commit(g,FOOT,S.mark==='socks'?{b:7,s:15,h:null}:{});}
   /* body */
@@ -1548,15 +1557,15 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   /* belly */
   if(S.mark!=='belly0'){const bx=16,by=cy+ry*.35+(S.shape==='pear'?2:0),brx=rx*.58,bry=ry*.52;
     const inB=(x,y)=>{const dx=(x+.5-bx)/brx,dy=(y+.5-by)/bry;return dx*dx+dy*dy<=1;};
-    for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(M[y*N+x]&&inB(x,y)&&g[y*N+x]!==1)g[y*N+x]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}}
+    for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++){if(M[SPI(x,y)]&&inB(x,y)&&g[SPI(x,y)]!==1)g[SPI(x,y)]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}}
   /* mushroom cap */
-  if(S.shape==='mush'){const cm=mask(),cty=cy-ry+1;fillEll(cm,16,cty,12.5,7.5);for(let y=Math.ceil(cty+2);y<N;y++)for(let x=0;x<N;x++)cm[y*N+x]=0;commit(g,cm,{b:6,s:13,h:7});
-    [[11,cty-3],[19,cty-4],[15,cty-1],[22,cty]].forEach(p=>{const X=Math.round(p[0]),Y=Math.round(p[1]);[[0,0],[1,0],[0,1],[1,1]].forEach(d=>{const i=(Y+d[1])*N+X+d[0];if(g[i]===6||g[i]===13)g[i]=7;});});
+  if(S.shape==='mush'){const cm=mask(),cty=cy-ry+1;fillEll(cm,16,cty,12.5,7.5);for(let y=Math.ceil(cty+2);y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++)cm[SPI(x,y)]=0;commit(g,cm,{b:6,s:13,h:7});
+    [[11,cty-3],[19,cty-4],[15,cty-1],[22,cty]].forEach(p=>{const X=Math.round(p[0]),Y=Math.round(p[1]);[[0,0],[1,0],[0,1],[1,1]].forEach(d=>{const i=SPI(X+d[0],Y+d[1]);if(g[i]===6||g[i]===13)g[i]=7;});});
     top=cty-7;}
   /* markings */
-  if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(cy-ry+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[Y*N+X]&&g[Y*N+X]!==1&&g[Y*N+X]!==5)g[Y*N+X]=3;}}}
-  else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=cy-ry+1;Y<=cy-ry+3;Y++){if(M[Y*N+X]&&g[Y*N+X]!==1)g[Y*N+X]=3;}});}
-  else if(S.mark==='patch'){const px=fl?19:11,py=Math.round(cy-ry*.35);for(let y=py-2;y<=py+2;y++)for(let x=px-2;x<=px+2;x++){const d=(x-px)*(x-px)+(y-py)*(y-py);const i=y*N+x;if(d<=5&&M[i]&&g[i]!==1&&g[i]!==5&&g[i]!==12)g[i]=6;}}
+  if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(cy-ry+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1&&g[SPI(X,Y)]!==5)g[SPI(X,Y)]=3;}}}
+  else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=cy-ry+1;Y<=cy-ry+3;Y++){if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1)g[SPI(X,Y)]=3;}});}
+  else if(S.mark==='patch'){const px=fl?19:11,py=Math.round(cy-ry*.35);for(let y=py-2;y<=py+2;y++)for(let x=px-2;x<=px+2;x++){const d=(x-px)*(x-px)+(y-py)*(y-py);const i=SPI(x,y);if(d<=5&&M[i]&&g[i]!==1&&g[i]!==5&&g[i]!==12)g[i]=6;}}
   /* cheek fluff */
   if(S.fluff){const fm=mask();both(f=>fillPoly(fm,[[16-rx+1,cy-1],[16-rx-3,cy+1],[16-rx+1,cy+3]],f));for(let i=0;i<N*N;i++)if(fm[i]&&!M[i]&&g[i]!==1)g[i]=0;commit(g,fm,{});}
   /* face: laid out first, fitted to this body (every face pixel has body on all four sides), so the arms can be
@@ -1577,14 +1586,14 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
     return {ok,FG,FI,draw,eyeY,eh,moY};};
   let eY0=Math.round(cy-ry*.22)+(S.ey||0);
   if(S.shape==='mush')eY0=Math.max(eY0,Math.round(cy-ry+1)+4);
-  let hw=0;while(hw<15&&M[eY0*N+16-hw-1])hw++;
+  let hw=0;while(hw<15&&M[SPI(16-hw-1,eY0)])hw++;
   const gp0=Math.max(2,Math.min(5,Math.round(rx*.3)+1+(S.ex||0),Math.floor(hw*.42)));
   let F=null;
   search:for(const eyes of [S.eyes,'round','dot'])for(const blush of S.blush?[true,false]:[false])for(let gp=gp0;gp>=1;gp--)for(const d of [0,1,-1,2,-2,3,4]){
     const t=lay(gp,eyes,eY0+d,blush);if(t.ok){F=t;break search;}}
   if(!F)F=lay(1,'dot',eY0,false);
   const {FG,FI,eyeY,moY}=F,face=F.draw,gp=Math.max(1,gp0);
-  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=0;x<N;x++){const i=y*N+x;if(M[i]&&M[i-1]&&M[i+1]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
+  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=-SPP;x<SPC+SPP;x++){const i=SPI(x,y);if(M[i]&&M[i-1]&&M[i+1]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
   /* arms: the chosen pose if it stays clear of the face (a pixel of body between), else a calmer one */
   /* each pose has a few placements (lower, further out); the first that keeps a pixel of body between the arm's
      outline and the face wins, else a calmer pose, else the arms stay tucked away */
@@ -1631,7 +1640,8 @@ function buildSprite(S,bob,blink){
     /* wings */
     if(S.wings){const w=mask();both(f=>fillEll(w,16-rx-2.5,cy-3,5,3.6,f));commit(g,w,{b:5,s:12,h:7});}
     /* ears */
-    const e=mask();let eo={};
+    /* 0.56: ears that would reach past the 40x40 frame sit just low enough to fit (only those move) */
+    const ears=(e,top)=>{let eo={};
     if(S.ears==='pointy')both(f=>fillPoly(e,[[16-rx*.85,top+4],[16-rx*.7,top-6],[16-rx*.2,top+1]],f));
     else if(S.ears==='round')both(f=>fillEll(e,16-rx*.62,top+1.5,3.4,3.4,f));
     else if(S.ears==='bunny')both(f=>fillEll(e,16-rx*.38,top-3,2.6,6.5,f));
@@ -1639,8 +1649,10 @@ function buildSprite(S,bob,blink){
     else if(S.ears==='nubs'){both(f=>fillPoly(e,[[16-rx*.55,top+2],[16-rx*.45,top-3],[16-rx*.2,top+1]],f));eo={b:6,s:13,h:null};}
     else if(S.ears==='antenna'){both(f=>curve(e,[[13,top+2],[11,top-4],[9,top-8]],2,2,f));}
     else if(S.ears==='tuft'){fillEll(e,16,top-2.5,1.8,4);both(f=>fillEll(e,12.5,top-1.5,1.6,3.2,f));eo={b:6,s:13,h:null};}
-    commit(g,e,eo);
-    if(S.ears==='antenna'){const bl=mask();both(f=>fillEll(bl,9,top-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+    if(S.ears==='antenna')both(f=>fillEll(e,9,top-9,2.1,2.1,f));return eo;};
+    let et=top;for(let k=0;k<8;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;et+=1;}
+    if(S.ears==='antenna'){const st=mask();both(f=>curve(st,[[13,et+2],[11,et-4],[9,et-8]],2,2,f));commit(g,st,{});const bl=mask();both(f=>fillEll(bl,9,et-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
+    else{const e=mask(),eo=ears(e,et);commit(g,e,eo);}
     /* feet (not bobbing) */
     both(f=>fillEll(FOOT,16-Math.round(rx*.45),27.5,3.2,2.2,f));commit(g,FOOT,{});
     /* body */
@@ -1648,10 +1660,10 @@ function buildSprite(S,bob,blink){
     /* belly */
     const bx=16,by=cy+ry*.35,brx=rx*.58,bry=ry*.52;
     const inB=(x,y)=>{const dx=(x+.5-bx)/brx,dy=(y+.5-by)/bry;return dx*dx+dy*dy<=1;};
-    for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(M[y*N+x]&&inB(x,y)&&g[y*N+x]!==1)g[y*N+x]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}
+    for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++){if(M[SPI(x,y)]&&inB(x,y)&&g[SPI(x,y)]!==1)g[SPI(x,y)]=(!inB(x+1,y)||!inB(x,y+1))?12:5;}
     /* markings */
-    if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(top+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[Y*N+X]&&g[Y*N+X]!==1&&g[Y*N+X]!==5)g[Y*N+X]=3;}}}
-    else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=top+1;Y<=top+3;Y++){if(M[Y*N+X]&&g[Y*N+X]!==1)g[Y*N+X]=3;}});}
+    if(S.mark==='spots'){for(let i=0;i<3;i++){const sx=16+Math.round((rm()-.5)*rx*1.3),sy=Math.floor(top+3+rm()*ry*.45);for(let a=0;a<2;a++)for(let b=0;b<2;b++){const X=sx+a,Y=sy+b;if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1&&g[SPI(X,Y)]!==5)g[SPI(X,Y)]=3;}}}
+    else if(S.mark==='stripes'){[12,15,16,19].forEach(X=>{for(let Y=top+1;Y<=top+3;Y++){if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1)g[SPI(X,Y)]=3;}});}
     /* arms */
     const a=mask();both(f=>fillEll(a,16-rx-.5,cy+2,2.1,3,f));commit(g,a,{});
     /* face */
@@ -1679,31 +1691,33 @@ function buildSprite(S,bob,blink){
     /* wings */
     if(S.wings){const w=mask(),t=top;both(f=>fillPoly(w,[[12,t+7],[2,t-2],[1,t+6],[4,t+5],[3,t+11],[6,t+9],[6,t+16],[10,t+12],[12,t+14]],f));commit(g,w,{b:11,s:3,h:3});}
     /* horns */
-    const hm=mask();
+    const horns=(hm,top)=>{
     if(S.horns==='up')both(f=>curve(hm,[[11,top+3],[8,top-2],[9,top-8]],3.4,1.2,f));
     else if(S.horns==='ram')both(f=>curve(hm,[[11,top+4],[4,top],[3,top+7]],3.6,1.4,f));
-    else if(S.horns==='crown'){[[11,4],[16,6],[21,4]].forEach(p=>fillPoly(hm,[[p[0]-2.2,top+2],[p[0],top-p[1]+2],[p[0]+2.2,top+2]]));}
-    commit(g,hm,{b:14,s:15,h:null});
+    else if(S.horns==='crown'){[[11,4],[16,6],[21,4]].forEach(p=>fillPoly(hm,[[p[0]-2.2,top+2],[p[0],top-p[1]+2],[p[0]+2.2,top+2]]));}};
+    /* 0.56: horns that would reach past the 40x40 frame sit just low enough to fit (only those move) */
+    let ht=top;for(let k=0;k<8;k++){const t=mask();horns(t,ht);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;ht+=1;}
+    const hm=mask();horns(hm,ht);commit(g,hm,{b:14,s:15,h:null});
     /* shoulder spines */
     if(S.spines){const sp=mask();both(f=>fillPoly(sp,sh.sp.map(p=>[p[0],p[1]+oy]),f));commit(g,sp,{b:14,s:15,h:null});}
     /* feet */
     both(f=>fillEll(FOOT,16-6,27.5,3.4,2,f));commit(g,FOOT,{});
-    for(const X of [8,10,21,23])g[29*N+X]=14;
+    for(const X of [8,10,21,23])g[SPI(X,29)]=14;
     /* body */
     fillPoly(M,sh.poly.map(p=>[p[0],p[1]+oy]));commit(g,M,{});
     /* chest */
     const cb=mask();fillEll(cb,16,top+(27-sh.top)*.62,4.2,5.2);
-    for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(cb[y*N+x]&&M[y*N+x]&&g[y*N+x]!==1)g[y*N+x]=5;
+    for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++)if(cb[SPI(x,y)]&&M[SPI(x,y)]&&g[SPI(x,y)]!==1)g[SPI(x,y)]=5;
     /* markings */
-    if(S.mark==='ribs'){for(let k=0;k<3;k++){const Y=Math.floor(top+(27-sh.top)*.5)+k*2;for(let X=14;X<=17;X++)if(M[Y*N+X]&&g[Y*N+X]===5)g[Y*N+X]=11;}}
-    else if(S.mark==='cracks'){let X=11,Y=top+2;for(let k=0;k<9;k++){if(M[Y*N+X]&&g[Y*N+X]!==1)g[Y*N+X]=11;Y++;X+=(k%2?1:-1)*(rm()<.5?0:1)+(k%3===0?1:0);}}
-    else if(S.mark==='veins'){for(const sd of [0,1]){let X=sd?19:12,Y=Math.floor(top+(27-top)*.5);for(let k=0;k<7;k++){const XX=sd?X:X;if(M[Y*N+XX]&&g[Y*N+XX]!==1&&g[Y*N+XX]!==5)g[Y*N+XX]=9;Y++;if(k%2)X+=sd?1:-1;}}}
-    else if(S.mark==='runes'){[[15,top+11],[16,top+11],[15,top+12],[16,top+13],[15,top+14]].forEach(p=>{if(M[p[1]*N+p[0]])g[p[1]*N+p[0]]=6;});}
+    if(S.mark==='ribs'){for(let k=0;k<3;k++){const Y=Math.floor(top+(27-sh.top)*.5)+k*2;for(let X=14;X<=17;X++)if(M[SPI(X,Y)]&&g[SPI(X,Y)]===5)g[SPI(X,Y)]=11;}}
+    else if(S.mark==='cracks'){let X=11,Y=top+2;for(let k=0;k<9;k++){if(M[SPI(X,Y)]&&g[SPI(X,Y)]!==1)g[SPI(X,Y)]=11;Y++;X+=(k%2?1:-1)*(rm()<.5?0:1)+(k%3===0?1:0);}}
+    else if(S.mark==='veins'){for(const sd of [0,1]){let X=sd?19:12,Y=Math.floor(top+(27-top)*.5);for(let k=0;k<7;k++){const XX=sd?X:X;if(M[SPI(XX,Y)]&&g[SPI(XX,Y)]!==1&&g[SPI(XX,Y)]!==5)g[SPI(XX,Y)]=9;Y++;if(k%2)X+=sd?1:-1;}}}
+    else if(S.mark==='runes'){[[15,top+11],[16,top+11],[15,top+12],[16,top+13],[15,top+14]].forEach(p=>{if(M[SPI(p[0],p[1])])g[SPI(p[0],p[1])]=6;});}
     /* arms and claws */
     if(S.arms==='raised'){const am=mask();both(f=>curve(am,[[sh.arm[0]+2,sh.arm[1]+oy+3],[sh.arm[0]-2,sh.arm[1]+oy-2],[sh.arm[0]-1,sh.arm[1]+oy-8]],3,2.2,f));commit(g,am,{});
-      for(const sd of [0,1]){const ax=sd?N-1-Math.floor(sh.arm[0]-1):Math.floor(sh.arm[0]-1),by=Math.floor(sh.arm[1]+oy-10);for(const d of [-1,0,1]){const X=ax+d;if(X>=0&&X<N&&by>=0)g[by*N+X]=14;}}}
+      for(const sd of [0,1]){const ax=sd?SPC-1-Math.floor(sh.arm[0]-1):Math.floor(sh.arm[0]-1),by=Math.floor(sh.arm[1]+oy-10);for(const d of [-1,0,1]){const X=ax+d;if(X>=-SPP&&X<SPC+SPP&&by>=-SPP)g[SPI(X,by)]=14;}}}
     else if(S.arms!=='none'){const am=mask();both(f=>fillEll(am,sh.arm[0],sh.arm[1]+oy,2.6,4.8,f));commit(g,am,{});
-    for(const sd of [0,1]){const ax=sd?N-1-Math.floor(sh.arm[0]):Math.floor(sh.arm[0]),by=Math.floor(sh.arm[1]+oy+4.8)+1;for(let i=-1;i<=1;i++){const X=ax+i,Y=by;if(X>=0&&X<N&&Y<N)g[Y*N+X]=14;}}}
+    for(const sd of [0,1]){const ax=sd?SPC-1-Math.floor(sh.arm[0]):Math.floor(sh.arm[0]),by=Math.floor(sh.arm[1]+oy+4.8)+1;for(let i=-1;i<=1;i++){const X=ax+i,Y=by;if(X>=-SPP&&X<SPC+SPP&&Y<SPC+SPP)g[SPI(X,Y)]=14;}}}
     /* face */
     const gx=gap,ey=eyeY,pre=S.g2?g.slice():null;
     if(S.eyes==='glare'){const L=blink?['gggg']:['gg..','.ggG'],Rr=blink?['gggg']:['..gg','Ggg.'];eh=blink?1:2;stamp(g,16-gx-4,ey+(blink?1:0),L,false);stamp(g,16+gx,ey+(blink?1:0),Rr,false);}
@@ -1714,27 +1728,27 @@ function buildSprite(S,bob,blink){
     else{const L=blink?['gggggg']:['.gggg.','ggppgg','.gggg.'];eh=blink?1:3;stamp(g,13,ey+(blink?1:0),L,false);}
     if(S.third&&!blink)stamp(g,15,ey-4,['gg','gG'],false);
     const MO={fangs:['pppppp','t.pp.t'],grin:['pppppppp','ptptptpt'],maw:['.pppppp.','pptpptpp','.pppppp.'],snarl:['pppp','tppt'],stitch:['ppppppp','.p.p.p.'],tusks:['t.....t','tppppppt'.slice(0,7),'.ppppp.']}[S.mouth];
-    stamp(g,16-MO[0].length/2,ey+eh+2,MO,false);
+    stamp(g,16-Math.floor(MO[0].length/2),ey+eh+2,MO,false);
     if(pre){const FI=[];for(let i=0;i<N*N;i++)if(g[i]!==pre[i])FI.push(i);FX.FI=FI;FX.FV=FI.map(i=>g[i]);if(globalThis.__FDBG)globalThis.__FDBG.push({FI,FV:FI.map(i=>g[i]),PV:FI.map(i=>pre[i]),M:Array.from(M),arms:S.arms,want:S.arms,dark:1});}
     /* halo for legends */
-    if(S.crown){const hmk=mask();for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=(x+.5-16)/6.5,dy=(y+.5-(top-3))/2;const d=dx*dx+dy*dy;if(d>=.62&&d<=1.1)setp(hmk,x,y,false);}
-      for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(hmk[y*N+x])g[y*N+x]=17;}
+    if(S.crown){const hmk=mask();for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++){const dx=(x+.5-16)/6.5,dy=(y+.5-(top-3))/2;const d=dx*dx+dy*dy;if(d>=.62&&d<=1.1)setp(hmk,x,y,false);}
+      for(let y=-SPP;y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++)if(hmk[SPI(x,y)])g[SPI(x,y)]=17;}
   }
 
   if(S.keep){
     const half=dk?7:rx,mouthY=eyeY+eh+(dk?2:1);
-    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.round(Math.max(top-2,Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0))));}
+    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N)-SPP;top=Math.round(Math.max(top-2,Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0))));}
     if(S.keep==='hat'){const hm=mask();fillPoly(hm,[[12.5,top+2],[19.5,top+2],[16,top-6]]);commit(g,hm,{b:6,s:13,h:null});
       const pm=mask();fillEll(pm,16,top-6.6,1.7,1.7);commit(g,pm,{b:17,s:18,h:null});
-      [[14,top+1],[17,top+1],[15,top-2],[16,top-2]].forEach(p=>{const i=p[1]*N+p[0];if(g[i]===6||g[i]===13)g[i]=7;});}
-    else if(S.keep==='scarf'){const sy=mouthY+(dk?4:3);for(let dy=0;dy<2;dy++)for(let x=0;x<N;x++){const i=(sy+dy)*N+x;if(M[i]&&g[i]!==1)g[i]=dy?13:6;}
+      [[14,top+1],[17,top+1],[15,top-2],[16,top-2]].forEach(p=>{const i=SPI(p[0],p[1]);if(g[i]===6||g[i]===13)g[i]=7;});}
+    else if(S.keep==='scarf'){const sy=mouthY+(dk?4:3);for(let dy=0;dy<2;dy++)for(let x=-SPP;x<SPC+SPP;x++){const i=SPI(x,sy+dy);if(M[i]&&g[i]!==1)g[i]=dy?13:6;}
       const tm=mask();fillPoly(tm,[[17,sy+1],[20,sy+1],[20,sy+6],[17,sy+6]]);commit(g,tm,{b:6,s:13,h:null});}
-    else if(S.keep==='flower'){const fy=top+3;let fx=16+Math.round(half*.62);if(FX.FI){let e=16;while(e<N-1&&(M[(fy+2)*N+e+1]||g[(fy+2)*N+e+1]>1))e++;fx=Math.min(fx,e-1);}stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
+    else if(S.keep==='flower'){const fy=top+3;let fx=16+Math.round(half*.62);if(FX.FI){let e=16;while(e<SPC+SPP-1&&(M[SPI(e+1,(fy+2))]||g[SPI(e+1,(fy+2))]>1))e++;fx=Math.min(fx,e-1);}stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
     else if(S.keep==='daisies'){[11,15,19].forEach(x=>stamp(g,x,top,['.c.','cyc','.c.'],false));}
     else if(S.keep==='charm'){const cy=mouthY+(dk?3:2);stamp(g,14,cy,['.o..o.','..oo..','.oyyo.','.oyao.','..oo..'],false);}
-    else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=0;x<N;x++){const i=sy*N+x;if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
-    else if(S.keep==='cap'){const cm=mask();fillEll(cm,16,top+1.2,6.4,3.4);for(let y=Math.ceil(top+1.2);y<N;y++)for(let x=0;x<N;x++)cm[y*N+x]=0;commit(g,cm,{b:6,s:13,h:null});const bm=mask();fillEll(bm,16,top-2.6,1.6,1.4);commit(g,bm,{b:7,s:7,h:null});}
-    else if(S.keep==='lantern'){const lx=16+half+2,ly=mouthY+1;stamp(g,Math.min(N-3,lx),ly,['.o.','ooo','yyy','yyy','yyy','ooo'],false);}
+    else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=-SPP;x<SPC+SPP;x++){const i=SPI(x,sy);if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
+    else if(S.keep==='cap'){const cm=mask();fillEll(cm,16,top+1.2,6.4,3.4);for(let y=Math.ceil(top+1.2);y<SPC+SPP;y++)for(let x=-SPP;x<SPC+SPP;x++)cm[SPI(x,y)]=0;commit(g,cm,{b:6,s:13,h:null});const bm=mask();fillEll(bm,16,top-2.6,1.6,1.4);commit(g,bm,{b:7,s:7,h:null});}
+    else if(S.keep==='lantern'){const lx=16+half+2,ly=mouthY+1;stamp(g,Math.min(SPC-3,lx),ly,['.o.','ooo','yyy','yyy','yyy','ooo'],false);}
     else if(/^charm[0-4]$/.test(S.keep)){const L='ABCDE'[+S.keep[5]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
     else if(/^ward[0-4]$/.test(S.keep)){const L='FHIJK'[+S.keep[4]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyyXo','oXXXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
   }
@@ -1807,7 +1821,7 @@ function drawFrame(e,cv,t,ph){
   const ha=e.hopT?t-e.hopT:9e9,FS=R===3?FOIL3:R===4?FOIL4:null,OX=8,OY=4-(ha<620?Math.round(Math.sin(ha/620*Math.PI)*4):0);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     const i=y*W+x,sx=x-OX,sy=y-OY;let slot=0;
-    if(sx>=0&&sx<32&&sy>=0&&sy<32)slot=g[sy*32+sx];
+    {const X=sx+SPP,Y=sy+SPP;if(X>=0&&X<SPN&&Y>=0&&Y<SPN)slot=g[Y*SPN+X];}
     let r,gg,b,foil=false;
     if(slot){const p=pal[slot];r=p[0];gg=p[1];b=p[2];foil=!!(FS&&FS[slot])||(c.bond>=25&&OL(slot));}
     else{const j=i*3;r=bg[j];gg=bg[j+1];b=bg[j+2];foil=!!(bf[i]&&R>=3);
@@ -1916,7 +1930,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.55.1',APPVER='1.0.0';
+const VERSION='prototype 0.56.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -3977,7 +3991,7 @@ function drawWeather(setpx,W,t){if(!W)return;const ti=W.ti,dk=W.dk,G=hexRGB(dk?T
     else{if(k%2)continue;const up=ti!==3,y=up?52-(ph*.5%50):(ph*.5%52);if(Math.sin(t/500+k*1.7)>-.3)setpx(s+Math.sin(t/800+k)*3,y,G);}}}
 /* 0.40: statues stand on little plinths at the scene's edges, the two most recent */
 function drawStatues(setpx,t){const L=statues().slice(-2);L.forEach((c,j)=>{const g=prep(Object.assign({},c,{keep:c.statue.keep})),sp=g.sp[0]||(g.sp[0]=buildSprite(g.spec,0,0)),x0=j?111:1,y0=GYH-19;
-  for(let y=0;y<16;y++)for(let x=0;x<16;x++){const sl=sp[(2*y+1)*32+2*x+1]||sp[(2*y)*32+2*x];if(!sl)continue;setpx(x0+x,y0+y,g.pal[sl]);}
+  for(let y=0;y<16;y++)for(let x=0;x<16;x++){const sl=sp[SPI(2*x+1,2*y+1)]||sp[SPI(2*x,2*y)];if(!sl)continue;setpx(x0+x,y0+y,g.pal[sl]);}
   for(let x=-1;x<17;x++){setpx(x0+x,y0+16,[150,140,166]);setpx(x0+x,y0+17,[112,102,130]);setpx(x0+x,y0+18,[86,78,104]);}});}
 function todMode(){const h=new Date().getHours();return h>=7&&h<17?'day':(h>=17&&h<20)||(h>=5&&h<7)?'dusk':'night';}
 function buildHearthBG(mode,style,fs){
@@ -4026,7 +4040,7 @@ function drawHearth(t){
     const g=e.sp[si],pal=pulse?e.palP:e.pal;
     let hop=0;hfx.forEach(f=>{if(f.i===i){const a=t-f.t0;if(f.k==='hop'){if(a<640)hop=-Math.round(Math.sin(a/640*Math.PI)*6);}else if(a<420)hop=a<210?-2:-1;}});
     if(slp||dz)hop=Math.floor(t/1500+i)%2;else if(still)hop=Math.floor(t/3000)%2;
-    for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[sy*32+sx];if(!sl)continue;let q=pal[sl];if(OL(sl)&&c.bond>=BOND_AT[4])q=GOLD[Math.floor((((sx+sy)*.05+t/1100)%1)*6)%6];setpx(p[0]+sx,p[1]+sy+hop,q);}
+    for(let sy=-SPP;sy<SPC+SPP;sy++)for(let sx=-SPP;sx<SPC+SPP;sx++){const sl=g[SPI(sx,sy)];if(!sl)continue;let q=pal[sl];if(OL(sl)&&c.bond>=BOND_AT[4])q=GOLD[Math.floor((((sx+sy)*.05+t/1100)%1)*6)%6];setpx(p[0]+sx,p[1]+sy+hop,q);}
     if(slp||dz){const zt=((t/900)+i*.9)%3;if(zt<2.5){const zy=p[1]+3-Math.floor(zt*3),zx=p[0]+23+Math.floor(zt*1.5);ZB.forEach((row,j)=>{for(let k=0;k<3;k++)if(row[k]==='#')setpx(zx+k,zy+j,[220,232,255]);});}}
   };
   if(!heapOn)drawWeather(setpx,hWeather(cs.filter(c=>c.id!==outId)),t);
@@ -4522,7 +4536,7 @@ let stv=null,stvId=null; /* the open viewer: {v, stop, frame} */
 function statueSprite(c,clay){
   const cc=Object.assign({},c,{keep:clay?'':(c.statue?c.statue.keep:(c.keep||''))}),spec=genSpec(cc),pl=makePal(spec,cc),g=buildSprite(spec,0,0),R=c.rarity,FS=R===3?FOIL3:R===4?FOIL4:null;
   const col=new Array(1024).fill(null),out=new Uint8Array(1024);
-  for(let i=0;i<1024;i++){const sl=g[i];if(!sl)continue;let [r,gg,b]=pl.pal[sl];
+  for(let i=0;i<1024;i++){const sl=g[SPI(i&31,i>>5)];if(!sl)continue;let [r,gg,b]=pl.pal[sl];
     if((FS&&FS[sl])||(c.bond>=25&&OL(sl))){const x=i%32+8,y=(i>>5)+4;
       if(R===3){const q=RAINBOW[Math.floor((((x+y)*.045)%1)*12)%12];r=lerp(r,q[0],.7);gg=lerp(gg,q[1],.7);b=lerp(b,q[2],.7);}
       else{const q=GOLD[Math.floor((((x+y)*.05)%1)*6)%6];r=lerp(r,q[0],.85);gg=lerp(gg,q[1],.85);b=lerp(b,q[2],.85);}}
@@ -5925,7 +5939,7 @@ function drawTitle(t){
   const cx=Math.round(W/2)+8,FY=GY+4,mx=cx-40,my=FY-30,breathe=REDUCE?0:Math.floor(t/1600)%2;
   for(let y=-2;y<=2;y++)for(let x=-11;x<=11;x++)if(x*x/121+y*y/5<=1){const X=mx+16+x,Y=my+30+y;if(X>=0&&Y>=0&&X<W&&Y<H){const o=(Y*W+X)*4;d[o]*=.65;d[o+1]*=.65;d[o+2]*=.65;}}
   try{const e=prep(TITLE_MATE),si=1;if(!e.sp[si])e.sp[si]=buildSprite(e.spec,0,1);const g=e.sp[si];
-    for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[sy*32+sx];if(sl)put(mx+sx,my+sy+breathe,e.pal[sl]);}}catch(err){}
+    for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[SPI(sx,sy)];if(sl)put(mx+sx,my+sy+breathe,e.pal[sl]);}}catch(err){}
   const zt=REDUCE?1:((t/900)%3);if(zt<2.5){const zy=my+2-Math.floor(zt*3),zx=mx+24+Math.floor(zt*1.5);ZB.forEach((row,j)=>{for(let k=0;k<3;k++)if(row[k]==='#')put(zx+k,zy+j,[230,236,255]);});}
   /* the fire */
   const fl=k=>REDUCE?0:Math.sin(t/80+k*1.9)*.9+Math.sin(t/37+k)*.5;
@@ -5941,7 +5955,7 @@ let COVER_MATE=null;
 function coverMate(){
   if(COVER_MATE)return COVER_MATE;const base={id:-1,seed:20261031,rarity:0,dark:false,theme:0,v:0,keep:'',bond:0,name:'',nick:''};
   for(let s=20261031;s<20261031+60;s++){const c=Object.assign({},base,{seed:s});try{const e=prep(c);if(!e.sp[0])e.sp[0]=buildSprite(e.spec,0,0);const g=e.sp[0];let edge=false;
-    for(let i=0;i<32&&!edge;i++){if(g[i]||g[32+i]||g[i*32]||g[i*32+31])edge=true;}if(!edge)return COVER_MATE=c;}catch(err){}}
+    for(let i=0;i<32&&!edge;i++){if(g[SPI(i,0)]||g[SPI(i,1)]||g[SPI(0,i)]||g[SPI(31,i)])edge=true;}if(!edge)return COVER_MATE=c;}catch(err){}}
   return COVER_MATE=base;
 }
 function openTitle(){
@@ -6161,7 +6175,7 @@ function gStart(){
   ({meadow:gMeadow,ember:gEmber,tide:gTide,frost:gFrost,dusk:gDusk})[g.G.id]();
 }
 const SPR_URL={};
-function spriteURL(c){const k=ckey(c);if(SPR_URL[k])return SPR_URL[k];try{const e=prep(c);if(!e.sp[0])e.sp[0]=buildSprite(e.spec,0,0);const g=e.sp[0],cv=document.createElement('canvas');cv.width=32;cv.height=32;const x=cv.getContext('2d'),im=x.createImageData(32,32);for(let i=0;i<1024;i++){const sl=g[i];if(!sl)continue;const q=e.pal[sl];im.data[i*4]=q[0];im.data[i*4+1]=q[1];im.data[i*4+2]=q[2];im.data[i*4+3]=255;}x.putImageData(im,0,0);return SPR_URL[k]=cv.toDataURL();}catch(err){return '';}}
+function spriteURL(c){const k=ckey(c);if(SPR_URL[k])return SPR_URL[k];try{const e=prep(c);if(!e.sp[0])e.sp[0]=buildSprite(e.spec,0,0);const g=e.sp[0],cv=document.createElement('canvas');cv.width=32;cv.height=32;const x=cv.getContext('2d'),im=x.createImageData(32,32);for(let i=0;i<1024;i++){const sl=g[SPI(i&31,i>>5)];if(!sl)continue;const q=e.pal[sl];im.data[i*4]=q[0];im.data[i*4+1]=q[1];im.data[i*4+2]=q[2];im.data[i*4+3]=255;}x.putImageData(im,0,0);return SPR_URL[k]=cv.toDataURL();}catch(err){return '';}}
 const mateHTML=c=>{const u=spriteURL(c);return u?`<img class="pgmate" src="${u}" alt="">`:'';};
 /* ---- shared feel: score, streaks, sparkles, sounds, messages, the finish ---- */
 const gOn=()=>!!(game&&game.alive&&game.started);
