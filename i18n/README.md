@@ -30,3 +30,5 @@ node build.mjs ../work.html ../app.html
 - Card backs' news from away is stored as an event (`c.gev`), so it shows in the app's current language.
 - Size: the Japanese adds about 190 K characters (about 0.2 MB as UTF-8); the app is about 1.2 MB. A native speaker
   should review the Japanese before a Japanese launch.
+- Forgeling names (0.57.1): in Japanese a name reads in katakana from its two syllables (`KANA_P`, `KANA_S`); a new
+  syllable in `PRE`/`SUF` needs its reading there. The save keeps the Latin name (`jaName`, a card's `toJSON`).
