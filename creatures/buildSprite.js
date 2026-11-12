@@ -108,13 +108,13 @@ function buildSprite(S,bob,blink){
 
   if(S.keep){
     const half=dk?7:rx,mouthY=eyeY+eh+(dk?2:1);
-    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0));}
+    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.round(Math.max(top-2,Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0))));}
     if(S.keep==='hat'){const hm=mask();fillPoly(hm,[[12.5,top+2],[19.5,top+2],[16,top-6]]);commit(g,hm,{b:6,s:13,h:null});
       const pm=mask();fillEll(pm,16,top-6.6,1.7,1.7);commit(g,pm,{b:17,s:18,h:null});
       [[14,top+1],[17,top+1],[15,top-2],[16,top-2]].forEach(p=>{const i=p[1]*N+p[0];if(g[i]===6||g[i]===13)g[i]=7;});}
     else if(S.keep==='scarf'){const sy=mouthY+(dk?4:3);for(let dy=0;dy<2;dy++)for(let x=0;x<N;x++){const i=(sy+dy)*N+x;if(M[i]&&g[i]!==1)g[i]=dy?13:6;}
       const tm=mask();fillPoly(tm,[[17,sy+1],[20,sy+1],[20,sy+6],[17,sy+6]]);commit(g,tm,{b:6,s:13,h:null});}
-    else if(S.keep==='flower'){const fx=16+Math.round(half*.62),fy=top+3;stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
+    else if(S.keep==='flower'){const fy=top+3;let fx=16+Math.round(half*.62);if(FX.FI){let e=16;while(e<N-1&&(M[(fy+2)*N+e+1]||g[(fy+2)*N+e+1]>1))e++;fx=Math.min(fx,e-1);}stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
     else if(S.keep==='daisies'){[11,15,19].forEach(x=>stamp(g,x,top,['.c.','cyc','.c.'],false));}
     else if(S.keep==='charm'){const cy=mouthY+(dk?3:2);stamp(g,14,cy,['.o..o.','..oo..','.oyyo.','.oyao.','..oo..'],false);}
     else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=0;x<N;x++){const i=sy*N+x;if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
@@ -124,5 +124,5 @@ function buildSprite(S,bob,blink){
     else if(/^ward[0-4]$/.test(S.keep)){const L='FHIJK'[+S.keep[4]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyyXo','oXXXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
   }
   if(FX.FI)FX.FI.forEach((p,k)=>{g[p]=FX.FV[k];});
-  return g;
+  return selout(g);
 }

@@ -41,6 +41,7 @@ function genSpec(c){
     }else{
       s.shape=qp(['hulk','wraith','beast','shard','imp','imp','slink','tower']);
       s.arms=qp(['claws','claws','raised','none']);
+      if(s.arms==='raised'&&!['imp','tower','wraith','shard'].includes(s.shape))s.arms='claws';
       s.eyes=q()<.5?s.eyes:qp(['many','void','glare','slit']);
       s.mouth=q()<.5?s.mouth:qp(['stitch','tusks','fangs']);
       s.mark=q()<.6?s.mark:'veins';

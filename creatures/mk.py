@@ -3,9 +3,15 @@
 import os
 H=os.path.dirname(os.path.abspath(__file__))
 s=open(H+'/../work.html').read()
-def swap(start,name,new):
+def swap(start,name,new,alt=None):
     global s
-    i=s.find(start); j=s.find('function '+name+'('); j=s.find('\n}',j)+2; assert 0<i<=s.find('function '+name+'('); s=s[:i]+new.rstrip('\n')+s[j:]
-swap('function genSpec(','genSpec',open(H+'/genSpec.js').read())
-swap('/* 0.54: the second generation of bright','buildSprite',open(H+'/cute2.js').read()+'\n'+open(H+'/buildSprite.js').read()+'\nwindow.__H={genSpec,buildSprite,makePal};')
+    i=s.find(start)
+    if i<0 and alt: i=s.find(alt)
+    if name=='commit' and 'function selout(' in s: name='selout'
+    j=s.find('function '+name+'('); assert 0<i<=j,(start,name); j=s.find('\n}',j)+2; s=s[:i]+new.rstrip('\n')+s[j:]
+R=lambda f:open(H+'/'+f).read()
+swap('/* 0.55: finer rendering','commit',R('render.js'),'function commit(')
+swap('/* 0.55: the palette adds','makePal',R('palette.js'),'function makePal(')
+swap('function genSpec(','genSpec',R('genSpec.js'))
+swap('/* 0.54: the second generation of bright','buildSprite',R('cute2.js')+'\n'+R('buildSprite.js')+'\nwindow.__H={genSpec,buildSprite,makePal};')
 open('/tmp/c54.html','w').write(s)
