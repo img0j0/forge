@@ -19,7 +19,6 @@
  "<button class=\"herocard\" id=\"btnShowToday\" aria-label=\"Look at today's Forgeling\">{0}</button>": "<button class=\"herocard\" id=\"btnShowToday\" aria-label=\"今日のフォージリングを見る\">{0}</button>",
  "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"Look at {0}\">{1}</button>": "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}を見る\">{1}</button>",
  "<div class=\"pips\" role=\"img\" aria-label=\"{0} of 5 days toward your next pack\">{1}</div>": "<div class=\"pips\" role=\"img\" aria-label=\"次のパックまで5日中{0}日\">{1}</div>",
- "<div class=\"feel\"><p class=\"feelq\">{0}</p><div class=\"chips\" role=\"group\" aria-label=\"How did it feel?\">{1}</div></div>": "<div class=\"feel\"><p class=\"feelq\">{0}</p><div class=\"chips\" role=\"group\" aria-label=\"どんな一日でしたか？\">{1}</div></div>",
  "<button data-insp=\"{0}\" aria-label=\"Look at {1}\">{2}</button>": "<button data-insp=\"{0}\" aria-label=\"{1}を見る\">{2}</button>",
  "<img src=\"{0}\" alt=\"A small Forgeling waving from the cover\">": "<img src=\"{0}\" alt=\"表紙から手を振る小さなフォージリング\">",
  "<circle class=\"mpplace\" data-place=\"{0}:{1}\" cx=\"{2}\" cy=\"{3}\" r=\"26\" role=\"button\" tabindex=\"0\" aria-label=\"{4}, {5}. Open its close-up\" fill=\"transparent\"/>": "<circle class=\"mpplace\" data-place=\"{0}:{1}\" cx=\"{2}\" cy=\"{3}\" r=\"26\" role=\"button\" tabindex=\"0\" aria-label=\"{4}、{5}。近くで見る\" fill=\"transparent\"/>",

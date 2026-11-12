@@ -36,5 +36,7 @@ pushy, no exclamation-heavy hype. The app is for adults (18+): no childish baby 
 | backup / copy | バックアップ / コピー | |
 | iCloud | iCloud | |
 | Erase everything | すべて消去 | |
+| The Scribe | 書記 | arrives at 60 pages |
+| page (of the journal) | ページ | every done day writes one |
 
-Forgeling names stay as generated (Latin letters) for now; katakana names are a later step.
+Forgeling names show in katakana in Japanese (0.57.1, `kanaName`); the save keeps the Latin name.

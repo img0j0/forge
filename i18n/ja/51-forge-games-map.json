@@ -68,7 +68,6 @@
  "This first time, they are back in about 20 minutes.": "はじめての今回は、20分ほどで帰ってきます。",
  "They are back in about three hours.": "3時間ほどで帰ってきます。",
  " Today’s new find is already home, so this wander brings back a spare, a story and a little bond.": "今日の新しい発見はもう届いているので、この旅で持ち帰るのは予備とお話、そして少しの絆です。",
- "<h2>Where should {0} wander?</h2><p class=\"muted small\">Realms on your map. {1}{2}</p>{3}\n    <button class=\"moodbtn\" data-wgo=\"-1\">{4}<div><b>Anywhere</b><span>Wherever the path goes. Good for finding something new.</span></div></button>\n    <div class=\"row\" style=\"justify-content:center\"><button class=\"ghost\" data-close>Not now</button></div>": "<h2>{0}はどこへ旅をする？</h2><p class=\"muted small\">地図にある地方です。{1}{2}</p>{3}\n    <button class=\"moodbtn\" data-wgo=\"-1\">{4}<div><b>どこでも</b><span>道の続くままに。新しいものを見つけるのに向いています。</span></div></button>\n    <div class=\"row\" style=\"justify-content:center\"><button class=\"ghost\" data-close>今はやめておく</button></div>",
  "point@statueForgeHTML": "ポイント",
  "points@statueForgeHTML": "ポイント",
  "<li><span class=\"fi\" aria-hidden=\"true\"><img class=\"cimg\" src=\"{0}\" width=\"30\" height=\"30\" alt=\"\"></span><span><b>{1}’s statue</b><small>Closest to Forgebound: {2} more bond {3}.</small></span><button class=\"chip\" data-spre=\"{4}\">Preview</button></li>": "<li><span class=\"fi\" aria-hidden=\"true\"><img class=\"cimg\" src=\"{0}\" width=\"30\" height=\"30\" alt=\"\"></span><span><b>{1}の像</b><small>絆の証にいちばん近い子：絆あと{2}{3}。</small></span><button class=\"chip\" data-spre=\"{4}\">見本</button></li>",

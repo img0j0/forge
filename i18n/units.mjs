@@ -5,11 +5,11 @@ export function scripts(html){const out=[];const re=/<script>([\s\S]*?)<\/script
 const strip=s=>s.replace(/\{\d+\}/g,' ').replace(/<[^>]*>/g,' ').replace(/&[#a-z0-9]+;/gi,' ');
 const CODEY=/^(?:[\w.#\[\]=:,'"()\s-]*|.*(?:\d+px|rgba?\(|#[0-9a-f]{3,6}\b|data:|base64|https?:|[{};]\s*$).*)$/i;
 // text the rules above would miss (punctuation only, or numbers): translated anyway
-const FORCE=new Set(['<p class="small"><b>{0}.</b> {1} {2}{3}</p>','<p class="small"><b>{0}, {1}.</b> {2}.</p>','+1 to +3','\u2606 Favorite','\u2605 Favorited',' · Favorite','{0}. {1}','A mix','SMTWTFS','{0} to {1}']);
+const FORCE=new Set(['<p class="small"><b>{0}.</b> {1} {2}{3}</p>','<p class="small"><b>{0}, {1}.</b> {2}.</p>','+1 to +3','\u2606 Favorite','\u2605 Favorited',' · Favorite','{0}. {1}','A mix','SMTWTFS','{0} to {1}','{0} asks: {1}','A {0} day.']);
 export function isHuman(key){if(FORCE.has(key))return true;const t=(strip(key)+' '+[...key.matchAll(/(?:aria-label|alt|title|placeholder)="([^"]*)"/g)].map(m=>m[1].replace(/\{\d+\}/g,' ')).join(' ')).trim();if(!t)return false;
   if(/\.{4,}|\|/.test(t))return false;
   const ok=(t.match(/[A-Za-z ,.'’!?;:—–()-]/g)||[]).length/t.length;if(ok<.75)return false;
-  if(/[A-Za-z]{2,}[ ,.!?'’:;—–-]+[A-Za-z]/.test(t)&&!/\d+px|font-|rgba?\(|var\(--|^\s*[.#][\w-]+\s*\{/.test(t))return true;   // a phrase
+  if((/[A-Za-z]{2,}[ ,.!?'’:;—–-]+[A-Za-z]/.test(t)||/^[A-Z] [a-z]{3,}/.test(t))&&!/\d+px|font-|rgba?\(|var\(--|^\s*[.#][\w-]+\s*\{/.test(t))return true;   // a phrase
   if(/\{\d+\}/.test(key)&&/(^|[\s,.])[A-Za-z]{4,}([\s,.]|$)/.test(t)&&!/[(){};=<>]/.test(t))return true;                     // a template sentence around placeholders
   if(/\{\d+\}/.test(key)&&/^[A-Z][a-z]{2,}[\s,.:]*$/.test(t.replace(/[\s,.:·]+/g,' ').trim()+' '))return true;                       // 'Day {0}, {1}': one word around placeholders
   if(/^[A-Z][a-z’']+[.!?]?$/.test(t)||/^[A-Z][a-z]+ ?[a-z]*[.!?…]?$/.test(t))return 'word';                                       // a capitalised single word
