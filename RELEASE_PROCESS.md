@@ -110,3 +110,5 @@ Update 0.68.0: patches read base68.html; base67.html removed. Checked: a road po
 Shipped 0.68.0: main/gh-pages 9adb0b7 (Pages success, live blob d362b05 matches), ios-app cca1759 (Native builds success), Claude copy version 119.
 Update 0.69.0: patches read base69.html; base68.html removed. Checked: pocket a card, it waits on top the next day with the same words, choosing it empties the pocket; the welcome back page in both languages; axe clean.
 Update 0.70.0: patches read base70.html; base69.html removed. Checked: Close the day at 10 pm (Dubai time zone) in English and Japanese, dark theme, Goodnight clears it; a habit after five answers; axe clean.
+Shipped 0.69.0: main/gh-pages 116ffab, ios-app 923fde0 (see monitor), Claude copy version 120. Shipped 0.70.0: main/gh-pages 83ec273, ios-app 8a74d88, Claude copy version 121.
+Update 0.71.0: patches read base71.html; base70.html removed. Checked: with the clock at December 3, Today offers November's book; pages flip with focus kept; the share picture has no photos or words; English and Japanese; axe clean.
