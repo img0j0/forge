@@ -1427,6 +1427,15 @@ html.reduce :is(.dc,.dci,.sumgrid>*,.stage.dealin .tilt,.flip.vin .flip-in,.tilt
 html.reduce .stage .rays,html.reduce .stage .flash{display:none}
 html.reduce .stage.charge .tilt{animation:none}
 @media (prefers-reduced-motion:reduce){:is(.cover,.vface.vback,.heroback,.dcb)::after{animation:none;opacity:0}.dc,.dci,.sumgrid>*{animation:none !important;transition:none !important}}
+
+/* 0.72.1: the flipped card is the clean back; its words sit under the card */
+.card .face.cbk{background:var(--cbP) 0 0/100% 100% no-repeat,#5A2C2A !important;border:0}
+.card .cbk>.bsp,.card .cbk>.binfo{display:none !important}
+.card .face.cbk::after{content:"";position:absolute;inset:-30% -60%;pointer-events:none;background:linear-gradient(110deg,transparent 42%,rgba(255,230,160,.34) 50%,transparent 58%);transform:translateX(-60%);animation:cbSheen 5.5s ease-in-out infinite}
+html.reduce .card .face.cbk::after{animation:none;opacity:0}
+.inspback{margin:6px auto 2px;text-align:center;display:grid;gap:3px;max-width:330px;padding:0 12px}
+.inspback>div,.inspback>p{font:400 15px/1.35 var(--body);color:inherit;opacity:1;max-width:none;margin:0}
+.inspback .m1{font-weight:700;font-size:16px}.inspback .m4{opacity:.7;font-size:13px}.inspback .m3,.inspback .inkl{font-style:italic;color:inherit}
 </style>
 <style id="jaType">@font-face{font-family:'JPHand';src:local('HiraMaruProN-W4'),local('Hiragino Maru Gothic ProN W4'),local('Hiragino Maru Gothic ProN'),local('NotoSansCJKjp-Medium'),local('Noto Sans CJK JP Medium'),local('NotoSansJP-Medium'),local('Noto Sans JP'),local('YuGothic-Medium'),local('Meiryo');size-adjust:76%}@font-face{font-family:'JPText';src:local('HiraMaruProN-W4'),local('Hiragino Maru Gothic ProN W4'),local('Hiragino Maru Gothic ProN'),local('NotoSansCJKjp-Medium'),local('Noto Sans CJK JP Medium'),local('NotoSansJP-Medium'),local('Noto Sans JP'),local('YuGothic-Medium'),local('Meiryo');size-adjust:93%}
 html[lang=ja]{--jp:'JPText','Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sans JP','Noto Sans CJK JP','Yu Gothic','Meiryo',sans-serif;
@@ -2139,7 +2148,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.72.0',APPVER='1.0.0';
+const VERSION='prototype 0.72.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?(LJ?JA[124]:'First Edition'):(LJ?JA[125]:'Pilot Edition');
@@ -3190,7 +3199,11 @@ function talk(){
   if(h){h.textContent=line;h.classList.add('speak');clearTimeout(talkT);talkT=setTimeout(()=>{h.classList.remove('speak');h.textContent=inspHint(c);},3800);}
   chime(0);
 }
-function flipCard(){const cd=$('#stage .card');if(!cd||cd._busy)return;cd._busy=true;cd.classList.add('sq');setTimeout(()=>{cd.classList.toggle('showback');cd.classList.remove('sq');setTimeout(()=>{cd._busy=false;},180);},170);}
+function backCap(cd){
+  const h=$('#inspHint');let el=$('#inspBack');if(!el&&h){h.insertAdjacentHTML('afterend','<div class="inspback" id="inspBack" hidden></div>');el=$('#inspBack');}
+  if(!el)return;const on=cd.classList.contains('showback');
+  if(on){const bi=cd.querySelector('.cbk .binfo');el.innerHTML=bi?bi.innerHTML:'';el.hidden=false;if(h)h.hidden=true;}else{el.hidden=true;if(h)h.hidden=false;}}
+function flipCard(){const cd=$('#stage .card');if(!cd||cd._busy)return;cd._busy=true;cd.classList.add('sq');setTimeout(()=>{cd.classList.toggle('showback');backCap(cd);cd.classList.remove('sq');setTimeout(()=>{cd._busy=false;},180);},170);}
 
 /* ================= Views ================= */
 function weekDots(){
