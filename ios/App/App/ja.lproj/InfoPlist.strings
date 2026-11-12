@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "写真ポストカードを撮るときだけ、カメラを使います。写真はiPhoneの中で小さなドット絵になり、写真そのものは保存も送信もされません。";
+"NSPhotoLibraryUsageDescription" = "写真ポストカードにする写真を選ぶときだけ、写真を開きます。写真はiPhoneの中で小さなドット絵になり、写真そのものは保存も送信もされません。";
+"NSPhotoLibraryAddUsageDescription" = "「画像を保存」を選んだときだけ、フォージリングの画像を写真に保存します。";

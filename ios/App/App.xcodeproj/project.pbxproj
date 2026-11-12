@@ -24,6 +24,7 @@
 		13844EA014894CE18CBB8E62 /* ForgelingsWidget.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = 9B053AEE28684225A50872BE /* ForgelingsWidget.appex */; };
 		0D36768598534F01808AC311 /* ForgelingsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683D2D99EAD441FCB6BAFC2B /* ForgelingsWidget.swift */; };
 		D56DFE2ECBBA48328E3FCDF2 /* WanderAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2146AA0D27E54471AE76FB3C /* WanderAttributes.swift */; };
+		F0F0A1B2C3D4E5F600000032 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F0F0A1B2C3D4E5F600000031 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,8 @@
 		683D2D99EAD441FCB6BAFC2B /* ForgelingsWidget.swift */ = {isa = PBXFileReference; name = "ForgelingsWidget.swift"; path = "ForgelingsWidget.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; includeInIndex = 0; };
 		47123F1E729D413DAFD9A71A /* ForgelingsWidget-Info.plist */ = {isa = PBXFileReference; name = "ForgelingsWidget-Info.plist"; path = "ForgelingsWidget-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; includeInIndex = 0; };
 		C1F6C4B672DB462B8D36DF40 /* ForgelingsWidget.entitlements */ = {isa = PBXFileReference; name = "ForgelingsWidget.entitlements"; path = "ForgelingsWidget.entitlements"; sourceTree = "<group>"; lastKnownFileType = unknown; includeInIndex = 0; };
+		F0F0A1B2C3D4E5F600000033 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F0F0A1B2C3D4E5F600000034 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +101,7 @@
 				F0F0A1B2C3D4E5F600000011 /* CloudSavePlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
+				F0F0A1B2C3D4E5F600000031 /* InfoPlist.strings */,
 				F0F0A1B2C3D4E5F600000001 /* PrivacyInfo.xcprivacy */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
@@ -185,6 +189,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ja,
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
@@ -209,6 +214,7 @@
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
+				F0F0A1B2C3D4E5F600000032 /* InfoPlist.strings in Resources */,
 				F0F0A1B2C3D4E5F600000002 /* PrivacyInfo.xcprivacy in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
@@ -265,6 +271,15 @@
 				504EC3111FED79650016851F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F0F0A1B2C3D4E5F600000031 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0F0A1B2C3D4E5F600000033 /* en */,
+				F0F0A1B2C3D4E5F600000034 /* ja */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

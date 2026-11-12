@@ -13,7 +13,22 @@ if 'ITSAppUsesNonExemptEncryption' not in s:
 if 'NSPhotoLibraryAddUsageDescription' not in s:
     # the share sheet offers "Save Image" for a shared Forgeling picture; iOS needs this sentence or the app crashes there
     s = s.replace('</dict>\n</plist>', '\t<key>NSPhotoLibraryAddUsageDescription</key>\n\t<string>Forgelings saves a picture of your Forgeling to your photos only when you choose Save Image.</string>\n</dict>\n</plist>')
+# 0.65: photo postcards. iOS needs these sentences before the camera or the photo picker opens (the app crashes without
+#   the camera one). English here; both languages in en.lproj and ja.lproj InfoPlist.strings, registered below.
+CAM = 'Forgelings uses the camera only when you choose to take a photo for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.'
+LIB = 'Forgelings opens your photos only when you choose one for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.'
+for key, text in (('NSCameraUsageDescription', CAM), ('NSPhotoLibraryUsageDescription', LIB)):
+    if key not in s:
+        s = s.replace('</dict>\n</plist>', f'\t<key>{key}</key>\n\t<string>{text}</string>\n</dict>\n</plist>')
 open(p, 'w', encoding='utf8').write(s)
+STR = {'en': {'NSCameraUsageDescription': CAM, 'NSPhotoLibraryUsageDescription': LIB,
+              'NSPhotoLibraryAddUsageDescription': 'Forgelings saves a picture of your Forgeling to your photos only when you choose Save Image.'},
+       'ja': {'NSCameraUsageDescription': '写真ポストカードを撮るときだけ、カメラを使います。写真はiPhoneの中で小さなドット絵になり、写真そのものは保存も送信もされません。',
+              'NSPhotoLibraryUsageDescription': '写真ポストカードにする写真を選ぶときだけ、写真を開きます。写真はiPhoneの中で小さなドット絵になり、写真そのものは保存も送信もされません。',
+              'NSPhotoLibraryAddUsageDescription': '「画像を保存」を選んだときだけ、フォージリングの画像を写真に保存します。'}}
+for lang, d in STR.items():
+    os.makedirs(os.path.join(app, 'App', lang + '.lproj'), exist_ok=True)
+    open(os.path.join(app, 'App', lang + '.lproj', 'InfoPlist.strings'), 'w', encoding='utf8').write(''.join(f'"{k}" = "{v}";\n' for k, v in d.items()))
 
 # ---- privacy manifest: no tracking, no data collected; the plugins' UserDefaults (Preferences) and file timestamp
 #      (Filesystem) use, declared with Apple's reason codes. Registered as a bundle resource in the project below. ----
@@ -76,6 +91,15 @@ if 'App.entitlements' not in s:
     s = s.replace('\t\t\t\t504EC3131FED79650016851F /* Info.plist */,\n', f'\t\t\t\t504EC3131FED79650016851F /* Info.plist */,\n\t\t\t\t{ref} /* App.entitlements */,\n', 1)
     s = s.replace('\t\t\t\tCODE_SIGN_STYLE = Automatic;\n', '\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n\t\t\t\tCODE_SIGN_STYLE = Automatic;\n')
     assert s.count('CODE_SIGN_ENTITLEMENTS = App/App.entitlements;') == 2 and s.count('App.entitlements') == 5, s.count('App.entitlements')
+if 'InfoPlist.strings' not in s:
+    VG, BLD, EN, JA = 'F0F0A1B2C3D4E5F600000031', 'F0F0A1B2C3D4E5F600000032', 'F0F0A1B2C3D4E5F600000033', 'F0F0A1B2C3D4E5F600000034'
+    s = s.replace('/* End PBXBuildFile section */', f'\t\t{BLD} /* InfoPlist.strings in Resources */ = {{isa = PBXBuildFile; fileRef = {VG} /* InfoPlist.strings */; }};\n/* End PBXBuildFile section */', 1)
+    s = s.replace('/* End PBXFileReference section */', f'\t\t{EN} /* en */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; }};\n\t\t{JA} /* ja */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; }};\n/* End PBXFileReference section */', 1)
+    s = s.replace('/* End PBXVariantGroup section */', f'\t\t{VG} /* InfoPlist.strings */ = {{\n\t\t\tisa = PBXVariantGroup;\n\t\t\tchildren = (\n\t\t\t\t{EN} /* en */,\n\t\t\t\t{JA} /* ja */,\n\t\t\t);\n\t\t\tname = InfoPlist.strings;\n\t\t\tsourceTree = "<group>";\n\t\t}};\n/* End PBXVariantGroup section */', 1)
+    s = s.replace('\t\t\t\t504EC30E1FED79650016851F /* Assets.xcassets */,\n', f'\t\t\t\t504EC30E1FED79650016851F /* Assets.xcassets */,\n\t\t\t\t{VG} /* InfoPlist.strings */,\n', 1)
+    s = s.replace('\t\t\t\t504EC30F1FED79650016851F /* Assets.xcassets in Resources */,\n', f'\t\t\t\t504EC30F1FED79650016851F /* Assets.xcassets in Resources */,\n\t\t\t\t{BLD} /* InfoPlist.strings in Resources */,\n', 1)
+    s = re.sub(r'(knownRegions = \(\n\t\t\t\ten,\n)', r'\1\t\t\t\tja,\n', s, count=1)
+    assert s.count(VG) == 3 and s.count(BLD) == 2 and s.count(EN) == 2 and s.count(JA) == 2 and '\t\t\t\tja,\n' in s, 'InfoPlist.strings'
 open(p, 'w', encoding='utf8').write(s)
 # the storyboard's view controller becomes MainViewController, which registers the local plugins
 sb = os.path.join(app, 'App', 'Base.lproj', 'Main.storyboard'); t = open(sb, encoding='utf8').read()

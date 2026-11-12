@@ -68,5 +68,9 @@
 	<string>Forgelings saves a picture of your Forgeling to your photos only when you choose Save Image.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Forgelings uses the camera only when you choose to take a photo for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Forgelings opens your photos only when you choose one for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.</string>
 </dict>
 </plist>

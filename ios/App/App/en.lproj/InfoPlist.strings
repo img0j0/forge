@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Forgelings uses the camera only when you choose to take a photo for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.";
+"NSPhotoLibraryUsageDescription" = "Forgelings opens your photos only when you choose one for a postcard. The photo becomes a small pixel picture on your iPhone, and the photo itself is not kept or sent anywhere.";
+"NSPhotoLibraryAddUsageDescription" = "Forgelings saves a picture of your Forgeling to your photos only when you choose Save Image.";
