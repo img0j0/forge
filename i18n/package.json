@@ -1,0 +1,1 @@
+{ "name": "forgelings-i18n", "private": true, "type": "module", "dependencies": { "acorn": "8.14.0", "acorn-walk": "8.3.4" } }
