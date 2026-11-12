@@ -1,7 +1,7 @@
 # Builds Forge's public pages (privacy, terms, support) for the website and App Store Connect.
 # Run from /home/claude/forge: python3 legal/page.py  -> writes legal/out/*.html, copied into pwa/ by pwa.py's caller.
 import os
-DATE = 'November 11, 2026'
+DATE = 'November 12, 2026'
 CONTACT = os.environ.get('FORGE_CONTACT', 'forgelings.app@gmail.com')  # set to the support email before App Store submission
 OUT = os.path.join(os.path.dirname(__file__), 'out'); os.makedirs(OUT, exist_ok=True)
 
@@ -53,8 +53,8 @@ page('privacy.html', 'Privacy policy', 'How Forgelings handles your data: it all
 <section><h2>What Forgelings never does</h2>
 <ul><li>No tracking, no analytics and no advertising.</li><li>No selling, renting or sharing of any information.</li><li>No third-party code that collects data.</li><li>Nothing about you leaves your device unless you choose to send it.</li></ul></section>
 <section><h2>When you choose to share</h2>
-<p>Some features create something you can send yourself: a share picture of a Forgeling, a backup file of your collection, a text report, or a gift or statue link for a friend. These go only where you put them, for example a message or your own files. Forgelings does not receive a copy.</p>
-<p>A gift link holds only the curio you are giving, your Forgeling's name and look, and your note if you add one. A statue link holds only what a statue is built from: its look, its name and the day it was cast. That part of a link comes after a # sign, which browsers never send to the website, so not even the host sees it.</p></section>
+<p>Some features create something you can send yourself: a share picture of a Forgeling, a backup file of your collection, a text report, or a gift, visit or statue link for a friend. These go only where you put them, for example a message or your own files. Forgelings does not receive a copy.</p>
+<p>A gift link holds only the curio you are giving, your Forgeling's name and look, and your note if you add one. A visit link holds only your Forgeling's name and look, and your note if you add one. A statue link holds only what a statue is built from: its look, its name and the day it was cast. That part of a link comes after a # sign, which browsers never send to the website, so not even the host sees it.</p></section>
 <section><h2>Hosting</h2>
 <p>The web version of Forgelings is delivered by GitHub Pages. Like any website, GitHub receives basic technical details such as your IP address when it delivers the page, under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. Forgelings itself never receives them. If you install Forgelings from an app store, that store's own privacy policy covers the download.</p></section>
 <section><h2>Keeping or deleting your data</h2>
