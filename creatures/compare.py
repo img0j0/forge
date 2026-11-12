@@ -1,7 +1,7 @@
 # Before/after: python3 compare.py OUT.png [dark] [gen] — top row the shipped build, bottom row the creature files.
 import sys,os,subprocess,base64
 H=os.path.dirname(os.path.abspath(__file__)); subprocess.run(['python3',H+'/mk.py'],check=True)
-s=open(H+'/../work.html').read(); i=s.find('function buildSprite('); j=s.find('\n}',i)+2
+s=open(os.environ.get('BEFORE',H+'/../work.html')).read(); i=s.find('function buildSprite('); j=s.find('\n}',i)+2
 open('/tmp/cur.html','w').write(s[:j]+'\nwindow.__H={genSpec,buildSprite,makePal};'+s[j:])
 from playwright.sync_api import sync_playwright
 out=sys.argv[1];dark=len(sys.argv)>2 and sys.argv[2]=='1';gen=int(sys.argv[3]) if len(sys.argv)>3 else 1
