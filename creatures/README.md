@@ -6,6 +6,8 @@
 - `compare.py OUT.png DARK GEN`: before (shipped build) and after (these files), side by side.
 - `identity.py GEN`: silhouettes and faces must match the shipped build (run it before shipping a rendering change).
 - `float.py`: head keepsakes must rest on the head.
+- `foil.py OUT.png`: pixels holo foil paints (pink), a build (`BEFORE=`, default /tmp/c541.html) against these files. Any new
+  palette slot must be checked against FOIL3, FOIL4 and OL().
 - `genSpec.v1.js`, `buildSprite.v1.js`: the 0.53 code, kept for the sameness check.
 - `python3 sheet.py OUT.png GEN DARK COUNT COLS SEED0`: a contact sheet (GEN 1 or 2, DARK 0 or 1).
 - `python3 check.py 3000`: layout check (faces never covered, off the body, at an edge or on a line). Must print problems 0.

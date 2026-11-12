@@ -4,10 +4,12 @@
    two (small parts keep the old rim rule). selout(): outlines take the colour of what they edge (a dark accent
    line round an accent part, gold round gold) and lines inside the silhouette, where parts overlap, soften to
    the part's own deep shade. */
-const MIDOF={2:29,6:30,5:31};
+/* the bright highlight (4) stays a one-pixel lit rim, as before 0.55 (holo foil follows it); the broader glow
+   toward the light is a softer tone of its own (39 body, 40 accent, 41 belly) */
+const MIDOF={2:29,6:30,5:31},SOFTOF={2:39,6:40,5:41};
 function commit(g,m,o){
   const inm=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&m[y*N+x]===1;
-  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h,md=o.m!==undefined?o.m:(MIDOF[base]||0);
+  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h,md=o.m!==undefined?o.m:(MIDOF[base]||0),sf=hl?(SOFTOF[base]||0):0;
   const ray=(x,y,dx,dy)=>{let k=0;while(k<14&&inm(x+dx*(k+1),y+dy*(k+1)))k++;return k;};
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     if(!inm(x,y))continue;let s=base;
@@ -18,7 +20,8 @@ function commit(g,m,o){
     }else{const u=L/T;
       if(sh&&(u>.8||!inm(x+1,y+1)&&(!inm(x+1,y)||!inm(x,y+1))))s=sh;
       else if(md&&u>.52)s=md;
-      else if(hl&&(u<.2||!inm(x-1,y-1)&&!inm(x-1,y)&&inm(x+1,y)&&inm(x,y+1)))s=hl;}
+      else if(hl&&!inm(x-1,y-1)&&inm(x+1,y)&&inm(x,y+1))s=hl;
+      else if(sf&&u<.2)s=sf;}
     g[y*N+x]=s;
   }
   if(o.out!==false)for(let y=0;y<N;y++)for(let x=0;x<N;x++){

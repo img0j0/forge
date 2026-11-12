@@ -11,7 +11,7 @@ function makePal(S,c){
   const out=[[0,0,0]];for(let i=1;i<19;i++)out[i]=hexRGB(p[i]||'#000000');
   CHARM_COL.forEach((h,i)=>out[19+i]=hexRGB(h));WARD_COL.forEach((h,i)=>out[24+i]=hexRGB(h));
   out[29]=hexRGB(mix(p[2],p[3],.5));out[30]=hexRGB(mix(p[6],p[13],.5));out[31]=hexRGB(mix(p[5],p[12],.5));
-  out[32]=hexRGB(mix(shade(p[6],-.62),p[1],.35));out[33]=hexRGB(shade(p[15],dk?-.6:-.45));out[34]=hexRGB('#7A4A0C');out[35]=out[11];out[36]=out[13];out[37]=out[15];out[38]=out[18];
+  out[32]=hexRGB(mix(shade(p[6],-.62),p[1],.35));out[33]=hexRGB(shade(p[15],dk?-.6:-.45));out[34]=hexRGB('#7A4A0C');out[39]=hexRGB(mix(p[2],p[4],.5));out[40]=hexRGB(mix(p[6],p[7],.3));out[41]=hexRGB(mix(p[5],p[7],.35));out[35]=out[11];out[36]=out[13];out[37]=out[15];out[38]=out[18];
   const pulse=out.slice();pulse[9]=hexRGB(mix(p[9],p[10],.45));
   return {pal:out,palP:pulse};
 }
