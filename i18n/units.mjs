@@ -8,6 +8,7 @@ export function isHuman(key){const t=strip(key).trim();if(!t)return false;
   if(/\.{4,}|\|/.test(t)||/^<svg|<path /.test(key.trim()))return false;
   const ok=(t.match(/[A-Za-z ,.'’!?;:—–()-]/g)||[]).length/t.length;if(ok<.75)return false;
   if(/[A-Za-z]{2,}[ ,.!?'’:;—–-]+[A-Za-z]/.test(t)&&!/\d+px|font-|rgba?\(|var\(--|^\s*[.#][\w-]+\s*\{/.test(t))return true;   // a phrase
+  if(/\{\d+\}/.test(key)&&/(^|[\s,.])[a-z]{4,}([\s,.]|$)/.test(t)&&!/[(){};=<>]/.test(t))return true;                     // a template sentence around placeholders
   if(/^[A-Z][a-z’']+[.!?]?$/.test(t)||/^[A-Z][a-z]+ ?[a-z]*[.!?…]?$/.test(t))return 'word';                                       // a capitalised single word
   return false;}
 export function units(html){const res=[];
