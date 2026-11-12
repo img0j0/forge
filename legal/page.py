@@ -1,7 +1,7 @@
 # Builds Forge's public pages (privacy, terms, support) for the website and App Store Connect.
 # Run from /home/claude/forge: python3 legal/page.py  -> writes legal/out/*.html, copied into pwa/ by pwa.py's caller.
 import os
-DATE = 'October 31, 2026'
+DATE = 'November 11, 2026'
 CONTACT = os.environ.get('FORGE_CONTACT', 'forgelings.app@gmail.com')  # set to the support email before App Store submission
 OUT = os.path.join(os.path.dirname(__file__), 'out'); os.makedirs(OUT, exist_ok=True)
 
@@ -48,7 +48,8 @@ page('privacy.html', 'Privacy policy', 'How Forgelings handles your data: it all
 <p class="lead">Short version: Forgelings collects nothing. Everything you do in the app stays on your device, and nobody else can see it, including the people who make Forgelings.</p>
 <section><h2>What Forgelings keeps, and where</h2>
 <p>Forgelings keeps your Forgelings, the days you showed up or rested, anything you write (names, tales, margin notes and feedback answers), your settings, and the fact that you are an adult. Your birth date is never kept.</p>
-<p>All of it is stored only on your device: in your browser for the web version, or inside the app on your phone for the app version. Forgelings has no accounts and no server of its own.</p></section>
+<p>All of it is stored on your device: in your browser for the web version, or inside the app on your phone for the app version. Forgelings has no accounts and no server of its own.</p>
+<p><b>Copies kept by your phone's own backup.</b> The iPhone app keeps a copy in your own iCloud, using Apple's iCloud key-value storage, so a new iPhone brings your Forgelings back. It sits in your Apple account, where only you can reach it; Forgelings cannot see it. You can turn it off in the app's Settings, which also removes the copy. On Android, if backup is on for your phone, Android's own backup keeps a copy of the app with your other apps, in your Google account, under Google's terms. The web version keeps no copy anywhere else.</p></section>
 <section><h2>What Forgelings never does</h2>
 <ul><li>No tracking, no analytics and no advertising.</li><li>No selling, renting or sharing of any information.</li><li>No third-party code that collects data.</li><li>Nothing about you leaves your device unless you choose to send it.</li></ul></section>
 <section><h2>When you choose to share</h2>
@@ -57,7 +58,7 @@ page('privacy.html', 'Privacy policy', 'How Forgelings handles your data: it all
 <section><h2>Hosting</h2>
 <p>The web version of Forgelings is delivered by GitHub Pages. Like any website, GitHub receives basic technical details such as your IP address when it delivers the page, under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. Forgelings itself never receives them. If you install Forgelings from an app store, that store's own privacy policy covers the download.</p></section>
 <section><h2>Keeping or deleting your data</h2>
-<p>Because your data is only on your device, you are in control of it. To delete everything, use "Erase everything on this device" in the app's Settings, or delete the app (or clear this site's data in your browser). There is no other copy anywhere, so there is nothing for anyone to delete on a server.</p></section>
+<p>Because your data is only on your device (and your own iCloud or phone backup, if used), you are in control of it. To delete everything, use "Erase everything" in the app's Settings: in the iPhone app it also removes the iCloud copy. You can also delete the app (or clear this site's data in your browser). Forgelings has no server, so there is nothing for anyone to delete on one.</p></section>
 <section><h2>Age</h2><p>Forgelings is for adults 18 and up. It is not directed at children.</p></section>
 <section><h2>Changes</h2><p>If Forgelings ever changes how it handles data, for example by adding accounts or backups to a server, this policy will be updated first, and you will see the change in the app before anything new happens.</p></section>
 <section><h2>Contact</h2>{contact_line()}</section>
@@ -81,8 +82,8 @@ page('support.html', 'Support', 'Help with Forgelings.', f'''
 <section><h2>Get in touch</h2>{support_contact}</section>
 <section><h2>Common questions</h2>
 <p><b>Will I lose my Forgelings if I miss a day?</b> Never. Missed days and rest days don't reset anything.</p>
-<p><b>How do I move my collection to a new phone?</b> In Settings, open Your collection and tap Save a copy. On the new phone, open the same section, tap Restore a copy and choose that file.</p>
+<p><b>How do I move my collection to a new phone?</b> In the iPhone app, the copy in your iCloud comes back by itself on a new iPhone signed in to the same Apple account. On Android, setting up the new phone from your backup brings it back. You can also, in Settings, open Your collection and tap Save a copy, then on the new phone open the same section, tap Restore a copy and choose that file.</p>
 <p><b>Something looks wrong after an update.</b> Close Forgelings completely and open it again. On iPhone, swipe it away in the app switcher first.</p>
-<p><b>How do I delete everything?</b> Settings, then "Erase everything on this device". Forgelings keeps no copy anywhere else.</p></section>
+<p><b>How do I delete everything?</b> Settings, then "Erase everything". In the iPhone app this removes the iCloud copy too. Forgelings itself keeps no copy anywhere.</p></section>
 ''')
 print('wrote', sorted(os.listdir(OUT)))
