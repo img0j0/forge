@@ -107,3 +107,5 @@ Update 0.66.0: patches read base66.html; base651.html removed. Widget code chang
 Update 0.67.0: patches read base67.html; base66.html removed. Checked: a 30-page player gets one letter in English and Japanese, bright and dark voice, Today row clears once read, Letters list reopens it, axe clean on Today, the letter and the list.
 Shipped 0.67.0: main/gh-pages f0488f3 (Pages success, live blob 250db0d matches), ios-app 4f7737f (Native builds success), Claude copy version 118.
 Update 0.68.0: patches read base68.html; base67.html removed. Checked: a road postcard mid-wander and on the wall after return (English bright, Japanese dark), On this day row and sheet, axe clean on each.
+Shipped 0.68.0: main/gh-pages 9adb0b7 (Pages success, live blob d362b05 matches), ios-app cca1759 (Native builds success), Claude copy version 119.
+Update 0.69.0: patches read base69.html; base68.html removed. Checked: pocket a card, it waits on top the next day with the same words, choosing it empties the pocket; the welcome back page in both languages; axe clean.
