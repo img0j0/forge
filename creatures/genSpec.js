@@ -36,7 +36,7 @@ function genSpec(c){
       s.eyes=q()<.45?s.eyes:qp(['happy','sparkle','bean','wink','sparkle','line']);
       s.mouth=q()<.4?s.mouth:qp(['fang','o','wavy','flat','fang','tongue']);
       if(s.shape==='blob'||s.shape==='loaf')s.tail=q()<.5?'none':s.tail;else if(q()<.2)s.tail='leaf';
-      s.blush=q()<.75;s.nose=q()<.3;s.mask=q()<.14;s.fluff=s.shape!=='mush'&&q()<.3;s.duo=q()<.35;
+      s.blush=q()<.75;s.nose=q()<.3;s.mask=q()<.14;s.fluff=s.shape!=='mush'&&s.ears!=='floppy'&&q()<.3;s.duo=q()<.35;
       s.mark=q()<.6?s.mark:qp(['patch','socks','belly0']);
     }else{
       s.shape=qp(['hulk','wraith','beast','shard','imp','imp','slink','tower']);
@@ -44,6 +44,7 @@ function genSpec(c){
       s.eyes=q()<.5?s.eyes:qp(['many','void','glare','slit']);
       s.mouth=q()<.5?s.mouth:qp(['stitch','tusks','fangs']);
       s.mark=q()<.6?s.mark:'veins';
+      if(s.shape==='slink')s.third=false;
     }
   }
   return s;

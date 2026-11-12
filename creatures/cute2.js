@@ -3,8 +3,8 @@
    and small touches (two-tone ears and tail, a nose, a mask, cheek fluff, socks, a patch). Same 32x32 grid and
    palette slots as the first generation, so cards, the Hearth, statues and share pictures need nothing new. */
 const CSH2={round:{cy:18,rx:10,ry:9},tall:{cy:16,rx:8,ry:11},wide:{cy:20,rx:12,ry:7},chonk:{cy:17,rx:11,ry:10},
-  pear:{cy:18,rx:8,ry:8},drop:{cy:19,rx:9.5,ry:8},loaf:{cy:21,rx:12,ry:6.5},blob:{cy:17,rx:10,ry:9},noodle:{cy:16,rx:6.5,ry:11.5},mush:{cy:21,rx:8,ry:6.5}};
-function cute2(g,S,oy,blink,FOOT,M,rm){
+  pear:{cy:18,rx:8,ry:8},drop:{cy:19,rx:9.5,ry:8},loaf:{cy:21,rx:12,ry:6.5},blob:{cy:17,rx:10,ry:9},noodle:{cy:16,rx:6.5,ry:11.5},mush:{cy:21,rx:9,ry:7}};
+function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   const sh=CSH2[S.shape],fl=S.flip,cy=sh.cy+oy,rx=sh.rx,ry=sh.ry;let top=cy-ry;
   const duo=S.duo?{b:6,s:13,h:7}:{};
   /* tail */
@@ -51,35 +51,56 @@ function cute2(g,S,oy,blink,FOOT,M,rm){
   else if(S.mark==='patch'){const px=fl?19:11,py=Math.round(cy-ry*.35);for(let y=py-2;y<=py+2;y++)for(let x=px-2;x<=px+2;x++){const d=(x-px)*(x-px)+(y-py)*(y-py);const i=y*N+x;if(d<=5&&M[i]&&g[i]!==1&&g[i]!==5&&g[i]!==12)g[i]=6;}}
   /* cheek fluff */
   if(S.fluff){const fm=mask();both(f=>fillPoly(fm,[[16-rx+1,cy-1],[16-rx-3,cy+1],[16-rx+1,cy+3]],f));for(let i=0;i<N*N;i++)if(fm[i]&&!M[i]&&g[i]!==1)g[i]=0;commit(g,fm,{});}
-  /* face */
-  const gp=Math.max(2,Math.min(5,Math.round(rx*.3)+1+(S.ex||0)));const eyeY=Math.round(cy-ry*.22)+(S.shape==='mush'?2:0)+(S.ey||0);
-  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=16-gp-4;x<=16+gp+3;x++){const i=y*N+x;if(M[i]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
+  /* face: laid out first, fitted to this body (every face pixel has body on all four sides), so the arms can be
+     placed clear of it; drawn last, so nothing covers it */
   const EYES={big:['ppp','wpp','ppp','ppw'],round:['wp','pp','pp'],dot:['wp','pp'],sleepy:['ppp'],
     happy:['.p.','p.p'],sparkle:['wpp.','pppp','pppw','.pp.'],bean:['p','p','p'],line:['pp.','..p'],wink:['wp','pp','pp']};
-  const EY=EYES[S.eyes],ew=EY[0].length,eh=EY.length,closed=blink&&!['sleepy','happy','line'].includes(S.eyes);
-  const pat=closed?['p'.repeat(ew)]:EY,ey=closed?eyeY+eh-1:eyeY+(S.eyes==='sleepy'?1:0);
-  stamp(g,16-gp-ew,ey,pat,false);
-  if(S.eyes==='wink')stamp(g,16+gp,eyeY+eh-1,['p'.repeat(ew)],false);else stamp(g,16+gp,ey,S.eyes==='line'?['.pp','p..']:pat,false);
-  if(S.blush){stamp(g,16-gp-ew-2,eyeY+eh,['cc'],false);stamp(g,16+gp+ew,eyeY+eh,['cc'],false);}
-  if(S.nose)stamp(g,15,eyeY+eh-1,['pp'],false);
   const MO={smile:['p..p','.pp.'],cat:['p.pp.p','.pppp.'],open:['pppp','.cc.'],tiny:['pp'],
     fang:['p...p','.ppp.','.w...'],o:['.p.','p.p','.p.'],wavy:['p.p.p','.p.p.'],flat:['ppp'],tongue:['pppp','.pc.','..c.']}[S.mouth];
-  stamp(g,16-Math.floor(MO[0].length/2),eyeY+eh+1+(S.nose?1:0),MO,false);
-  /* arms (in front of the body) */
-  const a=mask();
-  const out=f=>fillEll(a,16-rx-.5,cy+2,2.1,3,f),up=f=>curve(a,[[16-rx+1.5,cy+1],[16-rx-2.5,cy-2],[16-rx-2,cy-7]],3.6,2.8,f);
-  if(S.arms==='out')both(out);
-  else if(S.arms==='up')both(up);
-  else if(S.arms==='wave'){up(fl);out(!fl);}
-  else if(S.arms==='hug')both(f=>fillEll(a,16-rx*.34,Math.min(cy+ry*.66,25),2,1.5,f));
-  if(S.arms!=='tuck')commit(g,a,S.mark==='socks'?{b:7,s:15,h:null}:{});
+  const lay=(gp,eyes,eyeY,blush)=>{const EY=EYES[eyes],ew=EY[0].length,eh=EY.length,closed=blink&&!['sleepy','happy','line'].includes(eyes);
+    const pat=closed?['p'.repeat(ew)]:EY,ey=closed?eyeY+eh-1:eyeY+(eyes==='sleepy'?1:0),moY=eyeY+eh+1+(S.nose?1:0);
+    const draw=G=>{stamp(G,16-gp-ew,ey,pat,false);
+      if(eyes==='wink')stamp(G,16+gp,eyeY+eh-1,['p'.repeat(ew)],false);else stamp(G,16+gp,ey,eyes==='line'?['.pp','p..']:pat,false);
+      if(blush){stamp(G,16-gp-ew-1,eyeY+eh,['cc'],false);stamp(G,16+gp+ew-1,eyeY+eh,['cc'],false);}
+      if(S.nose)stamp(G,15,eyeY+eh-1,['pp'],false);
+      stamp(G,16-Math.floor(MO[0].length/2),moY,MO,false);};
+    const FG=new Uint8Array(N*N);draw(FG);const FI=[];for(let i=0;i<N*N;i++)if(FG[i])FI.push(i);
+    const B=p=>M[p]&&g[p]!==1,ok=FI.every(p=>B(p)&&B(p-1)&&B(p+1)&&B(p-N)&&B(p+N));
+    return {ok,FG,FI,draw,eyeY,eh,moY};};
+  let eY0=Math.round(cy-ry*.22)+(S.ey||0);
+  if(S.shape==='mush')eY0=Math.max(eY0,Math.round(cy-ry+1)+4);
+  let hw=0;while(hw<15&&M[eY0*N+16-hw-1])hw++;
+  const gp0=Math.max(2,Math.min(5,Math.round(rx*.3)+1+(S.ex||0),Math.floor(hw*.42)));
+  let F=null;
+  search:for(const eyes of [S.eyes,'round','dot'])for(const blush of S.blush?[true,false]:[false])for(let gp=gp0;gp>=1;gp--)for(const d of [0,1,-1,2,-2,3,4]){
+    const t=lay(gp,eyes,eY0+d,blush);if(t.ok){F=t;break search;}}
+  if(!F)F=lay(1,'dot',eY0,false);
+  const {FG,FI,eyeY,moY}=F,face=F.draw,gp=Math.max(1,gp0);
+  if(S.mask){for(let y=eyeY-1;y<=eyeY+2;y++)for(let x=0;x<N;x++){const i=y*N+x;if(M[i]&&M[i-1]&&M[i+1]&&g[i]!==1&&g[i]!==6&&g[i]!==13)g[i]=3;}}
+  /* arms: the chosen pose if it stays clear of the face (a pixel of body between), else a calmer one */
+  /* each pose has a few placements (lower, further out); the first that keeps a pixel of body between the arm's
+     outline and the face wins, else a calmer pose, else the arms stay tucked away */
+  const hugY=Math.min(Math.max(cy+ry*.66,moY+F.FI.length*0+3.5),25.5);
+  const OUT=[[-.5,2],[-1.5,3],[-.5,4.5],[-1.5,5.5]],UP=[[1.5,1,0],[1.5,3,-1],[.5,4,-1.5]];
+  const out=(a,f,k)=>fillEll(a,16-rx+OUT[k][0],cy+OUT[k][1],2.1,3,f),
+    up=(a,f,k)=>{const[x0,y0,dx]=UP[k];curve(a,[[16-rx+x0,cy+y0],[16-rx-2.5+dx,cy+y0-3],[16-rx-2+dx,cy+y0-8]],3.6,2.8,f);};
+  const clear=a=>FI.every(i=>{const x=i%N,y=(i-x)/N;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<N&&Y<N&&a[Y*N+X])return false;}return true;});
+  const tries={out:OUT.map((_,k)=>a=>both(f=>out(a,f,k))),up:UP.map((_,k)=>a=>both(f=>up(a,f,k))),
+    wave:UP.flatMap((_,k)=>OUT.map((_,j)=>a=>{up(a,fl,k);out(a,!fl,j);})),hug:[a=>both(f=>fillEll(a,16-rx*.34,hugY,2,1.5,f))]};
+  const order={out:['out'],up:['up','out'],wave:['wave','up','out'],hug:['hug','out'],tuck:[]}[S.arms];
+  let arms='tuck',a=mask();
+  pick:for(const k of order)for(const fn of tries[k]){const m=mask();fn(m);if(clear(m)){arms=k;a=m;break pick;}}
+  if(arms!=='tuck')commit(g,a,S.mark==='socks'?{b:7,s:15,h:null}:{});
+  const PV=FI.map(i=>g[i]);face(g);FX.FI=FI;FX.FV=FI.map(i=>FG[i]);
+  if(globalThis.__FDBG)globalThis.__FDBG.push({FI,FV:FI.map(i=>FG[i]),PV,M:Array.from(M),arms,want:S.arms,dark:0});
   /* crown */
   if(S.crown){const cm=mask();fillPoly(cm,[[12,top-1],[12,top-5],[14,top-3],[16,top-6],[18,top-3],[20,top-5],[20,top-1]]);commit(g,cm,{b:17,s:18,h:null});}
-  return {top,eyeY,eh,rx};
+  /* the keepsake code places charms and scarves below eyeY+eh+1: report the face's real depth */
+  return {top,eyeY,eh:moY+MO.length-eyeY-3,rx};
 }
 /* 0.54: three more Shade bodies for the second generation */
 Object.assign(DSH,{
   imp:{top:8,poly:[[11,8],[21,8],[25,13],[25,21],[21,27],[11,27],[7,21],[7,13]],eyeY:13,gap:2,arm:[6,20],sp:[[8,12],[4,8],[10,10]]},
-  slink:{top:11,poly:[[4,15],[11,11],[22,11],[29,16],[26,27],[6,27]],eyeY:15,gap:3,arm:[5,22],sp:[[6,15],[2,11],[9,13]]},
+  slink:{top:11,poly:[[4,15],[11,11],[22,11],[29,16],[26,27],[6,27]],eyeY:16,gap:3,arm:[5,22],sp:[[6,15],[2,11],[9,13]]},
   tower:{top:3,poly:[[12,3],[20,3],[23,10],[22,27],[10,27],[9,10]],eyeY:8,gap:1,arm:[8,18],sp:[[10,9],[6,5],[12,7]]}
 });

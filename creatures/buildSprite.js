@@ -1,9 +1,9 @@
 function buildSprite(S,bob,blink){
   const g=new Uint8Array(N*N),oy=bob,fl=S.flip,dk=S.dark;
   const rm=mulberry32(S.seed^0x51ed270b);
-  const FOOT=mask(),M=mask();
+  const FOOT=mask(),M=mask(),FX={};
   let cy,rx,ry,top,eyeY,gap,eh;
-  if(S.g2&&!dk){const o=cute2(g,S,oy,blink,FOOT,M,rm);top=o.top;eyeY=o.eyeY;eh=o.eh;rx=o.rx;}
+  if(S.g2&&!dk){const o=cute2(g,S,oy,blink,FOOT,M,rm,FX);top=o.top;eyeY=o.eyeY;eh=o.eh;rx=o.rx;}
   else if(!dk){
     const sh=CSH[S.shape];cy=sh.cy+oy;rx=sh.rx;ry=sh.ry;top=cy-ry;
     const tailX=Math.min(16+rx-2,25);
@@ -90,7 +90,7 @@ function buildSprite(S,bob,blink){
     else if(S.arms!=='none'){const am=mask();both(f=>fillEll(am,sh.arm[0],sh.arm[1]+oy,2.6,4.8,f));commit(g,am,{});
     for(const sd of [0,1]){const ax=sd?N-1-Math.floor(sh.arm[0]):Math.floor(sh.arm[0]),by=Math.floor(sh.arm[1]+oy+4.8)+1;for(let i=-1;i<=1;i++){const X=ax+i,Y=by;if(X>=0&&X<N&&Y<N)g[Y*N+X]=14;}}}
     /* face */
-    const gx=gap,ey=eyeY;
+    const gx=gap,ey=eyeY,pre=S.g2?g.slice():null;
     if(S.eyes==='glare'){const L=blink?['gggg']:['gg..','.ggG'],Rr=blink?['gggg']:['..gg','Ggg.'];eh=blink?1:2;stamp(g,16-gx-4,ey+(blink?1:0),L,false);stamp(g,16+gx,ey+(blink?1:0),Rr,false);}
     else if(S.eyes==='slit'){const L=blink?['ggg']:['gpg','gpg','gpg'];eh=blink?1:3;stamp(g,16-gx-3,ey+(blink?1:0),L,false);stamp(g,16+gx,ey+(blink?1:0),L,false);}
     else if(S.eyes==='hollow'){const L=blink?['www']:['www','wpw','www'];eh=blink?1:3;stamp(g,16-gx-3,ey+(blink?1:0),L,false);stamp(g,16+gx,ey+(blink?1:0),L,false);}
@@ -100,6 +100,7 @@ function buildSprite(S,bob,blink){
     if(S.third&&!blink)stamp(g,15,ey-4,['gg','gG'],false);
     const MO={fangs:['pppppp','t.pp.t'],grin:['pppppppp','ptptptpt'],maw:['.pppppp.','pptpptpp','.pppppp.'],snarl:['pppp','tppt'],stitch:['ppppppp','.p.p.p.'],tusks:['t.....t','tppppppt'.slice(0,7),'.ppppp.']}[S.mouth];
     stamp(g,16-MO[0].length/2,ey+eh+2,MO,false);
+    if(pre){const FI=[];for(let i=0;i<N*N;i++)if(g[i]!==pre[i])FI.push(i);FX.FI=FI;FX.FV=FI.map(i=>g[i]);if(globalThis.__FDBG)globalThis.__FDBG.push({FI,FV:FI.map(i=>g[i]),PV:FI.map(i=>pre[i]),M:Array.from(M),arms:S.arms,want:S.arms,dark:1});}
     /* halo for legends */
     if(S.crown){const hmk=mask();for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=(x+.5-16)/6.5,dy=(y+.5-(top-3))/2;const d=dx*dx+dy*dy;if(d>=.62&&d<=1.1)setp(hmk,x,y,false);}
       for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(hmk[y*N+x])g[y*N+x]=17;}
@@ -107,6 +108,7 @@ function buildSprite(S,bob,blink){
 
   if(S.keep){
     const half=dk?7:rx,mouthY=eyeY+eh+(dk?2:1);
+    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0));}
     if(S.keep==='hat'){const hm=mask();fillPoly(hm,[[12.5,top+2],[19.5,top+2],[16,top-6]]);commit(g,hm,{b:6,s:13,h:null});
       const pm=mask();fillEll(pm,16,top-6.6,1.7,1.7);commit(g,pm,{b:17,s:18,h:null});
       [[14,top+1],[17,top+1],[15,top-2],[16,top-2]].forEach(p=>{const i=p[1]*N+p[0];if(g[i]===6||g[i]===13)g[i]=7;});}
@@ -121,5 +123,6 @@ function buildSprite(S,bob,blink){
     else if(/^charm[0-4]$/.test(S.keep)){const L='ABCDE'[+S.keep[5]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
     else if(/^ward[0-4]$/.test(S.keep)){const L='FHIJK'[+S.keep[4]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyyXo','oXXXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
   }
+  if(FX.FI)FX.FI.forEach((p,k)=>{g[p]=FX.FV[k];});
   return g;
 }
