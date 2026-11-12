@@ -24,7 +24,6 @@
  "<div class=\"ownitem\"><span class=\"ot\">{0}<b>{1}</b><small>{2}</small></span><button class=\"pill\" data-ownrm=\"{3}\" aria-label=\"Remove {4}\">Remove</button></div>": "<div class=\"ownitem\"><span class=\"ot\">{0}<b>{1}</b><small>{2}</small></span><button class=\"pill\" data-ownrm=\"{3}\" aria-label=\"{4}を削除\">削除</button></div>",
  "<div class=\"pgready\" id=\"pgReady\"><img src=\"{0}\" alt=\"\">\n      <p><b>{1} {2}</b>: {3}.</p>\n      {4}\n      {5}\n      <button class=\"primary\" id=\"pgGo\">Start</button></div>": "<div class=\"pgready\" id=\"pgReady\"><img src=\"{0}\" alt=\"\">\n      <p><b>{1} {2}</b>：{3}。</p>\n      {4}\n      {5}\n      <button class=\"primary\" id=\"pgGo\">スタート</button></div>",
  "<h3 class=\"fgh\">Statues</h3><ul class=\"furn forgel\">{0}{1}</ul>": "<h3 class=\"fgh\">像</h3><ul class=\"furn forgel\">{0}{1}</ul>",
- "<p class=\"muted small feelc\">Felt {0}.</p>": "<p class=\"muted small feelc\">気分：{0}</p>",
  "Cast {0}.": "鋳造日：{0}。",
  "Show {0} {1}": "{0}{1}を表示",
  "Statue · {0} · {1}": "像 · {0} · {1}",

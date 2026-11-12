@@ -32,3 +32,5 @@ node build.mjs ../work.html ../app.html
   should review the Japanese before a Japanese launch.
 - Forgeling names (0.57.1): in Japanese a name reads in katakana from its two syllables (`KANA_P`, `KANA_S`); a new
   syllable in `PRE`/`SUF` needs its reading there. The save keeps the Latin name (`jaName`, a card's `toJSON`).
+- After a patch, `node scan.mjs ../work.html` must print no "match nothing" or "untranslated markup" warning: a changed English
+  template loses its Japanese, so carry the Japanese over to the new key (renumber its placeholders).

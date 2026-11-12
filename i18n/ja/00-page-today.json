@@ -13,7 +13,6 @@
  "<button class=\"ghost favswap\" id=\"btnSeeFind\">See today’s find</button>": "<button class=\"ghost favswap\" id=\"btnSeeFind\">今日の発見を見る</button>",
  "your pack": "パック",
  "<button class=\"primary\" id=\"btnPack\">Open {0}</button>": "<button class=\"primary\" id=\"btnPack\">{0}を開ける</button>",
- "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"Look at {0}\">{1}</button><h2>{2} is keeping you company</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>": "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}を見る\">{1}</button><h2>{2}がそばにいます</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>",
  " joined your binder": "がバインダーに加わりました",
  "Today’s Forgeling is in your binder": "今日のフォージリングはバインダーにいます",
  "<button class=\"ghost favswap\" id=\"btnFavBack\">Show {0} here</button>": "<button class=\"ghost favswap\" id=\"btnFavBack\">ここに{0}を表示</button>",
@@ -43,7 +42,6 @@
  "It all lives on this phone. A copy once a month keeps it safe.": "すべてこの端末の中にあります。月に一度コピーしておくと安心です。",
  "Keep Forgelings on your home screen": "Forgelingsをホーム画面に",
  "A browser can clear a website’s saved data if it sits unopened for a while. On your home screen, your collection is kept.": "ブラウザは、しばらく開いていないサイトの保存データを消すことがあります。ホーム画面に置けば、コレクションは守られます。",
- "Today felt ": "今日の気分：",
  "How did it feel?": "どんな一日でしたか？",
  "Edit today’s line": "今日のひとことを直す",
  "Add a line, and ink today’s Forgeling": "ひとこと書いて、今日のフォージリングを描き入れる",
@@ -53,5 +51,6 @@
  "day@renderToday": "日",
  "days@renderToday": "日",
  "visit@renderToday": "回",
- "visits@renderToday": "回"
+ "visits@renderToday": "回",
+ "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}\">{1}</button><h2>{2} is keeping you company</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>": "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}\">{1}</button><h2>{2}がそばにいます</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>"
 }
