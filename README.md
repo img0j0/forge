@@ -1,16 +1,47 @@
-# Forgelings for iPhone
+# Forgelings for iPhone and Android
 
-This folder turns the Forgelings web app into a real iPhone app with [Capacitor](https://capacitorjs.com).
-The app itself is the same single page as the web version (`forgelings.html`). Inside the iPhone app it:
+This folder turns the Forgelings web app into real iPhone and Android apps with [Capacitor](https://capacitorjs.com).
+The app itself is the same single page as the web version (`forgelings.html`). Inside the apps it:
 
-- keeps every save in the phone's own storage as well as web storage, so iOS can never wipe a collection
+- keeps every save in the phone's own storage as well as web storage, so the system can never wipe a collection
+- **iPhone:** keeps a quiet copy in the player's own iCloud (Apple's key-value storage), so a new iPhone brings the
+  Forgelings back. Forgelings can never see it. Players can turn it off in Settings, which removes the copy.
+- **Android:** Android's own app backup keeps a copy when the phone's backup is on (`allowBackup` is on)
 - sends one gentle reminder a day (only if today's card is still waiting) and a note when a wanderer is back
-- uses haptics and the iPhone share sheet
+- uses haptics and the share sheet; on Android, the back button closes what's open, then goes to Today
 - hides tester-only pieces (feedback questions, pilot report, prototype tools) and says "First Edition" on cards
 
-Bundle ID: `com.forgelings.app`. It can be changed until the first upload to App Store Connect, never after.
+App ID: `com.forgelings.app` on both stores. It can be changed until the first upload, never after.
 
-## First time on the Mac (about an afternoon)
+## No Mac needed to check a build
+
+Every push to this branch runs **Native builds** on GitHub (`.github/workflows/native.yml`):
+
+- **Android:** builds a debug app. Open the run under the repo's **Actions** tab, download
+  `forgelings-android-debug` from **Artifacts**, unzip it, and open `app-debug.apk` on an Android phone (allow
+  "install unknown apps" for your browser or Files app when asked).
+- **iPhone:** compiles the Xcode project for the simulator, unsigned, and checks Forgelings' own Swift code
+  (the iCloud copy) is inside the app. It can't make a TestFlight build; that needs signing (below).
+
+## Android: first time
+
+1. Install [Android Studio](https://developer.android.com/studio) on any Windows, Mac or Linux computer.
+2. Get this project, then:
+   ```
+   npm install
+   npm run sync:android
+   npm run open:android
+   ```
+   `sync:android` copies the app into the Android project and re-applies the icons, notification icon, launch screen
+   and portrait setting (`android-setup.py`).
+3. Press Run with a phone plugged in (Developer options and USB debugging on), or use an emulator.
+4. **Google Play:** a developer account costs $25 once. A **personal** account created after November 13, 2023 must
+   run a closed test with at least 12 testers opted in for 14 days in a row before the app can go public. An
+   **organization** account (for example the LLC, with a D-U-N-S number) skips that rule.
+5. Release builds need an upload key: in Android Studio, **Build > Generate Signed App Bundle**, create a keystore,
+   and keep it and its passwords safe (Play App Signing holds the real signing key).
+
+## iPhone: first time on the Mac (about an afternoon)
 
 1. **Update macOS** to Tahoe 26.2 or later: Settings > General > Software Update.
 2. **Install Xcode** from the Mac App Store (it's large, so leave it downloading). Open it once and let it install
@@ -25,21 +56,27 @@ Bundle ID: `com.forgelings.app`. It can be changed until the first upload to App
    npm run sync
    npm run open
    ```
-   `npm run sync` copies the app into the iPhone project. `npm run open` opens it in Xcode.
+   `npm run sync` copies the app into the iPhone project and re-applies the settings. `npm run open` opens it in Xcode.
 5. **In Xcode**, click **App** in the left sidebar, then **Signing & Capabilities**. Tick
-   "Automatically manage signing" and choose your team (your Apple ID).
+   "Automatically manage signing" and choose your team (your Apple ID). **iCloud** should be listed with
+   **Key-value storage** ticked (it comes from `App/App.entitlements`). If it isn't, click **+ Capability**, add
+   iCloud and tick Key-value storage.
 6. **Run it on your iPhone.** Plug the iPhone in, trust the Mac, and turn on Developer Mode on the
    iPhone if asked (Settings > Privacy & Security > Developer Mode). Pick the iPhone at the top of Xcode and press the
    Play button.
+7. **Check the iCloud copy** (on a real iPhone signed in to iCloud): find a Forgeling, wait a few seconds, then look in
+   Settings > Your collection > iCloud: it should say "Last saved just now". Delete the app, install it again, and the
+   journal should come back without the welcome.
 
-## Updating the app after a new Forgelings version
+## Updating the apps after a new Forgelings version
 
 ```
 cp /path/to/new/forgelings.html forgelings.html
-npm run sync
+npm run sync            # iPhone
+npm run sync:android    # Android
 ```
-Then press Play in Xcode again. To rebuild the Xcode project from scratch: delete `ios/`, run
-`npx cap add ios`, then `python3 ios-setup.py` (it re-applies the icon, launch screen and settings).
+Then press Play again. To rebuild a native project from scratch: delete `ios/` (or `android/`), run
+`npx cap add ios` (or `android`), then `python3 ios-setup.py` (or `android-setup.py`).
 
 ## Sending a build to TestFlight
 
@@ -55,6 +92,9 @@ Then press Play in Xcode again. To rebuild the Xcode project from scratch: delet
 |---|---|
 | `forgelings.html` | The app (copy of the latest Forgelings build) |
 | `build-www.py` | Makes `www/index.html` from it, marked as the store edition |
-| `capacitor.config.json` | App name, bundle ID, colours |
-| `ios-setup.py` | Applies the icon, launch screen, portrait-only, iPhone-only, the encryption answer, the photo-save permission sentence and the privacy manifest (`PrivacyInfo.xcprivacy`) |
+| `capacitor.config.json` | App name, app ID, colours, the Android notification icon |
+| `ios-setup.py` | Applies the icon, launch screen, portrait-only, iPhone-only, the encryption answer, the photo-save permission sentence, the privacy manifest (`PrivacyInfo.xcprivacy`), and the iCloud copy (`CloudSavePlugin.swift`, `MainViewController.swift`, `App.entitlements`) |
 | `ios/` | The Xcode project (generated by Capacitor, then adjusted by `ios-setup.py`) |
+| `android-setup.py` | Applies the Android icons (adaptive wax seal), notification icon, launch screen and portrait setting |
+| `android/` | The Android Studio project (generated by Capacitor, then adjusted by `android-setup.py`) |
+| `.github/workflows/native.yml` | Builds the Android app and compiles the iPhone app on GitHub |

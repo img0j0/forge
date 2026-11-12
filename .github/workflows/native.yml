@@ -32,5 +32,12 @@ jobs:
       - run: pip3 install pillow --break-system-packages || pip3 install pillow
       - run: npm ci
       - run: python3 build-www.py && npx cap sync ios && python3 ios-setup.py
-      - run: xcodebuild -project ios/App/App.xcodeproj -scheme App -sdk iphonesimulator -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -40
+      - run: xcodebuild -project ios/App/App.xcodeproj -scheme App -sdk iphonesimulator -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build | tail -40
         shell: bash -eo pipefail {0}
+      - name: Check Forgelings' own plugins are in the app
+        run: |
+          APP=build/Build/Products/Debug-iphonesimulator/App.app
+          grep -rl CloudSavePlugin "$APP" | head -3
+          test -n "$(grep -rl CloudSavePlugin "$APP")"
+          grep -rl MainViewController "$APP" | head -3
+          test -n "$(grep -rl MainViewController "$APP")"
