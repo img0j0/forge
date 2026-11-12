@@ -26,7 +26,8 @@ function buildSprite(S,bob,blink){
     else if(S.ears==='antenna'){both(f=>curve(e,[[13,top+2],[11,top-4],[9,top-8]],2,2,f));}
     else if(S.ears==='tuft'){fillEll(e,16,top-2.5,1.8,4);both(f=>fillEll(e,12.5,top-1.5,1.6,3.2,f));eo={b:6,s:13,h:null};}
     if(S.ears==='antenna')both(f=>fillEll(e,9,top-9,2.1,2.1,f));return eo;};
-    let et=top;for(let k=0;k<8;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;et+=1;}
+    /* fitted once on the resting pose (bob 0), then moved with the body, so ears never stretch as it bobs; one free row under the frame's top */
+    let et=top-oy;for(let k=0;k<9;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=2)break;et+=1;}et+=oy;
     if(S.ears==='antenna'){const st=mask();both(f=>curve(st,[[13,et+2],[11,et-4],[9,et-8]],2,2,f));commit(g,st,{});const bl=mask();both(f=>fillEll(bl,9,et-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
     else{const e=mask(),eo=ears(e,et);commit(g,e,eo);}
     /* feet (not bobbing) */
@@ -72,7 +73,8 @@ function buildSprite(S,bob,blink){
     else if(S.horns==='ram')both(f=>curve(hm,[[11,top+4],[4,top],[3,top+7]],3.6,1.4,f));
     else if(S.horns==='crown'){[[11,4],[16,6],[21,4]].forEach(p=>fillPoly(hm,[[p[0]-2.2,top+2],[p[0],top-p[1]+2],[p[0]+2.2,top+2]]));}};
     /* 0.56: horns that would reach past the 40x40 frame sit just low enough to fit (only those move) */
-    let ht=top;for(let k=0;k<8;k++){const t=mask();horns(t,ht);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;ht+=1;}
+    /* fitted once on the resting pose (bob 0), then moved with the body, so ears never stretch as it bobs; one free row under the frame's top */
+    let ht=top-oy;for(let k=0;k<9;k++){const t=mask();horns(t,ht);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=2)break;ht+=1;}ht+=oy;
     const hm=mask();horns(hm,ht);commit(g,hm,{b:14,s:15,h:null});
     /* shoulder spines */
     if(S.spines){const sp=mask();both(f=>fillPoly(sp,sh.sp.map(p=>[p[0],p[1]+oy]),f));commit(g,sp,{b:14,s:15,h:null});}

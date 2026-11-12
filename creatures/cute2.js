@@ -29,7 +29,8 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
     else if(S.ears==='antenna'){both(f=>curve(e,[[13,t+2],[11,t-4],[9,t-8]],2,2,f));both(f=>fillEll(e,9,t-9,2.1,2.1,f));}
     else if(S.ears==='tuft'){fillEll(e,16,t-2.5,1.8,4);both(f=>fillEll(e,12.5,t-1.5,1.6,3.2,f));o={b:6,s:13,h:null};}
     return o;};
-  let et=top;for(let k=0;k<8;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=1)break;et+=1;}
+  /* fitted once on the resting pose (bob 0), then moved with the body, so ears never stretch as it bobs; one free row under the frame's top */
+    let et=top-oy;for(let k=0;k<9;k++){const t=mask();ears(t,et);let hi=N;for(let q=0;q<N*N;q++)if(t[q]){hi=Math.floor(q/N);break;}if(hi>=2)break;et+=1;}et+=oy;
   if(S.ears==='antenna'){const st=mask();both(f=>curve(st,[[13,et+2],[11,et-4],[9,et-8]],2,2,f));commit(g,st,duo);const bl=mask();both(f=>fillEll(bl,9,et-9,2.1,2.1,f));commit(g,bl,{b:6,s:13,h:null});}
   else{const e=mask(),eo=ears(e,et);if(S.ears!=='none')commit(g,e,eo);}
   /* feet (not bobbing); blobs and loaves sit on the ground */
@@ -84,7 +85,7 @@ function cute2(g,S,oy,blink,FOOT,M,rm,FX){
   /* arms: the chosen pose if it stays clear of the face (a pixel of body between), else a calmer one */
   /* each pose has a few placements (lower, further out); the first that keeps a pixel of body between the arm's
      outline and the face wins, else a calmer pose, else the arms stay tucked away */
-  const hugY=Math.min(Math.max(cy+ry*.66,moY+F.FI.length*0+3.5),25.5);
+  const hugY=Math.min(Math.max(cy+ry*.66,moY+3.5),25.5+oy);
   const OUT=[[-.5,2],[-1.5,3],[-.5,4.5],[-1.5,5.5]],UP=[[1.5,1,0],[1.5,3,-1],[.5,4,-1.5]];
   const out=(a,f,k)=>fillEll(a,16-rx+OUT[k][0],cy+OUT[k][1],2.1,3,f),
     up=(a,f,k)=>{const[x0,y0,dx]=UP[k];curve(a,[[16-rx+x0,cy+y0],[16-rx-2.5+dx,cy+y0-3],[16-rx-2+dx,cy+y0-8]],3.6,2.8,f);};

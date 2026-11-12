@@ -8,6 +8,7 @@
 - `identity.py GEN`: silhouettes and faces must match the shipped build (run it before shipping a rendering change).
 - `clip.py [gen]`: nothing may be cut by the 40x40 frame (a part's fill on the edge). Must print 0.
 - `pick.py OUT.png 'JS filter' GEN`: before/after for chosen Forgelings.
+- `bob.py [html]`: above the feet, the bob frame must be the rest frame one pixel lower. Must print 0.
 - `float.py`: head keepsakes must rest on the head.
 - `foil.py OUT.png`: pixels holo foil paints (pink), a build (`BEFORE=`, default /tmp/c541.html) against these files. Any new
   palette slot must be checked against FOIL3, FOIL4 and OL().
