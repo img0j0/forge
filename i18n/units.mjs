@@ -5,6 +5,8 @@ export function scripts(html){const out=[];const re=/<script>([\s\S]*?)<\/script
 const strip=s=>s.replace(/\{\d+\}/g,' ').replace(/<[^>]*>/g,' ').replace(/&[#a-z0-9]+;/gi,' ');
 const CODEY=/^(?:[\w.#\[\]=:,'"()\s-]*|.*(?:\d+px|rgba?\(|#[0-9a-f]{3,6}\b|data:|base64|https?:|[{};]\s*$).*)$/i;
 export function isHuman(key){const t=strip(key).trim();if(!t)return false;
+  if(/\.{4,}|\|/.test(t)||/^<svg|<path /.test(key.trim()))return false;
+  const ok=(t.match(/[A-Za-z ,.'’!?;:—–()-]/g)||[]).length/t.length;if(ok<.75)return false;
   if(/[A-Za-z]{2,}[ ,.!?'’:;—–-]+[A-Za-z]/.test(t)&&!/\d+px|font-|rgba?\(|var\(--|^\s*[.#][\w-]+\s*\{/.test(t))return true;   // a phrase
   if(/^[A-Z][a-z’']+[.!?]?$/.test(t)||/^[A-Z][a-z]+ ?[a-z]*[.!?…]?$/.test(t))return 'word';                                       // a capitalised single word
   return false;}
