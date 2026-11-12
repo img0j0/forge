@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Forgelings</string>
+    <string name="title_activity_main">Forgelings</string>
+    <string name="package_name">com.forgelings.app</string>
+    <string name="custom_url_scheme">com.forgelings.app</string>
+</resources>

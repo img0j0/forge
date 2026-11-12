@@ -10,6 +10,13 @@
     "limitsNavigationsToAppBoundDomains": false
   },
   "plugins": {
-    "LocalNotifications": { "iconColor": "#FFD36B" }
+    "LocalNotifications": {
+      "iconColor": "#FFD36B",
+      "smallIcon": "ic_stat_forgelings"
+    }
+  },
+  "android": {
+    "backgroundColor": "#16132E",
+    "allowMixedContent": false
   }
 }

@@ -2,13 +2,17 @@
   "name": "forgelings-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Forgelings for iPhone: the Forgelings web app wrapped with Capacitor.",
+  "description": "Forgelings for iPhone and Android: the Forgelings web app wrapped with Capacitor.",
   "scripts": {
     "www": "python3 build-www.py",
-    "sync": "npm run www && npx cap sync ios",
-    "open": "npx cap open ios"
+    "sync": "npm run www && npx cap sync ios && python3 ios-setup.py",
+    "sync:android": "npm run www && npx cap sync android && python3 android-setup.py",
+    "open": "npx cap open ios",
+    "open:android": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.3",
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/haptics": "^8.0.2",
