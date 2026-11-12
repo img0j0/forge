@@ -66,7 +66,7 @@ html[lang=ja]{--jp:'JPText','Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sa
 --body:'Nunito Sans',var(--jp);--display:'Nunito Sans',var(--jp)}
 html.jr[lang=ja],html[lang=ja]{--hand:'Caveat','JPHand',var(--jp)}
 html[lang=ja] body{line-break:strict;word-break:normal;overflow-wrap:anywhere}
-html[lang=ja] #dateLabel{font-size:.88em}html.jr[lang=ja] .app .facebtn{font-size:calc(var(--hs)*17px);white-space:nowrap}html[lang=ja] .scrim.jcov .tagline,html[lang=ja] .tagline{font-size:20px;line-height:1.35}html[lang=ja] .stat{grid-template-columns:4.1em 1fr 1.7em}html[lang=ja] .stat>span:first-child{white-space:nowrap;font-size:.92em}html[lang=ja] .odds td{white-space:nowrap}html[lang=ja] .odds th{font-size:11px;word-break:keep-all}
+html[lang=ja] #dateLabel{font-size:.88em}html[lang=ja] :is(h1,h2,h3){text-wrap:balance}html.jr[lang=ja] .app .facebtn{font-size:calc(var(--hs)*17px);white-space:nowrap}html[lang=ja] .scrim.jcov .tagline,html[lang=ja] .tagline{font-size:20px;line-height:1.35}html[lang=ja] .stat{grid-template-columns:4.1em 1fr 1.7em}html[lang=ja] .stat>span:first-child{white-space:nowrap;font-size:.92em}html[lang=ja] .odds td{white-space:nowrap}html[lang=ja] .odds th{font-size:11px;word-break:keep-all}
 </style>`;
 out=out.replace('</head>',CSS+'\n</head>');
 fs.writeFileSync(OUT,out);
