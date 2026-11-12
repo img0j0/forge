@@ -29,8 +29,8 @@
   --body:'Nunito Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   --px:'Press Start 2P','Courier New',monospace; --px2:'VT323','Courier New',monospace;
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-top:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px));
+  padding-bottom:max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px));
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -46,7 +46,7 @@
 }
 :root{--mpaper:#F8F0DE; --mburn:rgba(150,104,48,.24); --mfog:#FFFFFF; --mgrain:#7A5A34; --mrib:#EFE2C4; --mbleed:1}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mpaper:#1F1B38; --mburn:rgba(0,0,0,.42); --mfog:#3D3768; --mgrain:#FFFFFF; --mrib:#2C2750; --mbleed:.4}}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px))}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer}
@@ -181,12 +181,12 @@ ul.furn li:not(.on) b{color:var(--muted)}
 .scrim.titlemode{background:#0B0E26;padding:0;align-items:stretch}
 .titlemode .ov{max-width:none;width:100%;height:100dvh;padding:0;display:block;position:relative;overflow:hidden}
 #titleCv{position:absolute;inset:0;width:100%;height:100%;transition:transform .5s ease;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
-.title-top{position:absolute;left:0;right:0;top:calc(9vh + env(safe-area-inset-top,0px));text-align:center;padding:0 24px}
+.title-top{position:absolute;left:0;right:0;top:calc(9vh + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));text-align:center;padding:0 24px}
 .wordmark{font:600 clamp(40px,14.5vw,64px)/1 var(--display);letter-spacing:.02em;margin:0;color:#FFF6CF;text-shadow:0 4px 0 rgba(10,8,30,.45)}
 .tagline{font:500 18px/1.4 var(--display);margin:12px 0 0;color:#EDE6FF}
 .titlemode.lite .wordmark{color:#3B2E6E;text-shadow:0 4px 0 rgba(255,255,255,.55)}
 .titlemode.lite .tagline{color:#3B2E6E}
-.title-bottom{position:absolute;left:0;right:0;bottom:0;padding:0 20px calc(26px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:10px}
+.title-bottom{position:absolute;left:0;right:0;bottom:0;padding:0 20px calc(26px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));display:grid;justify-items:center;gap:10px}
 .title-bottom .primary{max-width:340px;box-shadow:0 6px 0 rgba(10,8,30,.25)}
 .tsmall{font-size:14px;color:#EDE6FF;text-align:center;margin:0;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .titlemode.lite .tsmall{color:#2E2A47;text-shadow:0 1px 2px rgba(255,255,255,.7)}
@@ -444,7 +444,7 @@ h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 .bookrow{display:flex;gap:14px;align-items:center}.bookrow .book{flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25))}.bookrow h2{margin:0 0 2px}
 .feelc{margin:4px 0 0}
 /* Nav */
-.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);z-index:20;padding:6px 10px calc(6px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
 .tabs-in{max-width:460px;margin:0 auto;display:flex}
 .tab{flex:1;background:none;border:0;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700;position:relative}
 .tab[aria-current="page"]{color:var(--plum)}
@@ -454,8 +454,8 @@ h2.sub3{font:600 17px/1.2 var(--display);margin:20px 0 8px}
 /* Sheets and overlays */
 .scrim{position:fixed;inset:0;background:rgba(20,18,40,.58);display:flex;align-items:flex-end;justify-content:center;z-index:50;animation:fade .2s}
 .scrim.dark{align-items:center;background:radial-gradient(circle at 50% 35%,#3A2C6E,#0C0A1C)}
-.sheet{background:var(--surface);width:100%;max-width:460px;border-radius:28px 28px 0 0;padding:20px 20px calc(22px + env(safe-area-inset-bottom,0px));max-height:94dvh;overflow:auto;animation:rise .28s cubic-bezier(.2,.9,.3,1)}
-.ov{width:100%;max-width:460px;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:12px;max-height:100dvh;overflow:auto;color:#fff}
+.sheet{background:var(--surface);width:100%;max-width:460px;border-radius:28px 28px 0 0;padding:20px 20px calc(22px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));max-height:94dvh;overflow:auto;animation:rise .28s cubic-bezier(.2,.9,.3,1)}
+.ov{width:100%;max-width:460px;padding:14px 18px calc(18px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));display:grid;justify-items:center;gap:12px;max-height:100dvh;overflow:auto;color:#fff}
 .ov .rv-title{font:600 20px var(--display);text-align:center}
 .ov .rv-hint{color:#D9D2F5;font-size:15px;text-align:center}
 .ov .btnrow{width:100%;max-width:340px}
@@ -513,9 +513,9 @@ html .taskface p{margin:0;color:#FFF7EC;font-size:17px;line-height:1.4}
 @media (max-width:380px){.flip{width:min(268px,82vw)}}
 @keyframes sigBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(84px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-.updbar{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 6px 6px 16px;border-radius:24px;font-weight:700;font-size:14px;z-index:69;display:flex;gap:6px;align-items:center;width:max-content;max-width:92vw;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.updbar{position:fixed;left:50%;bottom:calc(84px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 6px 6px 16px;border-radius:24px;font-weight:700;font-size:14px;z-index:69;display:flex;gap:6px;align-items:center;width:max-content;max-width:92vw;box-shadow:0 6px 18px rgba(0,0,0,.28)}
 .updbar span{flex:1;line-height:1.3}
 .updbar button{min-height:44px;min-width:44px;border-radius:22px;padding:0 14px;border:0;font:inherit;font-weight:800;background:var(--bg);color:var(--ink);cursor:pointer}
 .updbar button.later{background:transparent;color:var(--bg);text-decoration:underline;text-underline-offset:3px}
@@ -792,11 +792,11 @@ html.ls[data-skyink="dark"] .mine{color:#4A3000}
 html.ls[data-skyink="light"] .inkm,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .inkm{color:#FFD36B}
 html.ls[data-skyink="light"] .mine,html.ls :is(.panel-box,.group,.hero,.setblock,.sheet,.mapwrap,.ov,.calling,.rib,.chron,.realm,.otale,.mecho) .mine{color:#FFE9A8;background:rgba(255,211,107,.12)}
 html.ls :is(.primary,.outline,.chip,.fchip,.pill,.moodbtn,.tool,.act,.binder button):focus-visible{outline:none;box-shadow:inset 0 0 0 3px #FFFFFF,inset 0 0 0 5px #2E2A47}
-html.ls .tabs{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:440px;margin:0 auto;padding:7px 4px 6px;background:rgba(16,12,40,.95);border:0;clip-path:var(--step)}
+html.ls .tabs{left:10px;right:10px;bottom:calc(10px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));max-width:440px;margin:0 auto;padding:7px 4px 6px;background:rgba(16,12,40,.95);border:0;clip-path:var(--step)}
 html.ls .tab{color:var(--muted)}
 html.ls .tab[aria-current="page"]{color:var(--plum)}
 html.ls .tab[aria-current="page"]::before{content:'';position:absolute;top:-3px;left:50%;width:24px;height:3px;margin-left:-12px;background:var(--plum)}
-html.ls .toast{border-radius:0;clip-path:var(--step);bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+html.ls .toast{border-radius:0;clip-path:var(--step);bottom:calc(92px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
 /* 0.38.5: toasts are pixel banners; a new ribbon gets gold and a medal */
 .toast{border-radius:0;clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px));background:#1E1740;color:#FFF7EC;box-shadow:inset 0 0 0 2px #F2C14E,inset 0 -4px 0 rgba(0,0,0,.25);padding:12px 18px 13px}
 .toast.medal{background:#FFD36B;color:#2E2A47;box-shadow:inset 0 0 0 2px #8A5A32,inset 0 -4px 0 rgba(138,90,50,.35);padding-left:46px;text-align:left}
@@ -864,9 +864,9 @@ html.jr .app :is(.chip,.fchip)[aria-pressed="true"]{background:#FFD36B;color:#2E
 html.jr :is(.primary,.outline,.chip,.fchip,.pill,.ghost,.rowl,.facebtn,.tab,.binder button,.herocard):focus-visible{outline:3px solid #FFD36B;outline-offset:2px;box-shadow:0 0 0 6px var(--jink)}
 /* sheets and toasts sit on the page too */
 html.jr .sheet{background:repeating-linear-gradient(transparent 0 33px,var(--jrule) 33px 34px),var(--jpaper);color:var(--ink);border-radius:0;box-shadow:0 -4px 0 var(--jedge)}
-html.jr .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+html.jr .toast{bottom:calc(84px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
 /* ribbons are the tabs */
-html.jr .tabs{background:var(--jdesk);border:0;left:0;right:0;bottom:0;padding:0 0 env(safe-area-inset-bottom,0px);box-shadow:0 -4px 0 var(--jedge2)}
+html.jr .tabs{background:var(--jdesk);border:0;left:0;right:0;bottom:0;padding:0 0 max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px));box-shadow:0 -4px 0 var(--jedge2)}
 html.jr .tabs-in{max-width:440px;gap:8px;align-items:flex-start;padding:0 18px}
 html.jr .tab{min-height:60px;padding:9px 0 15px;justify-content:flex-start;color:#FFFFFF;font:700 12px/1 var(--body);clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%);transition:min-height .2s}
 html.jr .tab .pi{width:16px;height:16px}
@@ -935,17 +935,17 @@ html.jr .app .favmark{color:#C98A12}
 .jcover,.jlabel,.jkick{display:none}
 .scrim.jcov{background:var(--jdesk)}
 .scrim.jcov #titleCv{display:none}
-.scrim.jcov .jcover{display:block;position:absolute;left:14px;right:10px;top:calc(16px + env(safe-area-inset-top,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));border-radius:4px 14px 14px 4px;background:radial-gradient(rgba(0,0,0,.08) 1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#6A3631,#4E2622);box-shadow:6px 6px 0 #E3D3AE,10px 10px 0 #2A1B0F}
+.scrim.jcov .jcover{display:block;position:absolute;left:14px;right:10px;top:calc(16px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:calc(16px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));border-radius:4px 14px 14px 4px;background:radial-gradient(rgba(0,0,0,.08) 1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#6A3631,#4E2622);box-shadow:6px 6px 0 #E3D3AE,10px 10px 0 #2A1B0F}
 .scrim.jcov .jstitch{position:absolute;inset:14px;border:2px dashed rgba(255,211,107,.45);border-radius:2px 10px 10px 2px}
 .scrim.jcov .jband{position:absolute;right:38px;top:0;bottom:0;width:16px;background:#22140E}
-.scrim.jcov .title-top{z-index:2;top:calc(5vh + 26px + env(safe-area-inset-top,0px));bottom:calc(172px + env(safe-area-inset-bottom,0px));padding:0 74px 0 34px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.scrim.jcov .title-top{z-index:2;top:calc(5vh + 26px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:calc(172px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));padding:0 74px 0 34px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .scrim.jcov .jkick{display:block;margin:0;font:400 19px/1 var(--px2);letter-spacing:.14em;text-transform:uppercase;color:#E9C77A}
 .scrim.jcov .wordmark{color:#FFD36B;text-shadow:0 2px 0 #8A5A10;margin:0;font-size:min(64px,calc((100vw - 140px) / 4.6))}
 .scrim.jcov .jlabel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;flex:0 1 auto;min-height:0;max-height:400px;width:100%;max-width:300px;margin:auto 0;background:#FBF5E6;box-shadow:0 4px 0 #C9B48A;transform:rotate(-1.5deg);padding:14px 12px;box-sizing:border-box}
 .scrim.jcov .jlabel img{flex:none;width:auto;height:clamp(84px,min(22vh,46vw),180px);aspect-ratio:1;image-rendering:pixelated}
 .scrim.jcov .tagline{flex:none;margin:0;font:700 24px/1.05 'Caveat',var(--display);color:#2E2A47;text-align:center}
 html.plainhand .scrim.jcov .tagline{font:600 18px/1.25 var(--display)}
-.scrim.jcov .title-bottom{z-index:2;padding-left:40px;padding-right:74px;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+.scrim.jcov .title-bottom{z-index:2;padding-left:40px;padding-right:74px;padding-bottom:calc(48px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)))}
 .scrim.jcov .tsmall{color:#F3E7C2}
 .scrim.jcov .giftnote{color:#FFE9A8}
 html.jr .app :is(.hero,.herowrap,.group,.panel-box,.setblock,.setsec){border-image:none !important;border-width:0 !important;outline:0}
@@ -1242,8 +1242,8 @@ html .app .chips.seg .chip[aria-pressed="true"]{color:#2E2A47 !important;backgro
 @media (prefers-reduced-motion:reduce){.app .chips.seg::before,html .app .chips.seg .chip{animation:none !important}}
 html.reduce .app .chips.seg::before,html.reduce .app .chips.seg .chip{animation:none !important}
 /* 0.51: toasts drop in from the top instead of covering rows above the tab bar */
-.toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto;transform:translate(-50%,-16px);width:max-content;max-width:min(94vw,440px)}
-html.ls .toast,html.jr .toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto}
+.toast{top:calc(10px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:auto;transform:translate(-50%,-16px);width:max-content;max-width:min(94vw,440px)}
+html.ls .toast,html.jr .toast{top:calc(10px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:auto}
 </style>
 </head>
 <body>
@@ -1726,7 +1726,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.51.0',APPVER='1.0.0';
+const VERSION='prototype 0.52.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -1798,9 +1798,77 @@ async function nrestore(){
     else if(nv&&!lv){try{localStorage.setItem(k,nv);}catch(e){}}
     else if(lv&&!nv)nset(k,lv);
   }
+  await cloudRestore();
   nflush();
 }
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(typeof markFindSeen==='function'&&state&&tab==='today')markFindSeen();nflush();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(typeof markFindSeen==='function'&&state&&tab==='today')markFindSeen();nflush();cloudPush();}else if(cloudOn()&&state)cloudLive();});
+/* ---- 0.52: a quiet copy in the player's own iCloud (iPhone app only: CloudSavePlugin.swift, Apple's key-value
+   storage, 1 MB per app). Android keeps its copy through Android's own app backup. The copy is the save, gzipped
+   (about 13 KB a year). Same journal (jid) on both sides: the newer _sv wins quietly. A different journal in iCloud is
+   never swapped in silently: the player chooses. ---- */
+const CLOUD_OFF='forge-cloud-off',CLOUD_AT='forge-cloud-at';
+const CS={t:null,busy:false,offer:null,avail:null,err:null};
+const cloudPlug=()=>NATIVE&&PL.CloudSave?PL.CloudSave:null;
+const cloudOn=()=>{if(!cloudPlug())return false;try{return localStorage.getItem(CLOUD_OFF)!=='1';}catch(e){return true;}};
+const cloudAt=()=>{try{return +localStorage.getItem(CLOUD_AT)||0;}catch(e){return 0;}};
+const ANDROID=NATIVE&&((CAP.getPlatform&&CAP.getPlatform()==='android')||/Android/i.test(navigator.userAgent));
+async function czip(t){try{if(typeof CompressionStream==='undefined')throw 0;const u=new Uint8Array(await new Response(new Blob([t]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return 'gz1:'+btoa(s);}catch(e){return 'j1:'+t;}}
+async function cunzip(v){if(typeof v!=='string')return null;if(v.startsWith('j1:'))return v.slice(3);if(!v.startsWith('gz1:'))return null;const b=atob(v.slice(4)),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
+const cparse=t=>{try{const o=JSON.parse(t);return o&&typeof o==='object'&&!Array.isArray(o)?o:null;}catch(e){return null;}};
+async function cloudRead(){const p=cloudPlug();if(!p)return null;try{const st=await p.status();CS.avail=!!(st&&st.available);if(!CS.avail)return null;const r=await p.get({key:KEY});const t=await cunzip(r&&r.value);const o=t&&cparse(t);return o?{t,o}:null;}catch(e){CS.err=String(e&&e.message||e);return null;}}
+// which save to keep: 'cloud' (take iCloud's), 'local' (keep this phone's), 'offer' (two different journals: ask)
+function cloudPick(lo,co){
+  const n=o=>o&&Array.isArray(o.cards)?o.cards.length:0;
+  if(!co||!n(co))return 'local';if(!lo||!n(lo))return 'cloud';
+  if(lo.jid&&co.jid&&lo.jid!==co.jid)return 'offer';
+  return (co._sv||0)>(lo._sv||0)?'cloud':'local';
+}
+async function cloudRestore(){
+  if(!cloudOn())return;const c=await cloudRead();if(!c)return;
+  let lt=null;try{lt=localStorage.getItem(KEY);}catch(e){}
+  const r=cloudPick(lt&&cparse(lt),c.o);
+  if(r==='cloud'){try{localStorage.setItem(KEY,c.t);localStorage.removeItem(KEY+'-daily');}catch(e){}nset(KEY,c.t);}
+  else if(r==='offer')CS.offer=c;
+}
+function cloudSoon(){if(!cloudOn()||CS.offer)return;clearTimeout(CS.t);CS.t=setTimeout(cloudPush,4000);}
+async function cloudPush(){
+  clearTimeout(CS.t);if(!cloudOn()||CS.offer||CS.busy)return;let t=null;try{t=localStorage.getItem(KEY);}catch(e){}if(!t)return;
+  CS.busy=true;try{const p=cloudPlug(),st=await p.status();CS.avail=!!(st&&st.available);
+    if(CS.avail){await p.set({key:KEY,value:await czip(t)});CS.err=null;try{localStorage.setItem(CLOUD_AT,String(Date.now()));}catch(e){}}
+  }catch(e){CS.err=String(e&&e.message||e);}CS.busy=false;
+  const l=document.getElementById('cloudLine');if(l)l.textContent=cloudLine();
+}
+function cloudLine(){
+  if(!cloudOn())return 'Off. Your collection lives only on this phone, so save a copy now and then.';
+  if(CS.avail===false)return 'Sign in to iCloud in your iPhone’s Settings to keep a copy there.';
+  const a=cloudAt();if(!a)return 'A copy is kept in your own iCloud, so a new iPhone brings your Forgelings back.';
+  const m=Math.round((Date.now()-a)/60000);
+  return 'A copy is kept in your own iCloud, so a new iPhone brings your Forgelings back. Last saved '+(m<2?'just now':m<60?m+' minutes ago':m<1440?Math.round(m/60)+(Math.round(m/60)===1?' hour ago':' hours ago'):'on '+new Date(a).toLocaleDateString())+'.';
+}
+function cloudSetHTML(){
+  if(cloudPlug())return `<div class="lbl2">iCloud</div><p class="muted small" id="cloudLine">${esc(cloudLine())}</p><button class="pill" id="btnCloud">${cloudOn()?'Turn off the iCloud copy':'Keep a copy in iCloud'}</button>`;
+  if(ANDROID)return `<div class="lbl2">Android backup</div><p class="muted small">If backup is on for this phone, Android keeps a copy of Forgelings with your other apps, and a new phone brings it back.</p>`;
+  return '';
+}
+async function cloudLive(){
+  if(!cloudOn()||!state||CS.offer)return;const c=await cloudRead();if(!c)return;const r=cloudPick(state,c.o);
+  if(r==='cloud'){try{localStorage.setItem(KEY,c.t);localStorage.removeItem(KEY+'-daily');}catch(e){}nset(KEY,c.t);nflush();tabAway=true;setTimeout(()=>location.reload(),300);}
+  else if(r==='offer'){CS.offer=c;cloudOfferSoon();}
+}
+function cloudOfferSoon(){if(!CS.offer)return;if(!state||!state.ageBand||!modal.hidden){setTimeout(cloudOfferSoon,2000);return;}cloudOffer();}
+function cloudOffer(){
+  const c=CS.offer;if(!c)return;const n=c.o.cards.length,m=state.cards.length,pl=k=>k+' Forgeling'+(k===1?'':'s');
+  const d=c.o.date&&/^\d{4}-\d{2}-\d{2}$/.test(c.o.date)?new Date(c.o.date+'T12:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):'';
+  openSheet(`<h2>A journal in your iCloud</h2><p class="muted">Your iCloud holds a Forgelings journal from another phone, with ${pl(n)}${d?', last opened '+esc(d):''}. This phone has its own, with ${pl(m)}.</p><p class="muted small">iCloud keeps one journal. The one you don’t choose is replaced, so save a copy of this phone’s journal first if you want to keep both.</p><div class="stack"><button class="primary" id="cloudUse">Use the iCloud journal (${pl(n)})</button><button class="ghost" id="cloudKeep">Keep this phone’s journal (${pl(m)})</button><button class="ghost" id="cloudCopy">Save a copy of this phone’s journal</button></div>`);
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#cloudUse,#cloudKeep,#cloudCopy');if(!b)return;
+  if(b.id==='cloudCopy'){openExport();return;}
+  const c=CS.offer;CS.offer=null;
+  if(b.id==='cloudUse'&&c){try{localStorage.setItem(KEY+'-replaced',JSON.stringify(state));localStorage.setItem(KEY,c.t);localStorage.removeItem(KEY+'-daily');}catch(e){}nset(KEY,c.t);nflush();tabAway=true;closeModal();setTimeout(()=>location.reload(),300);}
+  else{closeModal();cloudPush();toast('This phone\u2019s journal is now the one in iCloud.');}
+});
+if(cloudPlug()){try{cloudPlug().addListener('change',ev=>{if(!ev||!Array.isArray(ev.keys)||ev.keys.includes(KEY))cloudLive();});}catch(e){}}
+
 const p2=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
 let state=null,tab='today',bf={type:'all',mood:'all',sort:'new',page:0},rv=null,pk=null,pendingAllIn=false,pgT=null;
@@ -1911,7 +1979,7 @@ function sanitize(s){
   s.keepsR=Array.isArray(s.keepsR)?s.keepsR.filter((x,i,a)=>KEEPR.some(k=>k.id===x)&&a.indexOf(x)===i):[];
   return s;
 }
-function migrate(s){sanitize(s);if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.forge)s.forge={spent:0,made:[],log:{},bell:'',comp:'',compTo:-1};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
+function migrate(s){sanitize(s);if(typeof s.jid!=='string'||!/^[a-z0-9]{6,24}$/.test(s.jid))s.jid=rid();if(!Array.isArray(s.mapMax))s.mapMax=[0,1,2,3,4].map(ti=>mapTierOld(s.cards.filter(c=>c.theme===ti).length));s.cards.forEach(c=>{if(c.tale===undefined)c.tale=c.note||'';if(c.nick===undefined)c.nick='';if(c.wi===undefined)c.wi=Math.abs(c.seed||0)%1000;});if(s.settings.lore===undefined)s.settings.lore=true;if(!s.hearth)s.hearth={slots:[],visits:{date:'',used:0},total:0};if(s.hearth.bd===undefined)s.hearth.bd='';if(s.hearth.sleep===undefined)s.hearth.sleep=null;if(!s.hearth.pairs)s.hearth.pairs={};if(!s.hearth.quiet)s.hearth.quiet={g:0,b:0,v:0,shown:0,ready:0,pulse:0,seenAt:Date.now()};if(s.hearth.welcomes===undefined)s.hearth.welcomes=0;if(!s.journal)s.journal={};if(s.ribbons===undefined)s.ribbons=null;if(s.seen===undefined)s.seen=0;if(!s.feedback)s.feedback={};if(s.feedbackAsked===undefined)s.feedbackAsked=false;if(s.wander===undefined)s.wander=null;if(!s.curios)s.curios={};if(!s.forge)s.forge={spent:0,made:[],log:{},bell:'',comp:'',compTo:-1};if(!s.wstat)s.wstat={sent:0,back:0};s.cards.forEach(c=>{if(c.bond===undefined)c.bond=0;if(c.keep===undefined)c.keep='';if(!c.fire)c.fire=[];});return s;}
 /* 0.43.1: a whole save loads as before; one missing its settings or version is filled in from a fresh one; anything else
    is kept untouched (in -recovery) and the recovery sheet offers the daily safety copy instead of quietly starting over. */
 function loadParse(raw){
@@ -1960,7 +2028,7 @@ function save(){
     try{localStorage.setItem(KEY,j);saveProblem('web',false);}
     catch(e){try{localStorage.removeItem(KEY+'-daily');dailyAt=null;localStorage.setItem(KEY,j);saveProblem('web',false);}catch(e2){ok=false;saveProblem('web',true);}}
     if(ok&&dailyAt!==s.date){try{localStorage.setItem(KEY+'-daily',j);dailyAt=s.date;}catch(e){}}
-    nset(KEY,j);remindSoon();return ok;
+    nset(KEY,j);cloudSoon();remindSoon();return ok;
   }catch(e){saveProblem('encode',true);return false;}
 }
 function rollover(){
@@ -2418,11 +2486,11 @@ function renderSettings(){
       ${S.engine==='media'?'<p class="muted small" style="margin-top:6px">Soft music needs the standard method.</p>':''}`)}
     ${setSec('look','Look and feel',[ML[S.mood]||'A mix',SK[S.sky||'auto'],TH[S.theme],S.reduce?'less motion':''].filter(Boolean).join(' \u00B7 '),`<div class="lbl2">Forgeling mood</div><p class="muted small">Which Forgelings you find from now on. The ones you already have stay.</p><div class="chips" role="group" aria-label="Forgeling mood">${[['cute','Cute only'],['mix','A mix'],['dark','Dark only']].map(a=>`<button class="chip" data-setmood="${a[0]}" aria-pressed="${S.mood===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">Comfort</div><div class="chips"><button class="chip" id="setReduce" aria-pressed="${!!S.reduce}">Reduce motion ${S.reduce?'on':'off'}</button><button class="chip" id="setLore" aria-pressed="${S.lore!==false}">Whispers and tales ${S.lore!==false?'on':'off'}</button></div><div class="lbl2">Appearance</div><div class="chips" role="group" aria-label="Appearance">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(a=>`<button class="chip" data-settheme="${a[0]}" aria-pressed="${(S.theme||'auto')===a[0]}">${a[1]}</button>`).join('')}</div><div class="lbl2">The page</div><p class="muted small" style="margin:2px 0 6px">Your journal is paper by day and lamplit at dusk and night. Dark keeps it lamplit. Plain keeps a quiet, flat look instead of the journal.</p><div class="chips" role="group" aria-label="The page">${[['auto','Follows your day'],['day','Always day'],['night','Always lamplit'],['plain','Plain']].map(a=>`<button class="chip" data-setsky="${a[0]}" aria-pressed="${(S.sky||'auto')===a[0]}">${a[1]}</button>`).join('')}</div>${S.sky!=='plain'?`<div class="lbl2">Writing</div><p class="muted small" style="margin:2px 0 6px">Your words are handwritten in the journal. Plain print is easier to read for some people.</p><div class="chips" role="group" aria-label="Writing"><button class="chip" data-sethand="1" aria-pressed="${S.hand!==false}">Handwriting</button><button class="chip" data-sethand="0" aria-pressed="${S.hand===false}">Plain print</button></div>`:''}`)}
     ${remindHTML()}
-    ${setSec('coll','Your collection',state.cards.length+' Forgeling'+(state.cards.length===1?'':'s')+' \u00B7 save or restore a copy',`<div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div><div class="lbl2">Backup</div><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p><div class="chips"><button class="pill" id="btnExport">Save a copy</button><button class="pill" id="btnRestore">Restore a copy</button></div>`)}
-    ${setSec('about','About',`Fair odds, privacy and terms`,`<div class="lbl2">Fair odds</div><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button><div class="lbl2">Privacy</div><p class="muted small">Everything you do in Forgelings stays on this device. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p><div class="chips"><button class="pill" id="btnPrivacy">How Forgelings handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p>`)}
+    ${setSec('coll','Your collection',state.cards.length+' Forgeling'+(state.cards.length===1?'':'s')+' \u00B7 save or restore a copy',`<div class="numgrid"><div class="num"><b>${done}</b><span>days showed up</span></div><div class="num"><b>${state.cards.length}</b><span>Forgelings</span></div><div class="num"><b>${rare}</b><span>rare or better</span></div><div class="num"><b>${state.packsOpened}</b><span>packs opened</span></div></div><div class="lbl2">Backup</div><p class="muted small">Your collection lives on this device. Save a copy so you can move it or restore it.</p><div class="chips"><button class="pill" id="btnExport">Save a copy</button><button class="pill" id="btnRestore">Restore a copy</button></div>${cloudSetHTML()}`)}
+    ${setSec('about','About',`Fair odds, privacy and terms`,`<div class="lbl2">Fair odds</div><p class="muted small">Packs are earned, never sold. Check the odds yourself.</p><button class="pill" id="btnOdds">See the odds</button><div class="lbl2">Privacy</div><p class="muted small">Everything you do in Forgelings stays on this device${cloudPlug()?', with a copy in your own iCloud if you keep that on. Forgelings can never see it':ANDROID?', and in Android\u2019s own backup if that is on':''}. It has no accounts and sends nothing anywhere: no server, no tracking, no ads. Your birth date is not stored, only that you are an adult.</p><div class="chips"><button class="pill" id="btnPrivacy">How Forgelings handles your data</button><button class="pill" id="btnTerms">Terms of use</button></div><p class="small">Age setting: <b>${state.ageBand==='teen'?'Teen (13 to 17)':state.ageBand==='adult'?'Adult (18 and up)':'Not set'}</b></p>`)}
     ${STORE?'':setSec('feedback','Feedback','A few quick questions, and your report',`<p class="muted small">Answer as many as you like, whenever you like.</p>${feedbackHTML()}<div class="lbl2">My report</div><p class="muted small">A short summary, plus anything you wrote above, that you can send to whoever is gathering feedback.</p><button class="pill" id="btnReport">${navigator.share&&(RELEASE||STANDALONE())?'Send my report':'Copy my report'}</button>`)}
     ${installTipHTML()}
-    <div class="erase"><button class="pill" id="btnErase">Erase everything on this device</button></div>
+    <div class="erase"><button class="pill" id="btnErase">${cloudOn()?'Erase everything here and in iCloud':'Erase everything on this device'}</button></div>
     ${STORE?'':`    <details class="dev"><summary>Prototype tools</summary><div class="stack">
       <button class="tool" data-tool="next"><b>Skip to tomorrow</b><span>Skipping a day never breaks anything.</span></button>
       <button class="tool" data-tool="week"><b>Simulate 6 days</b><span>Earns 5 Forgelings (one rest day) and unlocks a pack.</span></button>
@@ -4968,7 +5036,7 @@ function copyText(txt,done){
 
 /* ---- 0.24: your own small thing, backups, and the share picture ---- */
 function toggleOwn(){const k=todayKey(),d=state.own.days,i=d.indexOf(k);if(i>=0)d.splice(i,1);else{d.push(k);d.sort();if(d.length>800)d.splice(0,d.length-800);chime(0);}save();renderToday();const b=$('#btnOwn');if(b)b.focus({preventScroll:true});}
-function backupDue(){const b=state.backup||{};if(state.cards.length<5||dayN()<7)return false;const last=[b.at,b.ask].filter(Boolean).sort().pop();return !last||daysBetween(last,todayKey())>=30;}
+function backupDue(){if(cloudOn()&&CS.avail!==false&&Date.now()-cloudAt()<7*864e5)return false;const b=state.backup||{};if(state.cards.length<5||dayN()<7)return false;const last=[b.at,b.ask].filter(Boolean).sort().pop();return !last||daysBetween(last,todayKey())>=30;}
 function openBackupNudge(){openSheet(`<h2>Keep your Forgelings safe</h2><p class="muted">Your collection lives only on this phone. If the browser ever clears its storage, a saved copy brings everything back.</p><p class="muted small">Save it to Files, a notes app or your own email. You can restore it any time from Settings, on this phone or a new one.</p><div class="stack"><button class="primary" id="saveFile">Save a copy</button><button class="ghost" id="backupLater">Remind me next month</button></div>`);}
 function canShareFiles(){try{return !!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'x.png',{type:'image/png'})]}));}catch(e){return false;}}
 function downloadBlob(blob,name){try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true;}catch(e){toast('Saving did not work here. Try copying the text instead.');return false;}}
@@ -5210,12 +5278,19 @@ $('#view-settings').addEventListener('click',e=>{
   else if(b.dataset.ownrm!==undefined){const id=+b.dataset.ownrm,o=state.owns.find(x=>x.id===id);if(o){state.own.days=[...new Set(state.own.days.concat(o.days))].sort().slice(-800);state.owns=state.owns.filter(x=>x.id!==id);save();renderSettings();renderToday();toast('Removed. Its past days stay in the Journal.');}}
   else if(b.dataset.ownmix!==undefined){state.settings.ownMix=b.dataset.ownmix;save();renderSettings();}
   else if(b.id==='btnExport')openExport();
+  else if(b.id==='btnCloud'){
+    if(cloudOn()){try{localStorage.setItem(CLOUD_OFF,'1');localStorage.removeItem(CLOUD_AT);}catch(e){}try{cloudPlug().remove({key:KEY}).catch(()=>{});}catch(e){}toast('The iCloud copy is off and removed.');}
+    else{try{localStorage.removeItem(CLOUD_OFF);}catch(e){}cloudPush().then(()=>{const l=$('#cloudLine');if(l)l.textContent=cloudLine();});toast('Keeping a copy in your iCloud.');}
+    renderSettings();
+  }
+
   else if(b.id==='btnRestore')openRestore();
   else if(b.id==='fbSave')saveFeedback();
   else if(b.id==='btnPrivacy')openSheet(privacyHTML());
   else if(b.id==='btnTerms')openSheet(termsHTML());
   else if(b.id==='btnErase'){
-    if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to erase everything. This cannot be undone.';return;}
+    if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent=cloudOn()?'Tap again to erase everything here and in iCloud. This cannot be undone.':'Tap again to erase everything. This cannot be undone.';return;}
+    if(cloudPlug()){clearTimeout(CS.t);CS.offer=null;try{cloudPlug().remove({key:KEY}).catch(()=>{});}catch(e){}try{localStorage.removeItem(CLOUD_AT);localStorage.removeItem(KEY+'-replaced');}catch(e){}}
     try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'-recovery');localStorage.removeItem(KEY+'-daily');localStorage.removeItem(QSEEN);}catch(e){}
     nset(KEY,null);nflush();if(NATIVE&&PL.LocalNotifications){try{PL.LocalNotifications.cancel({notifications:[{id:1},{id:2}]}).catch(()=>{});}catch(e){}}
     state=migrate(fresh());bf={type:'all',mood:'all',sort:'new',page:0};tab='today';applySettings();render();openAgeGate();
@@ -5809,15 +5884,15 @@ function shareOrCopy(txt,done,title){
 
 
 /* ---- Privacy note and terms of use: plain English, kept short, matching exactly what Forge does. ---- */
-const DOCS_DATE='October 20, 2026';
+const DOCS_DATE='November 11, 2026';
 function privacyHTML(){
   return `<h2>How Forgelings handles your data</h2><p class="muted small">Last updated ${DOCS_DATE}</p>
   <div class="tale"><b>What Forgelings keeps</b><p>Your Forgelings, the days you showed up or rested, anything you write (names, tales, margin notes and feedback answers), your settings, and the fact that you are an adult. Your birth date is never kept.</p></div>
-  <div class="tale"><b>Where it is kept</b><p>Only on this device, in this browser. Forgelings has no accounts and no server of its own, so nobody else can see it, including the people who make it.</p></div>
+  <div class="tale"><b>Where it is kept</b><p>${cloudPlug()?'On this device, and in your own iCloud unless you turn that off in Settings. The iCloud copy sits in your Apple account, where only you can reach it.':ANDROID?'On this device. If backup is on for this phone, Android also keeps a copy with your other apps, in your own Google account.':'Only on this device, in this browser.'} Forgelings has no accounts and no server of its own, so nobody else can see it, including the people who make it.</p></div>
   <div class="tale"><b>What Forgelings never does</b><p>No tracking, no analytics, no ads, no selling or sharing of anything. Nothing about you leaves this device unless you choose to send it.</p></div>
   <div class="tale"><b>When you choose to share</b><p>"Save a copy", "Send my report" and gift links create something that goes only where you put it, for example a message to a friend. A gift link holds only the curio, your Forgeling’s name and look, and your note. A statue link holds only what the statue is built from: its look, name and the day it was cast. The part of a link that holds them is never sent to the website.</p></div>
   <div class="tale"><b>Where Forgelings is hosted</b><p>The app is delivered by GitHub Pages. Like any website, GitHub receives basic technical details such as your IP address when it delivers the app, under GitHub's own privacy statement. Forgelings itself never receives them.</p></div>
-  <div class="tale"><b>Deleting everything</b><p>Use "Erase everything on this device" in Settings, or remove Forgelings and clear this site's data in your browser. There is no other copy anywhere.</p></div>
+  <div class="tale"><b>Deleting everything</b><p>${cloudPlug()?'Use "Erase everything" in Settings: it clears this device and the iCloud copy. Turning off the iCloud copy removes it from iCloud.':ANDROID?'Use "Erase everything on this device" in Settings, or remove Forgelings from your phone.':'Use "Erase everything on this device" in Settings, or remove Forgelings and clear this site\'s data in your browser. There is no other copy anywhere.'}</p></div>
   <div class="tale"><b>Age</b><p>While Forgelings is being tested, it is for adults 18 and up.</p></div>
   <div class="tale"><b>Changes</b><p>If this ever changes, for example if Forgelings adds accounts, this note will be updated first, and you will see it in the app before anything new happens.</p></div>
   <p class="muted small">Questions? Email <a href="mailto:forgelings.app@gmail.com">forgelings.app@gmail.com</a>. The full policy is also at <a href="https://img0j0.github.io/forge/privacy.html" target="_blank" rel="noopener">img0j0.github.io/forge/privacy.html</a>.</p>
@@ -6220,8 +6295,15 @@ else{
   if(returned&&modal.hidden){tab='hearth';render();window.scrollTo(0,0);}
   if(state.ageBand)arrive();
   wanderTick();remindSync(false);
+  if(CS.offer)setTimeout(cloudOfferSoon,900);else if(cloudOn())cloudSoon();
 }
 }
+if(NATIVE&&PL.App){try{PL.App.addListener('backButton',()=>{
+  if(!modal.hidden){const s=modal.querySelector('.scrim'),c=[...modal.querySelectorAll('[data-close]')].find(x=>x.offsetParent!==null);
+    if(c)c.click();else if(s&&s.dataset.dismiss==='true')closeModal();return;}
+  if(tab!=='today'){const t=document.querySelector('.tab[data-tab="today"]');if(t){t.click();window.scrollTo(0,0);return;}}
+  if(PL.App.minimizeApp)PL.App.minimizeApp();else if(PL.App.exitApp)PL.App.exitApp();
+});}catch(e){}}
 if(NATIVE)nrestore().then(boot,boot);else boot();
 
 })();
