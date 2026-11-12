@@ -1262,7 +1262,7 @@ html[lang=ja]{--jp:'JPText','Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sa
 --body:'Nunito Sans',var(--jp);--display:'Nunito Sans',var(--jp)}
 html.jr[lang=ja],html[lang=ja]{--hand:'Caveat','JPHand',var(--jp)}
 html[lang=ja] body{line-break:strict;word-break:normal;overflow-wrap:anywhere}
-html[lang=ja] #dateLabel{font-size:.88em}html[lang=ja] .scrim.jcov .tagline,html[lang=ja] .tagline{font-size:20px;line-height:1.35}html[lang=ja] .stat{grid-template-columns:4.1em 1fr 1.7em}html[lang=ja] .stat>span:first-child{white-space:nowrap;font-size:.92em}html[lang=ja] .odds td{white-space:nowrap}html[lang=ja] .odds th{font-size:11px;word-break:keep-all}
+html[lang=ja] #dateLabel{font-size:.88em}html.jr[lang=ja] .app .facebtn{font-size:calc(var(--hs)*17px);white-space:nowrap}html[lang=ja] .scrim.jcov .tagline,html[lang=ja] .tagline{font-size:20px;line-height:1.35}html[lang=ja] .stat{grid-template-columns:4.1em 1fr 1.7em}html[lang=ja] .stat>span:first-child{white-space:nowrap;font-size:.92em}html[lang=ja] .odds td{white-space:nowrap}html[lang=ja] .odds th{font-size:11px;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -1374,7 +1374,9 @@ function jaName(c){
   let v=c.name;
   Object.defineProperty(c,'name',{get:()=>kanaName(v),set:x=>{v=x;},enumerable:true,configurable:true});
   Object.defineProperty(c,'nameEn',{get:()=>v,enumerable:false,configurable:true});
-  Object.defineProperty(c,'toJSON',{value:function(){const o=Object.assign({},this);o.name=v;return o;},enumerable:false,configurable:true});
+  let dl=c.dateLabel;
+  if(typeof c.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(c.date))Object.defineProperty(c,'dateLabel',{get:()=>dateLabel(c.date),set:x=>{dl=x;},enumerable:true,configurable:true});
+  Object.defineProperty(c,'toJSON',{value:function(){const o=Object.assign({},this);o.name=v;o.dateLabel=dl;return o;},enumerable:false,configurable:true});
   return c;}
 const PRE_D=['Gor','Vex','Mor','Nox','Skar','Ur','Zul','Krag','Vor','Grim','Thul','Bael'];
 const SUF_D=['gash','thorn','maw','wraith','fang','dread','bane','moth','skull','rot','vyr','kra'];
@@ -1966,7 +1968,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.57.1',APPVER='1.0.0';
+const VERSION='prototype 0.57.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?(LJ?JA[124]:'First Edition'):(LJ?JA[125]:'Pilot Edition');
@@ -2083,7 +2085,7 @@ function cloudLine(){
   if(CS.avail===false)return (LJ?JA[340]:'Sign in to iCloud in your iPhone’s Settings to keep a copy there.');
   const a=cloudAt();if(!a)return (LJ?JA[341]:'A copy is kept in your own iCloud, so a new iPhone brings your Forgelings back.');
   const m=Math.round((Date.now()-a)/60000);
-  return (LJ?JA[342]:'A copy is kept in your own iCloud, so a new iPhone brings your Forgelings back. Last saved ')+(m<2?(LJ?JA[343]:'just now'):m<60?m+(LJ?JA[344]:' minutes ago'):m<1440?Math.round(m/60)+(Math.round(m/60)===1?(LJ?JA[345]:' hour ago'):(LJ?JA[346]:' hours ago')):'on '+new Date(a).toLocaleDateString())+'.';
+  return (LJ?JA[342]:'A copy is kept in your own iCloud, so a new iPhone brings your Forgelings back. Last saved ')+(m<2?(LJ?JA[343]:'just now'):m<60?m+(LJ?JA[344]:' minutes ago'):m<1440?Math.round(m/60)+(Math.round(m/60)===1?(LJ?JA[345]:' hour ago'):(LJ?JA[346]:' hours ago')):'on '+new Date(a).toLocaleDateString(LOC()))+'.';
 }
 function cloudSetHTML(){
   if(cloudPlug())return (LJ?Lt(349,[esc(cloudLine()),cloudOn()?(LJ?JA[347]:'Turn off the iCloud copy'):(LJ?JA[348]:'Keep a copy in iCloud')]):`<div class="lbl2">iCloud</div><p class="muted small" id="cloudLine">${esc(cloudLine())}</p><button class="pill" id="btnCloud">${cloudOn()?(LJ?JA[347]:'Turn off the iCloud copy'):(LJ?JA[348]:'Keep a copy in iCloud')}</button>`);
@@ -2098,7 +2100,7 @@ async function cloudLive(){
 function cloudOfferSoon(){if(!CS.offer)return;if(!state||!state.ageBand||!modal.hidden){setTimeout(cloudOfferSoon,2000);return;}cloudOffer();}
 function cloudOffer(){
   const c=CS.offer;if(!c)return;const n=c.o.cards.length,m=state.cards.length,pl=k=>k+(LJ?JA[351]:' Forgeling')+(k===1?'':'s');
-  const d=c.o.date&&/^\d{4}-\d{2}-\d{2}$/.test(c.o.date)?new Date(c.o.date+'T12:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):'';
+  const d=c.o.date&&/^\d{4}-\d{2}-\d{2}$/.test(c.o.date)?new Date(c.o.date+'T12:00:00').toLocaleDateString(LOC(),{month:'long',day:'numeric',year:'numeric'}):'';
   openSheet((LJ?Lt(353,[pl(n),d?(LJ?JA[352]:', last opened ')+esc(d):'',pl(m),pl(n),pl(m)]):`<h2>A journal in your iCloud</h2><p class="muted">Your iCloud holds a Forgelings journal from another phone, with ${pl(n)}${d?(LJ?JA[352]:', last opened ')+esc(d):''}. This phone has its own, with ${pl(m)}.</p><p class="muted small">iCloud keeps one journal. The one you don’t choose is replaced, so save a copy of this phone’s journal first if you want to keep both.</p><div class="stack"><button class="primary" id="cloudUse">Use the iCloud journal (${pl(n)})</button><button class="ghost" id="cloudKeep">Keep this phone’s journal (${pl(m)})</button><button class="ghost" id="cloudCopy">Save a copy of this phone’s journal</button></div>`));
 }
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#cloudUse,#cloudKeep,#cloudCopy');if(!b)return;
@@ -2116,7 +2118,9 @@ function nowDate(){const d=new Date();d.setDate(d.getDate()+((state&&state.offse
 const todayKey=()=>{const k=dkey(nowDate());return state&&state.date&&k<state.date&&dayDiff(k,state.date)<=2?state.date:k;}; /* 0.48.5: a day or two back (travel, a clock change) holds the journal's day */
 const dayDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
 const dayN=()=>Math.max(1,dayDiff(state.startDate,todayKey())+1);/* never below 1, even if the device clock is set back */
-const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+/* 0.57.2: dates follow the app's language, not only the phone's */
+function LOC(){return typeof LANG!=='undefined'&&LANG==='ja'?'ja-JP':undefined;}
+const dateLabel=k=>new Date(k+'T00:00:00').toLocaleDateString(LOC(),{weekday:'short',month:'short',day:'numeric'});
 function wantVs(){return [...new Set((state.want||[]).flatMap(k=>WANTS[k]?WANTS[k].v:[]))];}
 function todayOwnObj(){return state.todayOwn!=null?(state.owns||[]).find(o=>o.id===state.todayOwn)||null:null;}
 function pickToday(avoid){
@@ -2365,13 +2369,19 @@ function compNotice(){
   const c=companion();if(!c){state.comp=null;return;}
   const before=bondLevel(c),L=COMP_L[c.dark?1:0],n=c.nick||c.name;
   c.bond=(c.bond||0)+1;
-  const ow=todayOwnObj(),line=(ow?(ow.days.length<=1?(LJ?JA[389]:'{n} saw you do \u201C{o}\u201D today, and thinks that is nice.'):OWN_L[whash(dnum(state.date)*7+c.id)%OWN_L.length]).replace(/\{o\}/g,ow.text):L[whash(dnum(state.date)*31+c.id)%L.length]).replace(/\{n\}/g,n),after=bondLevel(c);
-  state.comp={date:state.date,cid:c.id,line,up:after>before?after:0};
+  const ow=todayOwnObj(),f=!!ow&&ow.days.length<=1,line=compLine(c,f),after=bondLevel(c);
+  state.comp={date:state.date,cid:c.id,line,up:after>before?after:0,f};
   hf.msg=line;
+}
+/* 0.57.2: the line is written from its template whenever it is shown (language and name as they are now) */
+function compLine(c,first){
+  const ow=todayOwnObj(),L=COMP_L[c.dark?1:0],n=c.nick||c.name;
+  return (ow?(first?(LJ?JA[389]:'{n} saw you do \u201C{o}\u201D today, and thinks that is nice.'):OWN_L[whash(dnum(state.date)*7+c.id)%OWN_L.length]).replace(/\{o\}/g,ow.text):L[whash(dnum(state.date)*31+c.id)%L.length]).replace(/\{n\}/g,n);
 }
 function compHTML(){
   const p=state.comp;if(!p||p.date!==state.date)return '';const c=cardById(p.cid);if(!c)return '';const n=c.nick||c.name;
-  return (LJ?Lt(391,[esc(p.line),esc(n),p.up?(LJ?Lt(390,[esc(n),BOND_NAMES[p.up-1]]):` ${esc(n)} is now ${BOND_NAMES[p.up-1]}.`):'']):`<p class="comp"><b>${esc(p.line)}</b> Showing up grew ${esc(n)}’s bond by 1.${p.up?(LJ?Lt(390,[esc(n),BOND_NAMES[p.up-1]]):` ${esc(n)} is now ${BOND_NAMES[p.up-1]}.`):''}</p>`);
+  const ow=todayOwnObj(),line=compLine(c,p.f!==undefined?!!p.f:!!ow&&ow.days.length<=1);
+  return (LJ?Lt(391,[esc(line),esc(n),p.up?(LJ?Lt(390,[esc(n),BOND_NAMES[p.up-1]]):` ${esc(n)} is now ${BOND_NAMES[p.up-1]}.`):'']):`<p class="comp"><b>${esc(line)}</b> Showing up grew ${esc(n)}’s bond by 1.${p.up?(LJ?Lt(390,[esc(n),BOND_NAMES[p.up-1]]):` ${esc(n)} is now ${BOND_NAMES[p.up-1]}.`):''}</p>`);
 }
 /* ---- 0.28: it remembers what you wrote ---- */
 const MECHO_GAP=5,SPOTS=[(LJ?JA[392]:'tucked under the rug'),(LJ?JA[393]:'in the woodpile'),(LJ?JA[394]:'between two warm stones'),(LJ?JA[395]:'folded in its pocket'),(LJ?JA[396]:'caught in the grass by the fire')];
@@ -4470,7 +4480,7 @@ function recapHTML(){
 }
 function calendarHTML(){
   const days=lastDays(35),today=todayKey();
-  const head=days.slice(0,7).map(k=>`<span class="wd">${new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'narrow'})}</span>`).join('');
+  const head=days.slice(0,7).map(k=>`<span class="wd">${new Date(k+'T00:00:00').toLocaleDateString(LOC(),{weekday:'narrow'})}</span>`).join('');
   let n=0,no=0;const ownSet=new Set(((state.own&&state.own.days)||[]).concat(...(state.owns||[]).map(o=>o.days)));
   const cells=days.map(k=>{
     const h=state.history.find(x=>x.date===k);let cls='c',label=(LJ?JA[1517]:'before you started');
@@ -5352,7 +5362,7 @@ function shareCanvas(c){
   y+=46;x.fillStyle=R.glow;fit(`${R.name} · ${realmName(c)}`,600,28,600,'"Nunito Sans", sans-serif');x.fillText(`${R.name} · ${realmName(c)}`,W/2,y);
   const found=c.source==='pack'?(LJ?JA[1691]:'Found in a pack, earned by showing up.'):(DID[c.v]?(LJ?Lt(1692,[DID[c.v]]):`Found the day I'd ${DID[c.v]}.`):(LJ?JA[1693]:'Found by showing up.'));
   x.fillStyle='#EDE3F2';x.font='400 27px "Nunito Sans", sans-serif';wrap(found,600).slice(0,3).forEach(l=>{y+=40;x.fillText(l,W/2,y);});
-  let when='';try{when=new Date(c.date+'T00:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});}catch(e){}
+  let when='';try{when=new Date(c.date+'T00:00:00').toLocaleDateString(LOC(),{month:'long',day:'numeric',year:'numeric'});}catch(e){}
   if(when){y+=38;x.fillStyle='#B9A9C9';x.font='400 22px "Nunito Sans", sans-serif';x.fillText(when,W/2,y);}
   x.fillStyle='#FFD36B';x.font='18px "Press Start 2P", monospace';x.fillText('FORGELINGS',W/2,H-72);
   x.fillStyle='#B9A9C9';x.font='400 20px "Nunito Sans", sans-serif';x.fillText((LJ?JA[1694]:'Every Forgeling is one of a kind'),W/2,H-40);
