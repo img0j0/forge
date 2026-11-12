@@ -2041,7 +2041,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.65.0',APPVER='1.0.0';
+const VERSION='prototype 0.65.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?(LJ?JA[124]:'First Edition'):(LJ?JA[125]:'Pilot Edition');
@@ -2226,23 +2226,26 @@ function chooseCard(i){
 /* 0.65: photo postcards. 3-bit indices into the realm's ramp, packed little-endian. */
 const BAYER4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 function pcPack(idx){const b=new Uint8Array(Math.ceil(idx.length*3/8));for(let i=0;i<idx.length;i++){const bit=i*3,by=bit>>3,o=bit&7,v=idx[i]&7;b[by]|=(v<<o)&255;if(o>5)b[by+1]|=v>>(8-o);}let s='';for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
-function pcUnpack(p){const s=atob(p),n=PC_W*PC_H,out=new Uint8Array(n);for(let i=0;i<n;i++){const bit=i*3,by=bit>>3,o=bit&7;let v=s.charCodeAt(by)>>o;if(o>5)v|=(s.charCodeAt(by+1)||0)<<(8-o);out[i]=v&7;}return out;}
+function pcUnpack(p){const [w,h]=pcDims(p),s=atob(p),n=w*h,out=new Uint8Array(n);for(let i=0;i<n;i++){const bit=i*3,by=bit>>3,o=bit&7;let v=s.charCodeAt(by)>>o;if(o>5)v|=(s.charCodeAt(by+1)||0)<<(8-o);out[i]=v&7;}return out;}
 const pcCache=new Map();
-function pcDraw(idx,r){const cv=document.createElement('canvas');cv.width=PC_W;cv.height=PC_H;const x=cv.getContext('2d'),im=x.createImageData(PC_W,PC_H),rgb=(PC_RAMP[r]||PC_RAMP[0]).map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
+function pcDraw(idx,r,w,h){w=w||PC_W;h=h||PC_H;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d'),im=x.createImageData(w,h),rgb=(PC_RAMP[r]||PC_RAMP[0]).map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
   for(let i=0;i<idx.length;i++){const c=rgb[idx[i]&7];im.data[i*4]=c[0];im.data[i*4+1]=c[1];im.data[i*4+2]=c[2];im.data[i*4+3]=255;}x.putImageData(im,0,0);return cv.toDataURL('image/png');}
-function pcURL(p,r){const key=r+':'+p;if(pcCache.has(key))return pcCache.get(key);let u='';try{u=pcDraw(pcUnpack(p),r);}catch(e){}pcCache.set(key,u);return u;}
+function pcURL(p,r){const key=r+':'+p;if(pcCache.has(key))return pcCache.get(key);let u='';try{const [w,h]=pcDims(p);u=pcDraw(pcUnpack(p),r,w,h);}catch(e){}pcCache.set(key,u);return u;}
 function giftURL(g){const key='g:'+g.r+':'+g.s;if(pcCache.has(key))return pcCache.get(key);let u='';try{u=pcDraw(pcScene(g.r,g.s),g.r);}catch(e){}pcCache.set(key,u);return u;}
 /* a photo to indices: centre-cropped to 4:3, scaled down in two steps, levels stretched, ordered dither to 8 shades */
 function pcFromImage(img){
   const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;if(!iw||!ih)return null;
-  const s=Math.max(PC_W/iw,PC_H/ih),sw=PC_W/s,sh=PC_H/s;
-  const m=document.createElement('canvas');m.width=256;m.height=192;const mx=m.getContext('2d');mx.imageSmoothingEnabled=true;mx.imageSmoothingQuality='high';mx.drawImage(img,(iw-sw)/2,(ih-sh)/2,sw,sh,0,0,256,192);
-  const cv=document.createElement('canvas');cv.width=PC_W;cv.height=PC_H;const x=cv.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(m,0,0,PC_W,PC_H);
-  const d=x.getImageData(0,0,PC_W,PC_H).data,n=PC_W*PC_H,L=new Float32Array(n);
-  for(let i=0;i<n;i++)L[i]=.2126*d[i*4]+.7152*d[i*4+1]+.0722*d[i*4+2];
+  const W=PH_W,H=PH_H,s=Math.max(W/iw,H/ih),sw=W/s,sh=H/s;
+  let k=8;while(k>1&&(sw<W*k||sh<H*k))k/=2;
+  let cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;let x=cv.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(img,(iw-sw)/2,(ih-sh)/2,sw,sh,0,0,W*k,H*k);
+  while(k>1){k/=2;const c2=document.createElement('canvas');c2.width=W*k;c2.height=H*k;const x2=c2.getContext('2d');x2.imageSmoothingEnabled=true;x2.imageSmoothingQuality='high';x2.drawImage(cv,0,0,W*k,H*k);cv=c2;x=x2;}
+  const d=x.getImageData(0,0,W,H).data,n=W*H,L0=new Float32Array(n);
+  for(let i=0;i<n;i++)L0[i]=.2126*d[i*4]+.7152*d[i*4+1]+.0722*d[i*4+2];
+  const at=(xx,y)=>L0[Math.min(H-1,Math.max(0,y))*W+Math.min(W-1,Math.max(0,xx))],L=new Float32Array(n);
+  for(let y=0;y<H;y++)for(let xx=0;xx<W;xx++){let b=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)b+=at(xx+i,y+j)*(i?1:2)*(j?1:2);L[y*W+xx]=L0[y*W+xx]+.6*(L0[y*W+xx]-b/16);}
   const so=Array.from(L).sort((a,b)=>a-b),lo=so[Math.floor(n*.02)],hi=Math.max(lo+24,so[Math.floor(n*.98)]);
   const idx=new Uint8Array(n);
-  for(let y=0;y<PC_H;y++)for(let xx=0;xx<PC_W;xx++){const i=y*PC_W+xx,t=Math.min(1,Math.max(0,(L[i]-lo)/(hi-lo)));idx[i]=Math.max(0,Math.min(7,Math.round(t*7+(BAYER4[(y&3)*4+(xx&3)]/16-.47)*.9)));}
+  for(let y=0;y<H;y++)for(let xx=0;xx<W;xx++){const i=y*W+xx,t=Math.min(1,Math.max(0,(L[i]-lo)/(hi-lo)));idx[i]=Math.max(0,Math.min(7,Math.round(t*7+(BAYER4[(y&3)*4+(xx&3)]/16-.47)*.55)));}
   return idx;}
 /* a Forgeling's own postcard: a little scene of the realm, drawn from a seed */
 function pcScene(r,seed){
@@ -2326,7 +2329,8 @@ function fresh(){const k=dkey(new Date());return {v:1,mapMax:[0,0,0,0,0],startDa
 
 /* Repairs a saved game so a damaged or hand-edited save can never crash the app. Valid data is left untouched. */
 /* 0.65: photo postcards */
-const PC_W=64,PC_H=48,PC_MAX=500,PC_B64=4*Math.ceil(PC_W*PC_H*3/8/3);
+const PC_W=64,PC_H=48,PH_W=96,PH_H=72,PC_MAX=400,PC_B64=4*Math.ceil(PC_W*PC_H*3/8/3),PH_B64=4*Math.ceil(PH_W*PH_H*3/8/3);
+const pcDims=p=>p.length===PH_B64?[PH_W,PH_H]:[PC_W,PC_H];
 const PC_RAMP=[['#14201A','#24402E','#3E6B3F','#5E9450','#8FBF6A','#C4DE8A','#EDF2C0','#FFFBEA'],
   ['#1A0B10','#4D1A1A','#8A2E22','#C2502E','#E8823F','#F5B060','#FFD99A','#FFF5E0'],
   ['#04101E','#0B3350','#1A5C82','#2F86AE','#5FB5E0','#8FD6E8','#C8EEF7','#F4FDFF'],
@@ -2395,7 +2399,7 @@ function sanitize(s){
     const ok=ch&&typeof ch==='object'&&typeof ch.date==='string'&&Array.isArray(ch.list)&&ch.list.length>=1&&ch.list.length<=3&&ch.list.every(x=>x&&Number.isInteger(x.v)&&x.v>=0&&x.v<VECTORS.length&&(x.o===null||x.o===undefined||owns.some(o=>o&&o.id===x.o)));
     if(!ok)s.choices=null;else{ch.list.forEach(x=>{if(x.o===undefined)x.o=null;});if(!(ch.chosen===null||(Number.isInteger(ch.chosen)&&ch.chosen>=0&&ch.chosen<ch.list.length)))ch.chosen=null;}}
   {const DK=/^\d{4}-\d{2}-\d{2}$/,P=s.posts&&typeof s.posts==='object'&&!Array.isArray(s.posts)?s.posts:{},o={};
-   Object.keys(P).filter(k=>DK.test(k)).sort().slice(-PC_MAX).forEach(k=>{const v=P[k];if(v&&Number.isInteger(v.r)&&v.r>=0&&v.r<=4&&typeof v.p==='string'&&v.p.length===PC_B64&&/^[A-Za-z0-9+/=]+$/.test(v.p))o[k]={r:v.r,p:v.p};});s.posts=o;
+   Object.keys(P).filter(k=>DK.test(k)).sort().slice(-PC_MAX).forEach(k=>{const v=P[k];if(v&&Number.isInteger(v.r)&&v.r>=0&&v.r<=4&&typeof v.p==='string'&&(v.p.length===PC_B64||v.p.length===PH_B64)&&/^[A-Za-z0-9+/=]+$/.test(v.p))o[k]={r:v.r,p:v.p};});s.posts=o;
    s.pcMade=Number.isInteger(s.pcMade)&&s.pcMade>=0?s.pcMade:0;s.pcLast=typeof s.pcLast==='string'&&DK.test(s.pcLast)?s.pcLast:'';
    s.pcGifts=(Array.isArray(s.pcGifts)?s.pcGifts:[]).filter(g=>g&&typeof g.d==='string'&&DK.test(g.d)&&Number.isInteger(g.r)&&g.r>=0&&g.r<=4&&Number.isInteger(g.s)).slice(-200).map(g=>({d:g.d,r:g.r,s:g.s,c:Number.isFinite(g.c)?g.c:-1}));}
   if(s.ask!==undefined){if(!s.ask||typeof s.ask!=='object'||Array.isArray(s.ask))s.ask={};else Object.keys(s.ask).forEach(k=>{const v=s.ask[k];if(!/^\d{4}-\d{2}-\d{2}$/.test(k)||!v||!Number.isInteger(v.a)||v.a<0||v.a>2)delete s.ask[k];});}
