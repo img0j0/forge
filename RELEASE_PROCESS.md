@@ -88,3 +88,4 @@ Update 0.52.0: patches now read base52.html (= work.html); base51.html removed (
 
 Update (Nov 12, 2026): Hunter tests each release himself. Do not run the full suite (runall.sh, journey, monkeys) before pushing; run only the checks for what changed, then ship and tell him what to test.
 Update 0.53.0: patches now read base53.html (= work.html); base52.html removed (git keeps it). Checked qa_axe and qa_contrast plus day/night screenshots; full suite not run (Hunter tests). Shipped: main/gh-pages bc20532 (Pages run success, live index.html blob 0d66868 matches), ios-app b7c2fc9 (Native builds success), Claude copy version 97.
+Update 0.54.0: patches now read base54.html (= work.html); base53.html removed (git keeps it). Creature art source and checks in creatures/ (same.py must print SAME). Shipped: main/gh-pages 034ef50 (Pages run success, live index.html blob 6b724b4 matches), ios-app 0633992 (Native builds success), Claude copy version 98.
