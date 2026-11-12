@@ -30,8 +30,9 @@ for(const u of U){const t=u.word?ja[u.key+'@'+u.area]:ja[u.key];if(t===undefined
   if(ph(t)!==ph(u.key)){problems.push(['placeholders differ',u.key,t]);continue;}
   if(tags(t)!==tags(u.key)){problems.push(['markup differs',u.key,t]);continue;}
   if(/\$\{|`/.test(t)&&!/\$\{|`/.test(u.key)){problems.push(['backtick or ${ in the Japanese',u.key,t]);continue;}
-  if(!idOf.has(u.key)){idOf.set(u.key,id++);JA.push(t);}
-  u.id=idOf.get(u.key);(byScript[u.si]=byScript[u.si]||[]).push(u);}
+  const ik=u.word?u.key+'@'+u.area:u.key;   // a single word can differ by area ('Calm' a stat, 'Calm' a wish)
+  if(!idOf.has(ik)){idOf.set(ik,id++);JA.push(t);}
+  u.id=idOf.get(ik);(byScript[u.si]=byScript[u.si]||[]).push(u);}
 
 const STATIC={};for(const k of staticText(html))if(ja[k]!==undefined)STATIC[k]=ja[k];
 // rewrite each script: outermost units first; a template's expressions keep their own (nested) rewrites
@@ -65,6 +66,7 @@ html[lang=ja]{--jp:'JPText','Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sa
 --body:'Nunito Sans',var(--jp);--display:'Nunito Sans',var(--jp)}
 html.jr[lang=ja],html[lang=ja]{--hand:'Caveat','JPHand',var(--jp)}
 html[lang=ja] body{line-break:strict;word-break:normal;overflow-wrap:anywhere}
+html[lang=ja] #dateLabel{font-size:.88em}html[lang=ja] .scrim.jcov .tagline,html[lang=ja] .tagline{font-size:20px;line-height:1.35}html[lang=ja] .stat{grid-template-columns:4.1em 1fr 1.7em}html[lang=ja] .stat>span:first-child{white-space:nowrap;font-size:.92em}html[lang=ja] .odds td{white-space:nowrap}html[lang=ja] .odds th{font-size:11px;word-break:keep-all}
 </style>`;
 out=out.replace('</head>',CSS+'\n</head>');
 fs.writeFileSync(OUT,out);

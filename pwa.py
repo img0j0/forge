@@ -1,8 +1,11 @@
-# Packs work.html into an installable web app in ./pwa (for GitHub Pages or any static host).
+# Packs work.html (with its Japanese, as app.html) into an installable web app in ./pwa (for GitHub Pages or any static host).
 import os, json, re, shutil
 from PIL import Image, ImageDraw, ImageChops
 OUT = 'pwa'; os.makedirs(OUT, exist_ok=True)
-src = open('work.html', encoding='utf8').read()
+# 0.57: the shipped page is work.html with its Japanese built in (i18n/build.mjs writes app.html)
+import subprocess
+subprocess.run(['node', 'build.mjs', '../work.html', '../app.html'], cwd='i18n', check=True)
+src = open('app.html', encoding='utf8').read()
 ver = re.search(r"const VERSION='prototype ([0-9.]+)'", src).group(1)
 
 # ---- the page: mark it as the release copy, link the manifest, plain title ----

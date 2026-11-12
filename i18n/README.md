@@ -16,3 +16,17 @@ node build.mjs ../work.html ../app.html
   sentences the code also compares or looks up.
 - The app runs in Japanese when the phone's language is Japanese, or when Settings saves `forge-lang`.
 - `GLOSSARY.md`: the terms. Keep them consistent.
+
+## Shipping (0.57)
+- `pwa.py` runs the build and packs `app.html`, so the website, the iPhone/Android source (`ios-app/forgelings.html`),
+  the Claude page and the project copy all get `app.html`, never `work.html` alone.
+- The phone's language picks the language; Settings > Look and feel > Language (English / 日本語) overrides it. The
+  iPhone app lists `ja` in `CFBundleLocalizations` so the web view reports Japanese on a Japanese iPhone.
+- New English text in a patch: run `node scan.mjs ../work.html` and add Japanese for everything in `todo/` that people
+  read (dev tools, the pilot report, name syllables and code stay English). Write new sentences as whole templates,
+  never glued from pieces (`'Found '+w+x` cannot be put in Japanese order).
+- `units.mjs` `FORCE` lists text the detector misses (only punctuation or numbers around placeholders).
+- Words that differ by place are keyed by area (`Calm@cardHTML` a stat, `Calm@WANTS` a wish); the build keeps them apart.
+- Card backs' news from away is stored as an event (`c.gev`), so it shows in the app's current language.
+- Size: the Japanese adds about 190 K characters (about 0.2 MB as UTF-8); the app is about 1.2 MB. A native speaker
+  should review the Japanese before a Japanese launch.
