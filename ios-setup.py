@@ -61,7 +61,26 @@ if 'PrivacyInfo.xcprivacy' not in s:
     s = s.replace('\t\t\t\t504EC30E1FED79650016851F /* Assets.xcassets */,\n', f'\t\t\t\t504EC30E1FED79650016851F /* Assets.xcassets */,\n\t\t\t\t{REF} /* PrivacyInfo.xcprivacy */,\n', 1)
     s = s.replace('\t\t\t\t504EC30F1FED79650016851F /* Assets.xcassets in Resources */,\n', f'\t\t\t\t504EC30F1FED79650016851F /* Assets.xcassets in Resources */,\n\t\t\t\t{BLD} /* PrivacyInfo.xcprivacy in Resources */,\n', 1)
     assert s.count('PrivacyInfo.xcprivacy') == 6, s.count('PrivacyInfo.xcprivacy')
+# 0.52: iCloud save (CloudSavePlugin.swift, registered by MainViewController.swift) and its entitlement
+for name, ref, bld in (('CloudSavePlugin.swift', 'F0F0A1B2C3D4E5F600000011', 'F0F0A1B2C3D4E5F600000012'),
+                       ('MainViewController.swift', 'F0F0A1B2C3D4E5F600000013', 'F0F0A1B2C3D4E5F600000014')):
+    if name not in s:
+        s = s.replace('/* End PBXBuildFile section */', f'\t\t{bld} /* {name} in Sources */ = {{isa = PBXBuildFile; fileRef = {ref} /* {name} */; }};\n/* End PBXBuildFile section */', 1)
+        s = s.replace('/* End PBXFileReference section */', f'\t\t{ref} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {name}; sourceTree = "<group>"; }};\n/* End PBXFileReference section */', 1)
+        s = s.replace('\t\t\t\t504EC3071FED79650016851F /* AppDelegate.swift */,\n', f'\t\t\t\t504EC3071FED79650016851F /* AppDelegate.swift */,\n\t\t\t\t{ref} /* {name} */,\n', 1)
+        s = s.replace('\t\t\t\t504EC3081FED79650016851F /* AppDelegate.swift in Sources */,\n', f'\t\t\t\t504EC3081FED79650016851F /* AppDelegate.swift in Sources */,\n\t\t\t\t{bld} /* {name} in Sources */,\n', 1)
+        assert s.count(name) == 6, (name, s.count(name))
+if 'App.entitlements' not in s:
+    ref = 'F0F0A1B2C3D4E5F600000015'
+    s = s.replace('/* End PBXFileReference section */', f'\t\t{ref} /* App.entitlements */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; }};\n/* End PBXFileReference section */', 1)
+    s = s.replace('\t\t\t\t504EC3131FED79650016851F /* Info.plist */,\n', f'\t\t\t\t504EC3131FED79650016851F /* Info.plist */,\n\t\t\t\t{ref} /* App.entitlements */,\n', 1)
+    s = s.replace('\t\t\t\tCODE_SIGN_STYLE = Automatic;\n', '\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n\t\t\t\tCODE_SIGN_STYLE = Automatic;\n')
+    assert s.count('CODE_SIGN_ENTITLEMENTS = App/App.entitlements;') == 2 and s.count('App.entitlements') == 5, s.count('App.entitlements')
 open(p, 'w', encoding='utf8').write(s)
+# the storyboard's view controller becomes MainViewController, which registers the local plugins
+sb = os.path.join(app, 'App', 'Base.lproj', 'Main.storyboard'); t = open(sb, encoding='utf8').read()
+t = t.replace('customClass="CAPBridgeViewController" customModule="Capacitor"', 'customClass="MainViewController" customModule="App" customModuleProvider="target"')
+open(sb, 'w', encoding='utf8').write(t)
 
 # ---- art: the seal mark icon and the dark launch screen (rendered on the dev branch by art/make_icons.py, copied into art/) ----
 import shutil
