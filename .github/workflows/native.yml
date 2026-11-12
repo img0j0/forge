@@ -41,3 +41,6 @@ jobs:
           test -n "$(grep -rl CloudSavePlugin "$APP")"
           grep -rl MainViewController "$APP" | head -3
           test -n "$(grep -rl MainViewController "$APP")"
+          test -d "$APP/PlugIns/ForgelingsWidget.appex" && echo "widget extension embedded"
+          grep -rl WidgetBridgePlugin "$APP" | head -3
+          test -n "$(grep -rl WidgetBridgePlugin "$APP")"

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@drawable/forgelings_widget_bg">
+    <ImageView
+        android:id="@+id/fw_sprite"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:scaleType="fitCenter"
+        android:importantForAccessibility="no"
+        android:src="@mipmap/ic_launcher_foreground" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/fw_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/fw_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#D9D2F5"
+            android:textSize="13sp"
+            android:maxLines="3"
+            android:ellipsize="end" />
+        <Chronometer
+            android:id="@+id/fw_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFD36B"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

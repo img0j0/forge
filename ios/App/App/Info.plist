@@ -66,5 +66,7 @@
 	<false/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Forgelings saves a picture of your Forgeling to your photos only when you choose Save Image.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 </dict>
 </plist>

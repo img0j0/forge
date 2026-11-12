@@ -19,6 +19,11 @@
 		F0F0A1B2C3D4E5F600000002 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F0F0A1B2C3D4E5F600000001 /* PrivacyInfo.xcprivacy */; };
 		F0F0A1B2C3D4E5F600000012 /* CloudSavePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F0A1B2C3D4E5F600000011 /* CloudSavePlugin.swift */; };
 		F0F0A1B2C3D4E5F600000014 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F0A1B2C3D4E5F600000013 /* MainViewController.swift */; };
+		C2F069E7956641F2B9D09DD3 /* WidgetBridgePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC9F13D541A45BCBA4396F2 /* WidgetBridgePlugin.swift */; };
+		14E0E90ABA9F47588657CF76 /* WanderAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2146AA0D27E54471AE76FB3C /* WanderAttributes.swift */; };
+		13844EA014894CE18CBB8E62 /* ForgelingsWidget.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = 9B053AEE28684225A50872BE /* ForgelingsWidget.appex */; };
+		0D36768598534F01808AC311 /* ForgelingsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683D2D99EAD441FCB6BAFC2B /* ForgelingsWidget.swift */; };
+		D56DFE2ECBBA48328E3FCDF2 /* WanderAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2146AA0D27E54471AE76FB3C /* WanderAttributes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +42,12 @@
 		F0F0A1B2C3D4E5F600000011 /* CloudSavePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSavePlugin.swift; sourceTree = "<group>"; };
 		F0F0A1B2C3D4E5F600000013 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		F0F0A1B2C3D4E5F600000015 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		ACC9F13D541A45BCBA4396F2 /* WidgetBridgePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBridgePlugin.swift; sourceTree = "<group>"; };
+		2146AA0D27E54471AE76FB3C /* WanderAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanderAttributes.swift; sourceTree = "<group>"; };
+		9B053AEE28684225A50872BE /* ForgelingsWidget.appex */ = {isa = PBXFileReference; name = "ForgelingsWidget.appex"; path = "ForgelingsWidget.appex"; sourceTree = BUILT_PRODUCTS_DIR; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
+		683D2D99EAD441FCB6BAFC2B /* ForgelingsWidget.swift */ = {isa = PBXFileReference; name = "ForgelingsWidget.swift"; path = "ForgelingsWidget.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; includeInIndex = 0; };
+		47123F1E729D413DAFD9A71A /* ForgelingsWidget-Info.plist */ = {isa = PBXFileReference; name = "ForgelingsWidget-Info.plist"; path = "ForgelingsWidget-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; includeInIndex = 0; };
+		C1F6C4B672DB462B8D36DF40 /* ForgelingsWidget.entitlements */ = {isa = PBXFileReference; name = "ForgelingsWidget.entitlements"; path = "ForgelingsWidget.entitlements"; sourceTree = "<group>"; lastKnownFileType = unknown; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +56,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED66587ADD94BC09F4BC954 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +75,7 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				40BEB162E7124F69AB8AA82F /* ForgelingsWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				9B053AEE28684225A50872BE /* ForgelingsWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,8 +104,21 @@
 				F0F0A1B2C3D4E5F600000015 /* App.entitlements */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				ACC9F13D541A45BCBA4396F2 /* WidgetBridgePlugin.swift */,
+				2146AA0D27E54471AE76FB3C /* WanderAttributes.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		40BEB162E7124F69AB8AA82F /* ForgelingsWidget */ = {
+			isa = PBXGroup;
+			children = (
+				683D2D99EAD441FCB6BAFC2B /* ForgelingsWidget.swift */,
+				47123F1E729D413DAFD9A71A /* ForgelingsWidget-Info.plist */,
+				C1F6C4B672DB462B8D36DF40 /* ForgelingsWidget.entitlements */,
+			);
+			name = ForgelingsWidget;
+			path = ForgelingsWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -98,10 +131,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				13EC3F080CB44D008EC336DB /* Copy Files */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				15D71A9BB7A24FF0B276CCA4 /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -111,14 +146,31 @@
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		10E578B8395A49DEBCFF6FA3 /* ForgelingsWidget */ = {
+			isa = PBXNativeTarget;
+			name = ForgelingsWidget;
+			productName = ForgelingsWidget;
+			productReference = 9B053AEE28684225A50872BE;
+			productType = "com.apple.product-type.app-extension";
+			buildConfigurationList = 6FBD6A91627F494D88B37875;
+			buildPhases = (
+				3229E42F542C4070B968D329 /* Sources */,
+				DED66587ADD94BC09F4BC954 /* Frameworks */,
+				3D0C78F521C3449D833A9AD1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		504EC2FC1FED79650016851F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastSwiftUpdateCheck = 920;
+				LastUpgradeCheck = 920;
 				TargetAttributes = {
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
@@ -144,6 +196,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				10E578B8395A49DEBCFF6FA3 /* "ForgelingsWidget" */,
 			);
 		};
 /* End PBXProject section */
@@ -163,6 +216,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3D0C78F521C3449D833A9AD1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -174,6 +234,17 @@
 				F0F0A1B2C3D4E5F600000014 /* MainViewController.swift in Sources */,
 				F0F0A1B2C3D4E5F600000012 /* CloudSavePlugin.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
+				C2F069E7956641F2B9D09DD3 /* WidgetBridgePlugin.swift in Sources */,
+				14E0E90ABA9F47588657CF76 /* WanderAttributes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3229E42F542C4070B968D329 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D36768598534F01808AC311 /* "ForgelingsWidget.swift" in Sources */,
+				D56DFE2ECBBA48328E3FCDF2 /* WanderAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +400,11 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					ActivityKit,
+				);
 			};
 			name = Debug;
 		};
@@ -351,8 +427,61 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					ActivityKit,
+				);
 			};
 			name = Release;
+		};
+		DCCFD15D73F24B259A0FCBCA /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = ForgelingsWidget/ForgelingsWidget-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "ForgelingsWidget";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.forgelings.app.ForgelingsWidget";
+				CODE_SIGN_ENTITLEMENTS = ForgelingsWidget/ForgelingsWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				DEVELOPMENT_LANGUAGE = en;
+			};
+		};
+		4A1E092D2C394CADA3DA5997 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = ForgelingsWidget/ForgelingsWidget-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "ForgelingsWidget";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.forgelings.app.ForgelingsWidget";
+				CODE_SIGN_ENTITLEMENTS = ForgelingsWidget/ForgelingsWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				DEVELOPMENT_LANGUAGE = en;
+			};
 		};
 /* End XCBuildConfiguration section */
 
@@ -375,6 +504,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		6FBD6A91627F494D88B37875 /* Build configuration list for PBXNativeTarget "ForgelingsWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DCCFD15D73F24B259A0FCBCA /* Debug */,
+				4A1E092D2C394CADA3DA5997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -391,6 +529,38 @@
 			productName = "CapApp-SPM";
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		13EC3F080CB44D008EC336DB /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				13844EA014894CE18CBB8E62 /* ForgelingsWidget.appex in Copy Files */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Embed Foundation Extensions";
+			dstPath = "";
+			dstSubfolderSpec = 13;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXContainerItemProxy section */
+		971C3AC1C26D401DB8D3D36C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 10E578B8395A49DEBCFF6FA3;
+			remoteInfo = ForgelingsWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		15D71A9BB7A24FF0B276CCA4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 10E578B8395A49DEBCFF6FA3 /* ForgelingsWidget */;
+			targetProxy = 971C3AC1C26D401DB8D3D36C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 	};
 	rootObject = 504EC2FC1FED79650016851F /* Project object */;
 }

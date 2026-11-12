@@ -5,5 +5,6 @@ import Capacitor
 class MainViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(CloudSavePlugin())
+        bridge?.registerPluginInstance(WidgetBridgePlugin())
     }
 }
