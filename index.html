@@ -1384,10 +1384,12 @@ function curve(m,pts,t0,t1,fl){for(let s=0;s<=48;s++){const t=s/48,p=bez(pts,t),
    two (small parts keep the old rim rule). selout(): outlines take the colour of what they edge (a dark accent
    line round an accent part, gold round gold) and lines inside the silhouette, where parts overlap, soften to
    the part's own deep shade. */
-const MIDOF={2:29,6:30,5:31};
+/* the bright highlight (4) stays a one-pixel lit rim, as before 0.55 (holo foil follows it); the broader glow
+   toward the light is a softer tone of its own (39 body, 40 accent, 41 belly) */
+const MIDOF={2:29,6:30,5:31},SOFTOF={2:39,6:40,5:41};
 function commit(g,m,o){
   const inm=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&m[y*N+x]===1;
-  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h,md=o.m!==undefined?o.m:(MIDOF[base]||0);
+  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h,md=o.m!==undefined?o.m:(MIDOF[base]||0),sf=hl?(SOFTOF[base]||0):0;
   const ray=(x,y,dx,dy)=>{let k=0;while(k<14&&inm(x+dx*(k+1),y+dy*(k+1)))k++;return k;};
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     if(!inm(x,y))continue;let s=base;
@@ -1398,7 +1400,8 @@ function commit(g,m,o){
     }else{const u=L/T;
       if(sh&&(u>.8||!inm(x+1,y+1)&&(!inm(x+1,y)||!inm(x,y+1))))s=sh;
       else if(md&&u>.52)s=md;
-      else if(hl&&(u<.2||!inm(x-1,y-1)&&!inm(x-1,y)&&inm(x+1,y)&&inm(x,y+1)))s=hl;}
+      else if(hl&&!inm(x-1,y-1)&&inm(x+1,y)&&inm(x,y+1))s=hl;
+      else if(sf&&u<.2)s=sf;}
     g[y*N+x]=s;
   }
   if(o.out!==false)for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -1497,7 +1500,7 @@ function makePal(S,c){
   const out=[[0,0,0]];for(let i=1;i<19;i++)out[i]=hexRGB(p[i]||'#000000');
   CHARM_COL.forEach((h,i)=>out[19+i]=hexRGB(h));WARD_COL.forEach((h,i)=>out[24+i]=hexRGB(h));
   out[29]=hexRGB(mix(p[2],p[3],.5));out[30]=hexRGB(mix(p[6],p[13],.5));out[31]=hexRGB(mix(p[5],p[12],.5));
-  out[32]=hexRGB(mix(shade(p[6],-.62),p[1],.35));out[33]=hexRGB(shade(p[15],dk?-.6:-.45));out[34]=hexRGB('#7A4A0C');out[35]=out[11];out[36]=out[13];out[37]=out[15];out[38]=out[18];
+  out[32]=hexRGB(mix(shade(p[6],-.62),p[1],.35));out[33]=hexRGB(shade(p[15],dk?-.6:-.45));out[34]=hexRGB('#7A4A0C');out[39]=hexRGB(mix(p[2],p[4],.5));out[40]=hexRGB(mix(p[6],p[7],.3));out[41]=hexRGB(mix(p[5],p[7],.35));out[35]=out[11];out[36]=out[13];out[37]=out[15];out[38]=out[18];
   const pulse=out.slice();pulse[9]=hexRGB(mix(p[9],p[10],.45));
   return {pal:out,palP:pulse};
 }
@@ -1913,7 +1916,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.55.0',APPVER='1.0.0';
+const VERSION='prototype 0.55.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
