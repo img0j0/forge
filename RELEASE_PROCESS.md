@@ -105,3 +105,5 @@ Update 0.65.1: patches read base651.html now; base65.html removed. Sharper photo
 Shipped 0.65.1: main/gh-pages 9cf805c (Pages success, live blob 244c851 matches), ios-app 4f8db85 (Native builds success), Claude copy version 116.
 Update 0.66.0: patches read base66.html; base651.html removed. Widget code changed on ios-app (WidgetBridgePlugin.swift, ForgelingsWidget.swift, Android WidgetBridgePlugin/ForgelingsWidgetProvider/layout). Checked: peek in English and Japanese, the widget snapshot through a mocked bridge (post PNG 288x216), no page errors.
 Update 0.67.0: patches read base67.html; base66.html removed. Checked: a 30-page player gets one letter in English and Japanese, bright and dark voice, Today row clears once read, Letters list reopens it, axe clean on Today, the letter and the list.
+Shipped 0.67.0: main/gh-pages f0488f3 (Pages success, live blob 250db0d matches), ios-app 4f7737f (Native builds success), Claude copy version 118.
+Update 0.68.0: patches read base68.html; base67.html removed. Checked: a road postcard mid-wander and on the wall after return (English bright, Japanese dark), On this day row and sheet, axe clean on each.
