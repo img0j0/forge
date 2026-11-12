@@ -43,7 +43,7 @@ Every day you show up earns an ember. Bring embers and spare curios to the Forge
 
 KIND BY DESIGN
 - Nothing is for sale. Every Forgeling and every pack is earned by showing up, and the odds are shown in the app.
-- No accounts, no ads, no tracking. Everything stays on your phone.
+- No accounts, no ads, no tracking. Your journal stays on your phone, with a quiet copy in your own iCloud so a new phone brings it back. We never see it.
 - One gentle reminder a day, only if you want it, and only on days your card is still waiting.
 - Send a curio, a charm or a statue to a friend as a gift.
 - Reduced motion and plain print options if you prefer things still and simple.
@@ -69,4 +69,4 @@ store edition from a lived-in save; the dev branch's `qa/` supplies the helpers)
 
 ## App Privacy
 
-Data collection: **No, we do not collect data from this app.**
+Data collection: **No, we do not collect data from this app.** (The iCloud copy lives in the player's own iCloud account, which only their devices can read; Apple does not count that as collection.)
