@@ -11,9 +11,10 @@
  "<button class=\"chip\" id=\"hPost\">Postcard wall · {0}</button>": "<button class=\"chip\" id=\"hPost\">ポストカードの壁 · {0}</button>",
  "Your postcard is on today’s page.": "ポストカードを今日のページに貼りました。",
  "{0} has come home with a postcard from {1}. It is on the wall by the fire.": "{0}が{1}からポストカードを持って帰ってきました。炉ばたの壁に飾ってあります。",
- "<figure class=\"pcard{0}\" style=\"--pr:{1}\"><img src=\"{2}\" alt=\"Your photo postcard, {3}\" width=\"{4}\" height=\"{5}\"><span class=\"pstamp\" aria-hidden=\"true\">{6}</span></figure>": "<figure class=\"pcard{0}\" style=\"--pr:{1}\"><img src=\"{2}\" alt=\"あなたの写真ポストカード、{3}\" width=\"{4}\" height=\"{5}\"><span class=\"pstamp\" aria-hidden=\"true\">{6}</span></figure>",
  "<figure class=\"pcard gift\" style=\"--pr:{0}\"><img src=\"{1}\" alt=\"A postcard from {2}, brought home by {3}\" width=\"{4}\" height=\"{5}\"><span class=\"pstamp\" aria-hidden=\"true\">{6}</span><figcaption>From {7}, {8}</figcaption></figure>": "<figure class=\"pcard gift\" style=\"--pr:{0}\"><img src=\"{1}\" alt=\"{3}が持って帰ってきた、{2}からのポストカード\" width=\"{4}\" height=\"{5}\"><span class=\"pstamp\" aria-hidden=\"true\">{6}</span><figcaption>{7}より · {8}</figcaption></figure>",
  "That photo could not be opened. Try another one.": "その写真は開けませんでした。別の写真を選んでください。",
  "The postcard is gone. The photo was never kept.": "ポストカードを外しました。写真はもともと保存されていません。",
- "A Forgeling": "フォージリング"
+ "A Forgeling": "フォージリング",
+ "Your photo postcard, {0}": "あなたの写真ポストカード、{0}",
+ "Your photo postcard, {0}, with {1} peeking in": "あなたの写真ポストカード、{0}。{1}がのぞいています"
 }
