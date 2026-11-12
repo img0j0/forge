@@ -1,6 +1,6 @@
 # Forgelings: App Store listing
 
-Updated October 31, 2026, for prototype 0.48 (the field journal). Character limits are Apple's. Counts are included so edits stay inside them.
+Updated November 11, 2026, for 0.52 (the iCloud copy). Character limits are Apple's. Counts are included so edits stay inside them.
 
 **Name** (30 max): Forgelings  (10)
 
@@ -20,7 +20,7 @@ habit,cozy,pixel,pet,daily,routine,self care,collect,gentle,mindful,tracker,crea
 **Privacy Policy URL:** https://img0j0.github.io/forge/privacy.html
 **Copyright:** 2026 Hunter Abrams (or the LLC's name)
 
-## Description (4,000 max; this one is 2223)
+## Description (4,000 max; this one is 2310)
 
 Forgelings is a habit journal that is gentle with you.
 
