@@ -14,7 +14,7 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base63.html` | The current build, 0.63.0, in English (identical files) |
+| `work.html`, `base64.html` | The current build, 0.64.0, in English (identical files) |
 | `app.html` | What ships: `work.html` with its Japanese built in (`i18n/build.mjs`; `pwa.py` makes it) |
 | `history/patchNN.py` | Every version's patch script, for reference |
 | `pwa.py` | Packs `work.html` into `pwa/` (the website) |
