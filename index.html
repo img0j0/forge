@@ -1244,6 +1244,18 @@ html.reduce .app .chips.seg::before,html.reduce .app .chips.seg .chip{animation:
 /* 0.51: toasts drop in from the top instead of covering rows above the tab bar */
 .toast{top:calc(10px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:auto;transform:translate(-50%,-16px);width:max-content;max-width:min(94vw,440px)}
 html.ls .toast,html.jr .toast{top:calc(10px + max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px)));bottom:auto}
+
+/* 0.53: handwriting for headings, one text face for the rest; Fredoka is the name on the cover */
+:root{--display:'Nunito Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+.wordmark{font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif}
+html.jr .app .summary{font:400 16px/1.45 var(--body);color:var(--ink)}
+/* 0.53: quiet ribbons; the open page keeps its colour */
+html.jr .tab:not([aria-current="page"]){color:#EADFCB}
+html.jr .tab[data-tab="today"]:not([aria-current="page"]){background:#7A5A27 !important}
+html.jr .tab[data-tab="hearth"]:not([aria-current="page"]){background:#642D2D !important}
+html.jr .tab[data-tab="binder"]:not([aria-current="page"]){background:#363E4A !important}
+html.jr .tab[data-tab="chronicle"]:not([aria-current="page"]){background:#36432F !important}
+html.jr .tab[data-tab="settings"]:not([aria-current="page"]){background:#473651 !important}
 </style>
 </head>
 <body>
@@ -1726,7 +1738,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.52.0',APPVER='1.0.0';
+const VERSION='prototype 0.53.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -2392,7 +2404,7 @@ function renderToday(){
     save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>',
     home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><rect x="9" y="6" width="2.5" height="2.5" rx=".6"/><rect x="12.5" y="6" width="2.5" height="2.5" rx=".6"/><rect x="9" y="9.5" width="2.5" height="2.5" rx=".6"/><path d="M10.5 18h3"/></svg>'};
   let hero='',mate='';
-  if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><p class="muted">Turn it over to see today's small thing.</p><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
+  if(s==='fresh')hero=`<button class="heroback pixcut" id="btnTurn" aria-label="Turn over today's card">${EMB}<span>Today's card</span></button><h2>Today's card is waiting</h2><button class="primary" id="btnTurnGo">Turn over today's card</button>`;
   else if(s==='revealed')hero=`<div class="taskface" style="--cc:${todayLook().c}"><div class="tfart">${todayLook().sig}</div><div class="tfmain"><div class="band"><span>${esc(todayBand())}</span></div><p>${todayOwnObj()?PEN:''}${esc(todayTask())}</p></div></div><div class="btnrow"><button class="primary" id="btnDone">I did it</button><button class="outline" id="btnAll">I went all in</button></div><p class="muted small">Going all in nudges your odds toward rarer Forgelings. The exact odds are in Settings.</p><div class="row" style="width:100%"><button class="ghost" id="btnCard">See the full card</button><button class="ghost" id="btnRest">Rest today</button></div>`;
   else if(s==='done'&&favShows()){const c=cardById(state.todayCard),f=homeFav(),fn=esc(f.nick||f.name);hero=`<button class="herocard" id="btnShowFav" aria-label="Look at ${fn}">${cardHTML(f,{w:136,mini:true})}</button><h2>${fn} is keeping you company</h2><p class="muted">${c?'Today’s find, '+esc(c.nick||c.name)+', is in your binder. ':''}${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${c?'<button class="ghost favswap" id="btnSeeFind">See today’s find</button>':''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
   else if(s==='done'){const c=cardById(state.todayCard),f=homeFav();hero=`${c?`<button class="herocard" id="btnShowToday" aria-label="Look at today's Forgeling">${cardHTML(c,{w:136,mini:true})}</button>`:''}${c&&VECTORS[c.v]?`<span class="jstamp" aria-hidden="true"><b>${esc(VECTORS[c.v].ability.toUpperCase())}</b><i>${esc(VECTORS[c.v].name.toUpperCase())} · ${dayN()}</i></span>`:''}<h2>${c?esc(c.nick||c.name)+' joined your binder':'Today’s Forgeling is in your binder'}</h2><p class="muted">${esc(mirrorLine()||'Come back tomorrow for the next card.')}</p>${compHTML()}${f&&c&&f.id!==c.id?`<button class="ghost favswap" id="btnFavBack">Show ${esc(f.nick||f.name)} here</button>`:''}${state.packs>0?`<button class="primary" id="btnPack">Open ${state.packs>1?'a pack ('+state.packs+' ready)':'your pack'}</button>`:''}<div style="width:100%;text-align:left">${echoHTML()}</div>`;}
@@ -2401,7 +2413,7 @@ function renderToday(){
   const pips=[0,1,2,3,4].map(i=>`<span class="pip${i<state.progress?' on':''}"></span>`).join('');
   const rows=[];
   if(state.packs>0&&s!=='done')rows.push(row('btnPack',IC.pack,'A pack is ready','Five new Forgelings, earned by showing up.','',true));
-  else if(state.packs===0)rows.push(row('',IC.pack,'Next pack',`${5-state.progress} more ${5-state.progress===1?'day':'days'} to go. Rest days and missed days never reset this.`,`<div class="pips" role="img" aria-label="${state.progress} of 5 days toward your next pack">${pips}</div>`));
+  else if(state.packs===0)rows.push(row('',IC.pack,'Next pack',`${5-state.progress} more ${5-state.progress===1?'day':'days'} to go.${dayN()<=7?' Rest days and missed days never reset this.':''}`,`<div class="pips" role="img" aria-label="${state.progress} of 5 days toward your next pack">${pips}</div>`));
   if(state.cards.length){const hv=visitsLeft(),wl=wTodayLine().replace(/<[^>]+>/g,'');const nf=state.hearth.sleep?[]:furnNew();
     const waits=state.hearth.sleep||nf.length||(state.request&&reqAsker())||(state.wander&&wCard()&&wReady())||!state.wstat.sent;
     const hsub=(state.hearth.sleep?'The fire has burned low and your Forgelings are asleep.':(nf.length?'Something new is waiting by the fire. ':'')+(state.request&&reqAsker()?`${esc(reqAsker().nick||reqAsker().name)} has a small request. `:'')+(hv>0?`${hv} ${hv===1?'visit':'visits'} left today.`:'Your companions are here for company.'));
@@ -3896,9 +3908,6 @@ function renderHearth(){
   if(fgMade('compass')&&fg.comp===todayKey())notes+=`<p class="small" id="hCompLine">${compassLine()}</p>`;
   el.innerHTML=`<div class="hearthwrap"><canvas id="hearthCv" width="${HW}" height="${HH}" role="img" aria-label="Your Forgelings sitting around a campfire"></canvas></div>
     <p class="hmsg" id="hmsg" aria-live="polite" aria-atomic="true">${esc(hf.msg||(!away&&memoryLine(c))||'The fire crackles. Everyone is settling in.')}</p>
-    ${reqHTML()}${away?'':mEchoHTML(c)}
-    ${cs.length>1?`<div class="chips hwho" role="group" aria-label="Companions">${cs.map((x,i)=>`<button class="chip" data-hslot="${i}" aria-pressed="${i===hf.sel}">${esc(x.nick||x.name)}</button>`).join('')}</div>`:''}
-    <div class="group hcompg"><button class="rowl" id="hComp"><span class="rt"><b>${esc(n)}</b><span class="rs">${BOND_NAMES[lv-1]}, bond ${lv} of 5${c.statue?' · has a statue':''}</span><span class="bondbar" aria-hidden="true"><i style="width:${pct}%"></i></span></span><span class="chev" aria-hidden="true">›</span></button></div>
     <div class="actions hgrid">
       <button class="act" id="hAffection" ${away?'disabled':''} aria-describedby="hmsg">${HIC.sit}Sit with<small>Just for company</small></button>
       <button class="act" id="hSnack" ${left&&!away?'':'disabled'}>${HIC.snack}Snack<small>+1 or +2</small></button>
@@ -3907,7 +3916,10 @@ function renderHearth(){
       ${wbtn}
       <button class="act" id="hForge">${HIC.forge}The Forge<small id="hEmbers">${embRoll(e,e===1?'ember':'embers')}</small></button>
     </div>
-    <p class="muted small hvis">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>${notes}
+    <p class="muted small hvis">${away?`${esc(n)} is out wandering. Visits start again when they are back.`:left?`Visits left today: ${left} of 3. Play any of the five games.`:`Today's bond visits are complete. Sit together or play just for fun.`}</p>
+    ${reqHTML()}${away?'':mEchoHTML(c)}
+    ${cs.length>1?`<div class="chips hwho" role="group" aria-label="Companions">${cs.map((x,i)=>`<button class="chip" data-hslot="${i}" aria-pressed="${i===hf.sel}">${esc(x.nick||x.name)}</button>`).join('')}</div>`:''}
+    <div class="group hcompg"><button class="rowl" id="hComp"><span class="rt"><b>${esc(n)}</b><span class="rs">${BOND_NAMES[lv-1]}, bond ${lv} of 5${c.statue?' · has a statue':''}</span><span class="bondbar" aria-hidden="true"><i style="width:${pct}%"></i></span></span><span class="chev" aria-hidden="true">›</span></button></div>${notes}
     <div class="chips hmore">${fgMade('compass')&&fg.comp!==todayKey()?'<button class="chip" id="hCompass">Ask the compass</button>':''}<button class="chip" id="hShelf">Curio shelf · ${have} of ${shelfSet().length}</button><button class="chip" id="hFurn">By the fire · ${fh} of ${FURN.length}</button><button class="chip" id="hKeeps">Keepsakes</button><button class="chip" id="hChange">Change who is here</button></div>`;
   drawHearth(performance.now());
   bloomCheck();
@@ -5198,7 +5210,7 @@ $('#view-today').addEventListener('click',e=>{
   if(b.dataset.feel){const f=b.dataset.feel;if(!FEELS.includes(f))return;state.feel=state.feel||{};if(state.feel[state.date]===f)delete state.feel[state.date];else{state.feel[state.date]=f;chime(0);}save();renderToday();renderChronicle();const n=$(`#view-today [data-feel="${f}"]`);if(n)n.focus({preventScroll:true});return;}
   if(b.id==='btnBackup'){openBackupNudge();return;}
   if(b.id==='btnHomeTip'){openHomeTip();return;}
-  if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard')openVector();
+  if(b.id==='btnTurn'||b.id==='btnTurnGo'||b.id==='btnCard'){const fr=state.status==='fresh'&&state.onboarded;openVector();if(fr)setTimeout(flipVector,REDUCE?0:260);}
   else if(b.id==='btnDone')startDone(false);
   else if(b.id==='btnAll')startDone(true);
   else if(b.id==='btnPack')openPack();
