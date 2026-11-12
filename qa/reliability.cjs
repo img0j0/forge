@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 (async()=>{
 const source=fs.readFileSync('work.html','utf8');const nodes=new Map();let blocked=true,stored='',backups=0;const daily={};
 const element=()=>({style:{},children:[],setAttribute(){},appendChild(x){this.children.push(x)},remove(){nodes.delete(this.id)}});
-const ctx={Set,JSON,Promise,document:{getElementById:id=>nodes.get(id),createElement:element,body:{prepend:x=>nodes.set(x.id,x)}},localStorage:{setItem(k,v){if(blocked)throw Error('quota');if(k===ctx.KEY)stored=v;else daily[k]=v},removeItem(k){delete daily[k]}},state:{_sv:0,cards:[{id:1,snackKnown:true,firstFind:{id:'key',at:'2026-10-26'}}]},sleepRun:null,KEY:'forge-app-v1',nset(){},nflush(){},remindSoon(){},openExport(){backups++}};
+const ctx={Set,JSON,Promise,document:{getElementById:id=>nodes.get(id),createElement:element,body:{prepend:x=>nodes.set(x.id,x)}},localStorage:{setItem(k,v){if(blocked)throw Error('quota');if(k===ctx.KEY)stored=v;else daily[k]=v},removeItem(k){delete daily[k]}},state:{_sv:0,cards:[{id:1,snackKnown:true,firstFind:{id:'key',at:'2026-10-26'}}]},sleepRun:null,KEY:'forge-app-v1',nset(){},nflush(){},remindSoon(){},cloudSoon(){},openExport(){backups++}};
 vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('const saveProblems='),source.indexOf('function rollover()')),ctx);
 ctx.save();assert(nodes.has('saveWarning'));assert.equal(ctx.state.cards.length,1);nodes.get('saveWarning').children[1].onclick();assert.equal(backups,1);
 ctx.save();assert.equal(nodes.size,1);blocked=false;nodes.get('saveWarning').children[2].onclick();assert.equal(nodes.size,0);assert.equal(JSON.parse(stored).cards[0].firstFind.id,'key');
