@@ -94,7 +94,7 @@
  "At 60, someone will come to the fire to read with you.": "60ページで、誰かが炉ばたに来て、いっしょに読んでくれます。",
  "At 100, gold edges and a clasp.": "100ページで、金の小口と留め金がつきます。",
  "The Scribe sits by your fire and reads with you. ": "書記が炉ばたに座って、いっしょに読んでくれます。",
- "<div class=\"panel-box bookp\"><div class=\"bookrow\">{0}<div><h2>Your book</h2><p class=\"muted small\">{1}</p><p class=\"muted small\">{2}{3}</p>{4}</div></div></div>": "<div class=\"panel-box bookp\"><div class=\"bookrow\">{0}<div><h2>あなたの本</h2><p class=\"muted small\">{1}</p><p class=\"muted small\">{2}{3}</p>{4}</div></div></div>",
+ "<div class=\"panel-box bookp\"><div class=\"bookrow\">{0}<div><h2>Your book</h2><p class=\"muted small\">{1}</p><p class=\"muted small\">{2}{3}</p>{4}{5}</div></div></div>": "<div class=\"panel-box bookp\"><div class=\"bookrow\">{0}<div><h2>あなたの本</h2><p class=\"muted small\">{1}</p><p class=\"muted small\">{2}{3}</p>{4}{5}</div></div></div>",
  "Saved. New finds will follow this.": "保存しました。これからの出会いに反映されます。",
  "A gentle nudge at {0}, only on days your card is still waiting.": "カードがまだ待っている日だけ、{0}にそっとお知らせします。",
  "Write a few words first.": "先に、少し言葉を書いてください。",
