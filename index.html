@@ -1378,18 +1378,47 @@ function fillPoly(m,pts,fl){const n=pts.length;for(let y=0;y<N;y++)for(let x=0;x
 function bez(pts,t){let p=pts.slice();while(p.length>1){const q=[];for(let i=0;i<p.length-1;i++)q.push([p[i][0]+(p[i+1][0]-p[i][0])*t,p[i][1]+(p[i+1][1]-p[i][1])*t]);p=q;}return p[0];}
 function curve(m,pts,t0,t1,fl){for(let s=0;s<=48;s++){const t=s/48,p=bez(pts,t),th=t0+(t1-t0)*t,r=th/2;for(let y=Math.max(0,Math.floor(p[1]-r-1));y<=Math.min(N-1,Math.ceil(p[1]+r+1));y++)for(let x=0;x<N;x++){const dx=x+.5-p[0],dy=y+.5-p[1];if(dx*dx+dy*dy<=r*r+.15)setp(m,x,y,fl);}}}
 /* Paint a mask into the grid: base fill, shade on the lower-right rim, highlight on the upper-left rim, auto outline */
+/* 0.55: finer rendering for every Forgeling (same shapes, faces and colours).
+   commit(): round form shading. Light comes from the upper left; each pixel measures how far the part reaches
+   toward the light and away from it, and gets highlight, base, a mid tone or shade by where it sits between the
+   two (small parts keep the old rim rule). selout(): outlines take the colour of what they edge (a dark accent
+   line round an accent part, gold round gold) and lines inside the silhouette, where parts overlap, soften to
+   the part's own deep shade. */
+const MIDOF={2:29,6:30,5:31};
 function commit(g,m,o){
   const inm=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&m[y*N+x]===1;
-  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h;
+  const base=o.b||2,sh=o.s===undefined?3:o.s,hl=o.h===undefined?4:o.h,md=o.m!==undefined?o.m:(MIDOF[base]||0);
+  const ray=(x,y,dx,dy)=>{let k=0;while(k<14&&inm(x+dx*(k+1),y+dy*(k+1)))k++;return k;};
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     if(!inm(x,y))continue;let s=base;
-    if(sh&&(!inm(x+1,y)||!inm(x,y+1)||!inm(x+1,y+1)))s=sh;
-    else if(hl&&!inm(x-1,y-1)&&inm(x+1,y)&&inm(x,y+1))s=hl;
+    const L=(ray(x,y,-1,-1)+ray(x,y,0,-1)+ray(x,y,-1,0)*.5)/2.5,D=(ray(x,y,1,1)+ray(x,y,0,1)+ray(x,y,1,0)*.5)/2.5,T=L+D;
+    if(T<3.2){
+      if(sh&&(!inm(x+1,y)||!inm(x,y+1)||!inm(x+1,y+1)))s=sh;
+      else if(hl&&!inm(x-1,y-1)&&inm(x+1,y)&&inm(x,y+1))s=hl;
+    }else{const u=L/T;
+      if(sh&&(u>.8||!inm(x+1,y+1)&&(!inm(x+1,y)||!inm(x,y+1))))s=sh;
+      else if(md&&u>.52)s=md;
+      else if(hl&&(u<.2||!inm(x-1,y-1)&&!inm(x-1,y)&&inm(x+1,y)&&inm(x,y+1)))s=hl;}
     g[y*N+x]=s;
   }
   if(o.out!==false)for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     if(!inm(x,y)&&(inm(x-1,y)||inm(x+1,y)||inm(x,y-1)||inm(x,y+1)))g[y*N+x]=o.o||1;
   }
+}
+/* every outline slot: the near-black 1 and selout's 32-38. Forgebound gold, legendary foil and statue outlines use it */
+const OL=s=>s===1||(s>=32&&s<=38);
+const SELFAM=s=>s===6||s===13||s===30?1:s===14||s===15?2:s===17||s===18?3:s===7?4:0;
+function selout(g){
+  const src=g.slice(),OUTER=[1,32,33,34,1],LIT=[35,36,37,38,37],INNER=[35,36,37,38,37];
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=y*N+x;if(src[i]!==1)continue;
+    let outer=false,lit=0;const cnt=[0,0,0,0,0];
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const X=x+dx,Y=y+dy;
+      const v=X<0||Y<0||X>=N||Y>=N?0:src[Y*N+X];
+      if(!v){if(!dx||!dy)outer=true;continue;}if(v===1)continue;cnt[SELFAM(v)]+=(!dx||!dy)?2:1;if(dx>=0&&dy>=0)lit++;else lit-=2;}
+    let f=0;for(let k=1;k<5;k++)if(cnt[k]>cnt[f])f=k;
+    if(!cnt[f])continue;
+    g[i]=outer?(lit>=2&&y<N-6?LIT[f]:OUTER[f]):INNER[f];}
+  return g;
 }
 const CH={o:1,b:2,s:3,h:4,l:5,a:6,w:7,p:8,g:9,G:10,k:11,c:16,t:14,y:17,A:19,B:20,C:21,D:22,E:23,F:24,H:25,I:26,J:27,K:28};
 function stamp(g,x,y,rows,flipH){rows.forEach((row,j)=>{const r=flipH?row.split('').reverse().join(''):row;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;const px=x+i,py=y+j;if(px>=0&&py>=0&&px<N&&py<N)g[py*N+px]=CH[ch];}});}
@@ -1446,6 +1475,7 @@ function genSpec(c){
     }else{
       s.shape=qp(['hulk','wraith','beast','shard','imp','imp','slink','tower']);
       s.arms=qp(['claws','claws','raised','none']);
+      if(s.arms==='raised'&&!['imp','tower','wraith','shard'].includes(s.shape))s.arms='claws';
       s.eyes=q()<.5?s.eyes:qp(['many','void','glare','slit']);
       s.mouth=q()<.5?s.mouth:qp(['stitch','tusks','fangs']);
       s.mark=q()<.6?s.mark:'veins';
@@ -1454,16 +1484,20 @@ function genSpec(c){
   }
   return s;
 }
+/* 0.55: the palette adds mid tones (29 body, 30 accent, 31 belly) and part outlines (32 accent, 33 horn, 34 gold);
+   shadows lean cool and highlights warm. */
 function makePal(S,c){
   const T=THEMES[c.theme],P=S.dark?T.dark:T.cute,b=S.body,dk=S.dark,p=[];
-  p[2]=b;p[3]=mix(shade(b,dk?-.4:-.26),dk?'#2A1A4A':'#5B3E8F',.2);p[4]=shade(b,dk?.22:.34);
+  p[2]=b;p[3]=mix(shade(b,dk?-.4:-.26),dk?'#2A1A4A':'#5B3E8F',.2);p[4]=mix(shade(b,dk?.22:.34),'#FFF1C8',dk?.06:.14);
   p[1]=dk?mix(shade(b,-.85),'#05040A',.4):shade(b,-.64);
-  p[5]=P.belly;p[12]=shade(P.belly,-.2);p[6]=P.accent;p[13]=shade(P.accent,-.28);
+  p[5]=P.belly;p[12]=mix(shade(P.belly,-.2),'#7A6AA8',.12);p[6]=P.accent;p[13]=mix(shade(P.accent,-.28),'#4A3A7A',.14);
   p[7]='#FFFFFF';p[8]=dk?'#0A0810':'#2B2140';p[9]=P.glow||'#FFFFFF';p[10]=P.glow2||'#FFFFFF';
-  p[11]=shade(b,dk?-.55:-.42);p[14]=dk?'#E6DEC6':'#FFFFFF';p[15]=dk?'#A89F86':'#D8D0F0';
+  p[11]=mix(shade(b,dk?-.55:-.42),dk?'#1A1030':'#3A2A6A',.15);p[14]=dk?'#E6DEC6':'#FFFFFF';p[15]=dk?'#A89F86':'#D8D0F0';
   p[16]='#FF8FB0';p[17]='#FFD84A';p[18]='#C98A12';
   const out=[[0,0,0]];for(let i=1;i<19;i++)out[i]=hexRGB(p[i]||'#000000');
   CHARM_COL.forEach((h,i)=>out[19+i]=hexRGB(h));WARD_COL.forEach((h,i)=>out[24+i]=hexRGB(h));
+  out[29]=hexRGB(mix(p[2],p[3],.5));out[30]=hexRGB(mix(p[6],p[13],.5));out[31]=hexRGB(mix(p[5],p[12],.5));
+  out[32]=hexRGB(mix(shade(p[6],-.62),p[1],.35));out[33]=hexRGB(shade(p[15],dk?-.6:-.45));out[34]=hexRGB('#7A4A0C');out[35]=out[11];out[36]=out[13];out[37]=out[15];out[38]=out[18];
   const pulse=out.slice();pulse[9]=hexRGB(mix(p[9],p[10],.45));
   return {pal:out,palP:pulse};
 }
@@ -1686,13 +1720,13 @@ function buildSprite(S,bob,blink){
 
   if(S.keep){
     const half=dk?7:rx,mouthY=eyeY+eh+(dk?2:1);
-    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0));}
+    if(FX.FI){const ft=Math.floor(Math.min(...FX.FI)/N);top=Math.round(Math.max(top-2,Math.min(top,ft-({cap:6,flower:6,hat:4,daisies:4}[S.keep]||0))));}
     if(S.keep==='hat'){const hm=mask();fillPoly(hm,[[12.5,top+2],[19.5,top+2],[16,top-6]]);commit(g,hm,{b:6,s:13,h:null});
       const pm=mask();fillEll(pm,16,top-6.6,1.7,1.7);commit(g,pm,{b:17,s:18,h:null});
       [[14,top+1],[17,top+1],[15,top-2],[16,top-2]].forEach(p=>{const i=p[1]*N+p[0];if(g[i]===6||g[i]===13)g[i]=7;});}
     else if(S.keep==='scarf'){const sy=mouthY+(dk?4:3);for(let dy=0;dy<2;dy++)for(let x=0;x<N;x++){const i=(sy+dy)*N+x;if(M[i]&&g[i]!==1)g[i]=dy?13:6;}
       const tm=mask();fillPoly(tm,[[17,sy+1],[20,sy+1],[20,sy+6],[17,sy+6]]);commit(g,tm,{b:6,s:13,h:null});}
-    else if(S.keep==='flower'){const fx=16+Math.round(half*.62),fy=top+3;stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
+    else if(S.keep==='flower'){const fy=top+3;let fx=16+Math.round(half*.62);if(FX.FI){let e=16;while(e<N-1&&(M[(fy+2)*N+e+1]||g[(fy+2)*N+e+1]>1))e++;fx=Math.min(fx,e-1);}stamp(g,fx-1,fy-1,['.c.','cyc','.c.'],false);}
     else if(S.keep==='daisies'){[11,15,19].forEach(x=>stamp(g,x,top,['.c.','cyc','.c.'],false));}
     else if(S.keep==='charm'){const cy=mouthY+(dk?3:2);stamp(g,14,cy,['.o..o.','..oo..','.oyyo.','.oyao.','..oo..'],false);}
     else if(S.keep==='shells'){const sy=mouthY+(dk?4:3);for(let x=0;x<N;x++){const i=sy*N+x;if(M[i]&&g[i]!==1)g[i]=x%2?7:16;}}
@@ -1702,7 +1736,7 @@ function buildSprite(S,bob,blink){
     else if(/^ward[0-4]$/.test(S.keep)){const L='FHIJK'[+S.keep[4]],cy=mouthY+(dk?2:1);stamp(g,13,cy,['o....o','.o..o.','..oo..','.oXXo.','oXXXXo','oXyyXo','oXXXXo','.oXXo.','..oo..'].map(r=>r.replace(/X/g,L)),false);}
   }
   if(FX.FI)FX.FI.forEach((p,k)=>{g[p]=FX.FV[k];});
-  return g;
+  return selout(g);
 }
 
 /* ================= Scene (48x37 pixel backdrop) ================= */
@@ -1758,7 +1792,7 @@ function prep(c){
   const n=[0,3,5,9,7][c.rarity];for(let i=0;i<n;i++){let sx=Math.floor(rb()*48),sy=Math.floor(rb()*34);if(c.rarity===4){const a=rb()*Math.PI*2,q=14+rb()*5;sx=Math.max(1,Math.min(46,Math.floor(24+Math.cos(a)*q*1.25)));sy=Math.max(1,Math.min(33,Math.floor(19+Math.sin(a)*q*.85)));}sparks.push({x:sx,y:sy,per:700+rb()*900,ph:rb(),big:rb()<.35});}
   return PREP[k]={c,spec,pal:pl.pal,palP:pl.palP,scene,sp:[null,null,null,null],sparks,img:null};
 }
-const FOIL3={4:1,6:1,9:1,10:1,17:1},FOIL4={1:1,17:1};
+const FOIL3={4:1,6:1,9:1,10:1,17:1},FOIL4={1:1,17:1,32:1,33:1,34:1,35:1,36:1,37:1,38:1};
 function drawFrame(e,cv,t,ph){
   const c=e.c,R=c.rarity,W=48,H=37,ctx=cv.getContext('2d');
   if(!e.img)e.img=ctx.createImageData(W,H);
@@ -1772,7 +1806,7 @@ function drawFrame(e,cv,t,ph){
     const i=y*W+x,sx=x-OX,sy=y-OY;let slot=0;
     if(sx>=0&&sx<32&&sy>=0&&sy<32)slot=g[sy*32+sx];
     let r,gg,b,foil=false;
-    if(slot){const p=pal[slot];r=p[0];gg=p[1];b=p[2];foil=!!(FS&&FS[slot])||(c.bond>=25&&slot===1);}
+    if(slot){const p=pal[slot];r=p[0];gg=p[1];b=p[2];foil=!!(FS&&FS[slot])||(c.bond>=25&&OL(slot));}
     else{const j=i*3;r=bg[j];gg=bg[j+1];b=bg[j+2];foil=!!(bf[i]&&R>=3);
       if(R===4){const dd=Math.hypot(x+.5-24,y+.5-19);if(Math.abs(dd-Rr)<.7){r=226;gg=186;b=72;}}}
     if(foil){
@@ -1879,7 +1913,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.54.1',APPVER='1.0.0';
+const VERSION='prototype 0.55.0',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?'First Edition':'Pilot Edition';
@@ -3989,7 +4023,7 @@ function drawHearth(t){
     const g=e.sp[si],pal=pulse?e.palP:e.pal;
     let hop=0;hfx.forEach(f=>{if(f.i===i){const a=t-f.t0;if(f.k==='hop'){if(a<640)hop=-Math.round(Math.sin(a/640*Math.PI)*6);}else if(a<420)hop=a<210?-2:-1;}});
     if(slp||dz)hop=Math.floor(t/1500+i)%2;else if(still)hop=Math.floor(t/3000)%2;
-    for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[sy*32+sx];if(!sl)continue;let q=pal[sl];if(sl===1&&c.bond>=BOND_AT[4])q=GOLD[Math.floor((((sx+sy)*.05+t/1100)%1)*6)%6];setpx(p[0]+sx,p[1]+sy+hop,q);}
+    for(let sy=0;sy<32;sy++)for(let sx=0;sx<32;sx++){const sl=g[sy*32+sx];if(!sl)continue;let q=pal[sl];if(OL(sl)&&c.bond>=BOND_AT[4])q=GOLD[Math.floor((((sx+sy)*.05+t/1100)%1)*6)%6];setpx(p[0]+sx,p[1]+sy+hop,q);}
     if(slp||dz){const zt=((t/900)+i*.9)%3;if(zt<2.5){const zy=p[1]+3-Math.floor(zt*3),zx=p[0]+23+Math.floor(zt*1.5);ZB.forEach((row,j)=>{for(let k=0;k<3;k++)if(row[k]==='#')setpx(zx+k,zy+j,[220,232,255]);});}}
   };
   if(!heapOn)drawWeather(setpx,hWeather(cs.filter(c=>c.id!==outId)),t);
@@ -4486,10 +4520,10 @@ function statueSprite(c,clay){
   const cc=Object.assign({},c,{keep:clay?'':(c.statue?c.statue.keep:(c.keep||''))}),spec=genSpec(cc),pl=makePal(spec,cc),g=buildSprite(spec,0,0),R=c.rarity,FS=R===3?FOIL3:R===4?FOIL4:null;
   const col=new Array(1024).fill(null),out=new Uint8Array(1024);
   for(let i=0;i<1024;i++){const sl=g[i];if(!sl)continue;let [r,gg,b]=pl.pal[sl];
-    if((FS&&FS[sl])||(c.bond>=25&&sl===1)){const x=i%32+8,y=(i>>5)+4;
+    if((FS&&FS[sl])||(c.bond>=25&&OL(sl))){const x=i%32+8,y=(i>>5)+4;
       if(R===3){const q=RAINBOW[Math.floor((((x+y)*.045)%1)*12)%12];r=lerp(r,q[0],.7);gg=lerp(gg,q[1],.7);b=lerp(b,q[2],.7);}
       else{const q=GOLD[Math.floor((((x+y)*.05)%1)*6)%6];r=lerp(r,q[0],.85);gg=lerp(gg,q[1],.85);b=lerp(b,q[2],.85);}}
-    if(clay){const L=Math.round((.3*r+.59*gg+.11*b)/255*4)/4;col[i]=sl===1?[.30,.28,.34]:[.50+.36*L,.48+.36*L,.54+.34*L];}else col[i]=[r/255,gg/255,b/255];out[i]=sl===1?1:0;}
+    if(clay){const L=Math.round((.3*r+.59*gg+.11*b)/255*4)/4;col[i]=OL(sl)?[.30,.28,.34]:[.50+.36*L,.48+.36*L,.54+.34*L];}else col[i]=[r/255,gg/255,b/255];out[i]=OL(sl)?1:0;}
   return {col,out};
 }
 /* pixels to blocks: depth from the distance to the silhouette edge; the outline is painted on the front and back faces
