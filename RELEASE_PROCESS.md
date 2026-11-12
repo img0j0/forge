@@ -116,3 +116,4 @@ Native builds: 0.69.0's iOS job was cancelled when 0.70.0 was pushed (Android pa
 Update 0.72.0: patches read base72.html; base71.html removed. New art script art/cardback72.py (imports cardback.py; patch72 embeds its packed SVGs). Checked: frame-by-frame screenshots of choosing, the pack and a Legend build-up (a test copy dealing one card per rarity), English and Japanese, day and night, reduced motion, axe clean on the choose sheet and the summary.
 Shipped 0.72.0: main/gh-pages 4eba6c0 (Pages success, live blob 6ec2ac4 matches), ios-app daccaa7 (Native builds success), Claude copy version 123.
 Update 0.72.1: patches read base721.html; base72.html removed. Checked: flip shows the clean back, words below, back again restores the hint; English light and Japanese dark.
+Shipped 0.72.1: main/gh-pages c4160e4 (Pages success, live blob c134d60 matches), ios-app 96f6307 (Native builds success), Claude copy version 124.
