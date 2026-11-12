@@ -50,7 +50,14 @@ public class ForgelingsWidgetProvider extends AppWidgetProvider {
             v.setTextViewText(R.id.fw_line, until > 0 && !back.isEmpty() ? back : line);
             v.setViewVisibility(R.id.fw_timer, View.GONE);
         }
-        String png = p.getString("png", null);
+        String png = p.getString("png", null), post = until > now ? null : p.getString("post", null);
+        if (post != null) {
+            try {
+                byte[] b = Base64.decode(post, Base64.DEFAULT);
+                Bitmap bm = BitmapFactory.decodeByteArray(b, 0, b.length);
+                if (bm != null) { v.setImageViewBitmap(R.id.fw_sprite, bm); png = null; }
+            } catch (IllegalArgumentException ignored) {}
+        }
         if (png != null) {
             try {
                 byte[] b = Base64.decode(png, Base64.DEFAULT);

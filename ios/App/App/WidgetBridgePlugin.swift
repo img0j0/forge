@@ -28,6 +28,10 @@ public class WidgetBridgePlugin: CAPPlugin, CAPBridgedPlugin {
         d.set(call.getString("day") ?? "", forKey: "fl.day")
         d.set(call.getDouble("until") ?? 0, forKey: "fl.until")
         if let b = call.getString("png"), let data = Data(base64Encoded: b) { d.set(data, forKey: "fl.png") }
+        // 0.66: the latest photo postcard ("" when there is none)
+        if let b = call.getString("post") {
+            if b.isEmpty { d.removeObject(forKey: "fl.post") } else if let data = Data(base64Encoded: b) { d.set(data, forKey: "fl.post") }
+        }
         WidgetCenter.shared.reloadAllTimelines()
         call.resolve(["ok": true])
     }

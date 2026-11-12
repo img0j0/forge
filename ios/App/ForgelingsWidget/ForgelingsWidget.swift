@@ -20,6 +20,7 @@ struct FLEntry: TimelineEntry {
     let day: String
     let until: Date?
     let png: Data?
+    let post: Data?
 }
 
 private func todayKey(_ d: Date) -> String {
@@ -39,10 +40,11 @@ struct FLProvider: TimelineProvider {
                        back: d?.string(forKey: "fl.back") ?? "",
                        day: d?.string(forKey: "fl.day") ?? "",
                        until: u > 0 ? Date(timeIntervalSince1970: u / 1000) : nil,
-                       png: d?.data(forKey: "fl.png"))
+                       png: d?.data(forKey: "fl.png"),
+                       post: d?.data(forKey: "fl.post"))
     }
     func placeholder(in context: Context) -> FLEntry {
-        FLEntry(date: Date(), name: "Forgelings", line: isJA ? "一日ひとつ、小さなこと。" : "One small thing a day.", fresh: "", wline: "", back: "", day: "", until: nil, png: nil)
+        FLEntry(date: Date(), name: "Forgelings", line: isJA ? "一日ひとつ、小さなこと。" : "One small thing a day.", fresh: "", wline: "", back: "", day: "", until: nil, png: nil, post: nil)
     }
     func getSnapshot(in context: Context, completion: @escaping (FLEntry) -> Void) { completion(load()) }
     func getTimeline(in context: Context, completion: @escaping (Timeline<FLEntry>) -> Void) {
@@ -62,6 +64,18 @@ struct Sprite: View {
             Image(uiImage: ui).interpolation(.none).resizable().aspectRatio(contentMode: .fit)
         } else {
             Image(systemName: "flame.fill").resizable().aspectRatio(contentMode: .fit).foregroundColor(gold).padding(8)
+        }
+    }
+}
+
+// 0.66: the latest photo postcard, on cream paper, slightly tilted
+struct Postcard: View {
+    let data: Data
+    var body: some View {
+        if let ui = UIImage(data: data) {
+            Image(uiImage: ui).interpolation(.none).resizable().aspectRatio(4.0 / 3.0, contentMode: .fit)
+                .padding(4).background(Color(red: 1.0, green: 0.97, blue: 0.92))
+                .clipShape(RoundedRectangle(cornerRadius: 3)).rotationEffect(.degrees(-2))
         }
     }
 }
@@ -101,7 +115,11 @@ struct FLView: View {
                 }.frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 HStack(spacing: 14) {
-                    Sprite(png: e.png).frame(width: 96, height: 96)
+                    if !wandering, let p = e.post, UIImage(data: p) != nil {
+                        Postcard(data: p).frame(width: 132, height: 104)
+                    } else {
+                        Sprite(png: e.png).frame(width: 96, height: 96)
+                    }
                     VStack(alignment: .leading, spacing: 5) {
                         Text(e.name).font(.system(size: 18, weight: .bold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                         words

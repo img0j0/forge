@@ -38,6 +38,9 @@ public class WidgetBridgePlugin extends Plugin {
         e.putLong("until", call.getDouble("until", 0.0).longValue());
         String png = call.getString("png", null);
         if (png != null) e.putString("png", png);
+        // 0.66: the latest photo postcard ("" when there is none)
+        String post = call.getString("post", null);
+        if (post != null) { if (post.isEmpty()) e.remove("post"); else e.putString("post", post); }
         e.apply();
         ForgelingsWidgetProvider.refreshAll(ctx);
         JSObject r = new JSObject(); r.put("ok", true); call.resolve(r);
