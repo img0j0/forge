@@ -35,7 +35,7 @@ Current build: **prototype 0.74.0**, shipped November 12, 2026. Live at https://
 
 ## Where things stand and what's next
 
-**Next: Hunter's call.** 0.74 was the polish pass (type scale, explanations that fade, one focal point at the Hearth). All planned work before it is done too: the five enhancements (0.58 to 0.62), the daily card and journal rework (0.63 to 0.65), the brainstorm plan (0.66 to 0.71), animations (0.72) and launch readiness (0.73; report https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ: ready for TestFlight, not yet the App Store).
+**Next: Hunter's call** on the journal and book design doc (Reference docs). 0.74 was the polish pass (type scale, explanations that fade, one focal point at the Hearth). All planned work before it is done too: the five enhancements (0.58 to 0.62), the daily card and journal rework (0.63 to 0.65), the brainstorm plan (0.66 to 0.71), animations (0.72) and launch readiness (0.73; report https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ: ready for TestFlight, not yet the App Store).
 
 Open items:
 
@@ -97,6 +97,7 @@ Open items:
 
 ## Reference docs
 
+- Journal and book design (November 13; 0.75 to 0.78, printed book): https://claude.ai/artifact/P9KAXd64JbAGFALG1KTwvk
 - Launch readiness (0.73): https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ
 - Daily card and journal rework: https://claude.ai/artifact/LbyhNoAzE9YGXmR9Ubh8z1
 - Competitors and opportunities (0.52): https://claude.ai/artifact/UnbnvevT3fJLCjQEReBieG
