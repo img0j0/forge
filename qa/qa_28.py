@@ -8,7 +8,7 @@ def load(pg,s):
     setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def bond(pg,cid): return [c for c in st(pg)["cards"] if c["id"]==cid][0]["bond"]
 def do_day(pg):
-    tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack")
+    tabto(pg,"today"); turn_card(pg)
     pg.wait_for_timeout(700); pg.evaluate("()=>{const o=document.querySelector('#modal #vOk');if(o)o.click();}"); pg.wait_for_timeout(500); closemodals(pg)
     pg.wait_for_selector("#btnDone",state="visible"); pg.tap("#btnDone"); pg.wait_for_timeout(800)
     pg.evaluate("()=>{const m=[...document.querySelectorAll('#modal [data-mood]')].find(b=>/mix/i.test(b.textContent));if(m)m.click()}"); pg.wait_for_timeout(900)
@@ -32,7 +32,7 @@ with sync_playwright() as p:
     rec("Notice","the Hearth shows the same line",s["comp"]["line"] in h,h[:500])
     rec("Notice","no junk text",not JUNK.search(t+h),JUNK.findall(t+h)[:3])
     # ---------- rest days cost nothing and give nothing ----------
-    dev(pg,"next"); closemodals(pg); b1=bond(pg,first); tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(500); pg.evaluate("()=>{const o=document.querySelector('#modal #vOk');if(o)o.click();}"); pg.wait_for_timeout(400); pg.wait_for_selector("#btnRest",state="visible"); pg.tap("#btnRest"); pg.wait_for_timeout(600); closemodals(pg)
+    dev(pg,"next"); closemodals(pg); b1=bond(pg,first); tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(500); pg.evaluate("()=>{const o=document.querySelector('#modal #vOk');if(o)o.click();}"); pg.wait_for_timeout(400); pg.wait_for_selector("#btnRest",state="visible"); pg.tap("#btnRest"); pg.wait_for_timeout(600); closemodals(pg)
     rec("Rest","a rest day neither grows nor lowers the bond, and shows no notice",bond(pg,first)==b1 and "Showing up grew" not in pg.inner_text("#view-today"))
     # ---------- someone out wandering is skipped ----------
     s=st(pg); ids=[c["id"] for c in s["cards"]]; A,B=ids[0],ids[1]
@@ -56,7 +56,8 @@ with sync_playwright() as p:
     rec("Echo","answering 'I did it' shows the Forgeling's reply and keeps the line",s2["journal"][ago(10)].get("reply")=="did" and s2["mEcho"]["ans"]=="did" and s2["mEcho"]["line"] in pg.inner_text(".mecho") and pg.locator("[data-mecho]").count()==0,h[:300])
     rec("Echo","answering uses no visit",st(pg)["hearth"]["visits"]==vis_before)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300)
-    rec("Echo","the Journal shows how it went","Later: you did it." in pg.inner_text("#view-chronicle"))
+    pg.evaluate("()=>{const b=document.getElementById('jLines');b&&b.click()}"); pg.wait_for_timeout(400)  # 0.63: every done day is a page; older ones are under "All your pages"
+    rec("Echo","the Journal shows how it went","Later: you did it." in pg.inner_text("#view-chronicle")+mt(pg))
     pg.reload(); pg.wait_for_timeout(800); closemodals(pg); tabto(pg,"hearth")
     rec("Echo","the answered note stays put for the rest of the day, without the buttons","Finish the essay draft" in pg.inner_text("#view-hearth") and pg.locator("[data-mecho]").count()==0)
     # gap: nothing new for a few days; then the next unanswered line; answered lines never return

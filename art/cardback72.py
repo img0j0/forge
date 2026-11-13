@@ -6,7 +6,29 @@
 #   packed() gives the CSS-ready SVG, as before.
 import math,random,os,sys
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
-from cardback import SEAL,SP,W,H,blank,put,packed
+from cardback import SEAL,SP,W,H,blank,put
+def packed(G):
+    # 0.73: half the size of cardback.packed (qa_301 keeps pixel art under 9,000 characters): each colour is one
+    # stroked path of horizontal runs, the first run on a row placed absolutely and the rest relatively.
+    by={}
+    for y,row in enumerate(G):
+        x=0
+        while x<W:
+            c=row[x];s0=x
+            while x<W and row[x]==c:x+=1
+            by.setdefault(c,{}).setdefault(y,[]).append((s0,x-s0))
+    bg=max(by,key=lambda c:sum(len(v) for v in by[c].values()))
+    out=[]
+    for c,rows in by.items():
+        if c==bg:continue
+        d=[]
+        for y,runs in rows.items():
+            px=None
+            for (x0,n) in runs:
+                d.append(f"M{x0} {y}.5h{n}" if px is None else f"m{x0-px} 0h{n}");px=x0+n
+        out.append(f"<path stroke='{c}' d='{''.join(d)}'/>")
+    svg=f"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 56' shape-rendering='crispEdges' preserveAspectRatio='none'><rect width='40' height='56' fill='{bg}'/>{''.join(out)}</svg>"
+    return svg.replace('#','%23')
 L0,L,L1,L2,TOOL,TOOLHI='#3E1C1D','#5A2C2A','#62322F','#6E3A33','#4A2223','#704033'
 EDGE,G0,G,G1,G2,ST='#24100F','#9A6A1A','#E0A82E','#FFD36B','#FFF1C9','#C9A15A'
 def leather(G_,R,lattice_rows):

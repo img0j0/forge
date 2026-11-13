@@ -16,7 +16,7 @@ with sync_playwright() as p:
     b=p.chromium.launch()
     if P.startswith("file://"):
         size=os.path.getsize(P.replace("file://",""))
-        rec("Size","the whole app stays under the 1 MB budget (raised whenever a wanted feature needs room)",size<1_000_000,size)
+        rec("Size","the whole app stays under the 1.15 MB budget (raised whenever a wanted feature needs room; 0.73: 1 MB to 1.15 MB for 0.63 to 0.72)",size<1_150_000,size)
     ctx,pg=newpage(b); pg.set_default_timeout(7000); pg.goto(P); pg.wait_for_selector("#ageGo, #titleGo")
     rec("Stage","the title screen keeps its own scene, with no night stage behind it",pg.locator("#modal .stageCv").count()==0)
     first_card(pg); closemodals(pg); base=st(pg)

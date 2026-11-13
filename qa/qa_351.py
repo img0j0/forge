@@ -48,7 +48,7 @@ with sync_playwright() as p:
             # Plain print
             tabto(pg,"settings"); pg.evaluate("document.querySelector('[data-sethand=\"0\"]').click()"); pg.wait_for_timeout(300)
             h1=pg.evaluate("()=>getComputedStyle(document.getElementById('title')).fontFamily")
-            rec("Print","Plain print swaps the handwriting for the regular font",pg.evaluate("document.documentElement.classList.contains('plainhand')") and h1.startswith('Fredoka') and st(pg)["settings"]["hand"] is False,h1)
+            rec("Print","Plain print swaps the handwriting for the regular font",pg.evaluate("document.documentElement.classList.contains('plainhand')") and h1.startswith("\"Nunito Sans\"") and st(pg)["settings"]["hand"] is False,h1)
             pg.evaluate("document.querySelector('[data-sethand=\"1\"]').click()"); pg.wait_for_timeout(300)
             rec("Print","…and Handwriting brings it back",not pg.evaluate("document.documentElement.classList.contains('plainhand')"))
             # Plain: the old look, untouched

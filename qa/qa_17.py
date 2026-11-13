@@ -58,7 +58,8 @@ with sync_playwright() as p:
     rec("Echo","when two anniversaries fall on one day, the oldest wins","A year ago today" in t and "Echo1" in t and "Echo2" not in t,t[-200:].replace("\n"," | "))
     rec("Echo","…still only one echo",pg.locator("#view-today .echo").count()==1)
     t=scenario(pg,base,"2026-12-15",[("2026-11-15","pack"),("2026-11-15","daily")])
-    rec("Echo","on a day with pack finds too, the daily card is the one remembered","Echo2" in t and "Echo1" not in t,t[-160:].replace("\n"," | "))
+    et=pg.inner_text("#view-today .echo") if pg.locator("#view-today .echo").count() else ""  # 0.63: the day's question names the companion, which may be Echo1
+    rec("Echo","on a day with pack finds too, the daily card is the one remembered","Echo2" in et and "Echo1" not in et,et)
     t=scenario(pg,base,"2027-02-28",[("2027-01-31","daily")])
     rec("Echo","month-end: a card from 31 January echoes on 28 February","A month ago today" in t,t[-160:].replace("\n"," | "))
     t=scenario(pg,base,"2030-11-15",[("2026-11-15","daily")])

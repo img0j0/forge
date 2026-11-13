@@ -1,6 +1,6 @@
 from lib import *
 import datetime as _d
-# 0.38.0: The Scribe (60 lines in total), its reading by the fire, Hearth lines about your own small things, ribbon.
+# 0.38.0: The Scribe (60 lines in total; since 0.63, 60 pages: days done plus days with a line of your own), its reading by the fire, Hearth lines about your own small things, ribbon.
 AXE=open(S+'/qa/node_modules/axe-core/axe.min.js').read()
 def axe(pg):
     pg.evaluate(AXE); pg.wait_for_function("()=>document.getAnimations().every(a=>a.playState!=='running'||a.effect&&a.effect.getTiming().iterations===Infinity)",timeout=8000)
@@ -9,19 +9,29 @@ def load(pg,s):
     s["opens"]=s.get("opens",[])+[s["date"]]; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def lines(s,n,start=8):
     base=_d.date.fromisoformat(s["date"]); return {(base-_d.timedelta(days=start+i*2)).isoformat():{"v":i%12,"text":f"old line {i}"} for i in range(n)}
+def pages(s,n,start=8):
+    # 0.63: the Scribe comes at 60 pages (done days and days with your own line); fill lines on other days up to n
+    done={h["date"] for h in s["history"] if h.get("status")=="done" and h["date"]!=s["date"]}
+    base=_d.date.fromisoformat(s["date"]); out={}; k=0; i=0
+    while len(done)+len(out)<n:
+        d=(base-_d.timedelta(days=start+k)).isoformat(); k+=1
+        if d in done: continue
+        out[d]={"v":i%12,"text":f"old line {i}"}; i+=1
+    s["history"]=[h for h in s["history"] if h["date"]!=s["date"]]
+    return out
 def scribe_px(pg):  # count pixels of the Scribe's quill ink on the Hearth canvas
     return pg.evaluate("()=>{const cv=document.getElementById('hearthCv');if(!cv)return -1;const d=cv.getContext('2d').getImageData(94,54,20,18).data;let n=0;for(let i=0;i<d.length;i+=4){if(Math.abs(d[i]-0x5A)<30&&Math.abs(d[i+1]-0x3F)<30&&Math.abs(d[i+2]-0xC0)<40)n++;}return n}")
 with sync_playwright() as p:
     b=p.chromium.launch(); bad=[]
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); dev(pg,"week"); closemodals(pg)
-    s=st(pg); s["journal"]=lines(s,58); load(pg,s); tabto(pg,"hearth"); pg.wait_for_timeout(600)
-    rec("Before","with 58 lines there is no Scribe yet",scribe_px(pg)==0 and "Scribe" not in pg.inner_text("#hmsg"))
+    s=st(pg); s["journal"]=pages(s,58); load(pg,s); tabto(pg,"hearth"); pg.wait_for_timeout(600)
+    rec("Before","with 58 pages there is no Scribe yet",scribe_px(pg)==0 and "Scribe" not in pg.inner_text("#hmsg"))
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
     rec("Before","the book promises someone will come at 60","At 60, someone will come to the fire to read with you." in pg.inner_text("#view-chronicle"))
     # the 59th and 60th lines: the arrival
-    s=st(pg); s["journal"]=lines(s,59); s["status"]="done"; load(pg,s); tabto(pg,"today")
+    s=st(pg); s["journal"]=pages(s,59); s["status"]="rest"; load(pg,s); tabto(pg,"today")
     pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(300); pg.fill("#jIn","The sixtieth line."); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(250)
-    rec("Arrive","the sixtieth line brings the Scribe, with a toast","The Scribe has come" in pg.inner_text("#toast"))
+    rec("Arrive","the sixtieth page (a line on a rest day) brings the Scribe, with a toast","The Scribe has come" in pg.inner_text("#toast"))
     tabto(pg,"hearth"); pg.wait_for_timeout(700)
     rec("Arrive","the Hearth says someone new has come to the fire","Someone new has come to the fire" in pg.inner_text("#hmsg"),pg.inner_text("#hmsg"))
     rec("Look","the Scribe is drawn by the fire, with its ink-dipped quill",scribe_px(pg)>=2,scribe_px(pg))

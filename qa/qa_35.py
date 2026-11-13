@@ -12,7 +12,7 @@ def forge_sheet(pg):
     if not pg.locator("#hForge").count(): print("DEBUG no hForge; modal:",mt(pg)[:200],"| hearth:",pg.inner_text("#view-hearth")[:200])
     pg.tap("#hForge"); pg.wait_for_timeout(400); return mt(pg)
 def do_day(pg,allin=False):
-    tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(500)
+    tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(500)
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnAll" if allin else "#btnDone"); pg.wait_for_timeout(800)
     pg.evaluate("()=>{const m=[...document.querySelectorAll('#modal [data-mood]')].find(b=>/mix/i.test(b.textContent));m&&m.click()}"); pg.wait_for_timeout(600)
     pg.evaluate("()=>{const c=document.getElementById('cover');c&&c.click()}"); pg.wait_for_selector("#rvSkip",state="visible",timeout=8000)
@@ -32,7 +32,7 @@ with sync_playwright() as p:
     rec("Embers","a done day adds one ember, and the reveal says so","An ember for the Forge" in t and embers(pg)==2,(t[:80],embers(pg)))
     dev(pg,"next"); closemodals(pg); t=do_day(pg,allin=True); tabto(pg,"hearth")
     rec("Embers","an all-in day adds two","Two embers for the Forge" in t and embers(pg)==4,embers(pg))
-    dev(pg,"next"); closemodals(pg); tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(400)
+    dev(pg,"next"); closemodals(pg); tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(400)
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnRest"); pg.wait_for_timeout(500); closemodals(pg); tabto(pg,"hearth")
     rec("Embers","a rest day adds none and takes none",embers(pg)==4)
     dev(pg,"next"); dev(pg,"next"); closemodals(pg); tabto(pg,"hearth")

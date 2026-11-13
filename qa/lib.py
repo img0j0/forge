@@ -53,3 +53,11 @@ def hsheet(pg,k):  # 0.43: the Hearth's lists open as sheets (shelf, furn, keeps
     ids={"shelf":"hShelf","furn":"hFurn","keeps":"hKeeps","comp":"hComp"}
     closemodals(pg); pg.evaluate("t=>document.querySelector('.tab[data-tab=\"hearth\"]').click()","x"); pg.wait_for_timeout(300)
     pg.evaluate("i=>document.getElementById(i).click()",ids[k]); pg.wait_for_timeout(350)
+def turn_card(pg):
+    # 0.64: Turn over opens three face-down cards; turn the first and choose it (today's card then opens face up).
+    #   A new player's first day still has one card, turned with #vBack as before.
+    pg.tap("#btnTurnGo"); pg.wait_for_selector("[data-chup], #vBack",state="visible")
+    if pg.locator("[data-chup]").count():
+        pg.locator('[data-chup="0"]').click(); pg.wait_for_selector('[data-chgo="0"]',state="visible"); pg.locator('[data-chgo="0"]').click()
+        pg.wait_for_selector("#vflip",state="visible"); pg.wait_for_timeout(900)
+    elif not pg.locator("#vflip.flipped").count(): pg.evaluate("document.getElementById('vBack').click()")

@@ -8,7 +8,7 @@ def axe(pg):
 def load(pg,s):
     s["opens"]=s.get("opens",[])+[s["date"]]; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def turn(pg):
-    tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(600)
+    tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(600)
 def finish(pg):
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnDone"); pg.wait_for_timeout(800)
     pg.evaluate("()=>{const m=[...document.querySelectorAll('#modal [data-mood]')].find(b=>/mix/i.test(b.textContent));m&&m.click()}"); pg.wait_for_timeout(500)
@@ -20,8 +20,11 @@ with sync_playwright() as p:
     b=p.chromium.launch(); bad=[]
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg)
     s=st(pg); rec("Start","a fresh save starts with no wants, no own things, the Mix setting, and the old field still shaped",s["want"]==[] and s["owns"]==[] and s["settings"]["ownMix"]=="mix" and s["own"]=={"text":"","days":[]} and not s["wantAsked"])
+    # 0.73: the offer waits for a second page (a calmer first day); give this save a done day yesterday
+    import datetime as _d
+    s=st(pg); s["history"].append({"date":(_d.date.fromisoformat(s["date"])-_d.timedelta(days=1)).isoformat(),"status":"done","v":1}); load(pg,s)
     tabto(pg,"today")
-    rec("Ask","after the first find, Today offers 'Make your cards yours' first",pg.evaluate("document.querySelector('#view-today .group .rowl').id")=="btnWant" and "What do you want more of" in pg.inner_text("#btnWant"))
+    rec("Ask","after the second page, Today offers 'Make your cards yours' first",pg.evaluate("document.querySelector('#view-today .group .rowl').id")=="btnWant" and "What do you want more of" in pg.inner_text("#btnWant"))
     pg.tap("#btnWant"); pg.wait_for_timeout(500); t=mt(pg)
     rec("Ask","it opens 'What do you want more of?' with eight choices",t.startswith("What do you want more of?") and pg.locator("#modal [data-want]").count()==8)
     bad+=["want sheet: "+v for v in axe(pg)]
@@ -63,7 +66,7 @@ with sync_playwright() as p:
     ms=share("surprise"); rec("Mix",f"Only the world's cards: none are yours ({ms} of 30)",ms==0,ms)
     pg.evaluate("document.querySelector('[data-ownmix=\"mix\"]').click()"); pg.wait_for_timeout(200)
     # an own day, end to end
-    s=st(pg); o=[x for x in s["owns"] if x["text"]=="Text Mom"][0]; s["todayOwn"]=o["id"]; s["todayV"]=4; s["status"]="fresh"; load(pg,s)
+    s=st(pg); o=[x for x in s["owns"] if x["text"]=="Text Mom"][0]; s["todayOwn"]=o["id"]; s["todayV"]=4; s["status"]="fresh"; s["choices"]=None; load(pg,s)  # 0.64: no three-card deal, so this card is today's
     turn(pg); t=mt(pg)
     rec("Card","an own-thing card reads 'Yours · Connection', with your words as the small thing",t.count("Yours · Connection")==1 and "Your small thing" in t and "Text Mom" in t and "Something you chose for yourself" in t,t[:200])
     rec("Card","…with a little pen mark",pg.locator("#modal .vfront .pen").count()>=1)
@@ -74,7 +77,7 @@ with sync_playwright() as p:
     rec("Done","doing it is a done day like any other, and remembers whose it was",s["status"]=="done" and h["status"]=="done" and h.get("own")==o["id"] and s["date"] in o2["days"] and c["own"]=="Text Mom",(h,c.get("own")))
     tabto(pg,"binder"); pg.evaluate(f"()=>{{const e=document.querySelector('#view-binder .card[data-cid=\"{c['id']}\"]');e&&e.click()}}"); pg.wait_for_timeout(700)
     pg.evaluate("document.getElementById('inspFlip').click()"); pg.wait_for_timeout(800)
-    rec("Back","its card back says 'Yours: Text Mom'","Yours: Text Mom" in pg.inner_text("#stage .cbk"),pg.inner_text("#stage .cbk")[:120])
+    rec("Back","its card back says 'Yours: Text Mom' (0.72.1: under the card)","Yours: Text Mom" in pg.inner_text("#inspBack"),pg.inner_text("#inspBack")[:120])
     pg.evaluate("()=>{const b=document.getElementById('ovClose');b&&b.click()}"); closemodals(pg)
     # realm leaning: own Moving days find Meadow Forgelings more often
     s=st(pg); mv=[x for x in s["owns"] if x["k"]==0][0]

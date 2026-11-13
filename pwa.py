@@ -4,7 +4,10 @@ from PIL import Image, ImageDraw, ImageChops
 OUT = 'pwa'; os.makedirs(OUT, exist_ok=True)
 # 0.57: the shipped page is work.html with its Japanese built in (i18n/build.mjs writes app.html)
 import subprocess
-subprocess.run(['node', 'build.mjs', '../work.html', '../app.html'], cwd='i18n', check=True)
+# 0.73: works from any folder (qa_402 and qa_pwa build in a scratch folder): work.html and app.html are in the
+#   current folder, the build script and its dictionaries next to this file.
+_HERE=os.path.dirname(os.path.abspath(__file__))
+subprocess.run(['node', 'build.mjs', os.path.abspath('work.html'), os.path.abspath('app.html')], cwd=os.path.join(_HERE,'i18n'), check=True)
 src = open('app.html', encoding='utf8').read()
 ver = re.search(r"const VERSION='prototype ([0-9.]+)'", src).group(1)
 

@@ -13,19 +13,21 @@ def write(pg,txt):
     tabto(pg,"today"); pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); pg.fill("#jIn",txt); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
 with sync_playwright() as p:
     b=p.chromium.launch(); bad=[]
-    ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"today")
+    # 0.63: How did it feel? is the day's question every third day (October 22, 2026 is one); answering writes today's page
+    import datetime as _dt
+    ctx,pg=newpage(b); pg.clock.install(time=_dt.datetime(2026,10,22,11,0)); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"today")
     h=pg.inner_text("#view-today .hero")
-    rec("Feel","after a done day, Today asks How did it feel? with Easy, Good and Hard","How did it feel?" in h and pg.locator("#view-today [data-feel]").count()==3)
-    rec("Feel","the line link now says it inks today's Forgeling","Add a line, and ink today’s Forgeling" in pg.inner_text("#btnMargin"))
+    rec("Feel","after a done day, Today asks How did it feel? with Easy, Good and Hard",pg.locator("#view-today .facebtn[data-ask]").count()==3,h[:120])
+    rec("Feel","the line link now says it inks today's Forgeling","Add your own words, and ink today’s Forgeling" in pg.inner_text("#btnMargin"))
     bad+=["today: "+v for v in axe(pg)]
-    pg.tap("#view-today [data-feel='good']"); pg.wait_for_timeout(300); s=st(pg)
-    rec("Feel","one tap records it, and Today says so",s["feel"].get(s["date"])=="good" and "Today felt good." in pg.inner_text("#view-today .hero") and pg.get_attribute("#view-today [data-feel='good']","aria-pressed")=="true")
+    pg.tap("#view-today .facebtn[data-ask='1']"); pg.wait_for_timeout(300); s=st(pg)
+    rec("Feel","one tap records it, and today's page says so",s["feel"].get(s["date"])=="good" and pg.locator("#askAgain").count()==1,pg.inner_text("#view-today .hero")[:200])
     rec("Feel","a tap alone does not ink the Forgeling or count as a line",not [c for c in s["cards"] if c.get("ink")] and s["journal"]=={})
-    pg.tap("#view-today [data-feel='good']"); pg.wait_for_timeout(300)
-    rec("Feel","tapping it again takes it back",st(pg)["feel"]=={})
-    pg.tap("#view-today [data-feel='hard']"); pg.wait_for_timeout(300)
-    t=journal(pg); rec("Journal","the Journal lists a tap-only day with its feeling","Felt hard." in t)
-    rec("Book","before any line, the book says writing is never needed","Your book" in t and "Writing is never needed" in t)
+    pg.tap("#askAgain"); pg.wait_for_timeout(300)
+    rec("Feel","Change the answer takes it back",st(pg)["feel"]=={})
+    pg.tap("#view-today .facebtn[data-ask='2']"); pg.wait_for_timeout(300)
+    t=journal(pg); rec("Journal","the Journal's page for the day says how it felt","hard" in t.lower(),t[:300])
+    rec("Book","the book says every day you show up writes a page (0.63: writing is never needed)","Your book" in t and "Every day you show up writes one for you" in t,t[:200])
     # ink
     write(pg,"Scared to start. Started anyway."); s=st(pg); c=[x for x in s["cards"] if x["id"]==s["todayCard"]][0]
     rec("Ink","writing a line on a done day inks today's Forgeling",c.get("ink")=="Scared to start. Started anyway.")
@@ -33,7 +35,7 @@ with sync_playwright() as p:
     iv=pg.evaluate("()=>{const card=document.querySelector('#stage .card');return {cls:card.classList.contains('inked'),wash:!!card.querySelector('.inkwash'),drop:!!card.querySelector('.inkdrop')}}")
     rec("Ink","the card shows the ink wash and the ink drop",iv["cls"] and iv["wash"] and iv["drop"],iv)
     pg.evaluate("document.getElementById('inspFlip').click()"); pg.wait_for_timeout(800)
-    rec("Ink","…and your line on its back","Scared to start. Started anyway." in pg.inner_text("#stage .cbk"))
+    rec("Ink","…and your line with its details, under the card (0.72.1)","Scared to start. Started anyway." in pg.inner_text("#inspBack"))
     bad+=["inked card: "+v for v in axe(pg)]
     pg.evaluate("()=>{const b=document.getElementById('ovClose');b&&b.click()}"); closemodals(pg)
     st0=st(pg); others=[x for x in st0["cards"] if x["id"]!=c["id"]]
@@ -43,20 +45,20 @@ with sync_playwright() as p:
     write(pg,"Scared to start. Started anyway.")
     # next day: a line written before the card is done does not ink anything
     dev(pg,"next"); closemodals(pg); tabto(pg,"today")
-    rec("Feel","before today's card is done, nothing is asked",pg.locator("#view-today [data-feel]").count()==0)
+    rec("Feel","before today's card is done, nothing is asked",pg.locator("#view-today [data-ask]").count()==0)
     # the book grows with totals
     s=st(pg); base=s["date"]; import datetime as _d
     def daysago(n): return (_d.date.fromisoformat(base)-_d.timedelta(days=n)).isoformat()
     for L,expect in [(1,"plain"),(10,"leather"),(30,"ribbon"),(60,"someone"),(100,"gold")]:
         s=st(pg); s["journal"]={daysago(i*3+1):{"v":i%12,"text":f"line {i}"} for i in range(L)}; load(pg,s); t=journal(pg)
         lab=pg.get_attribute("#view-chronicle .book","aria-label")
-        ok={"plain":"leather" not in lab and f"{L} line written" in t,
+        ok={"plain":"leather" not in lab and "in your journal" in t,
             "leather":"bound in leather" in lab and "ribbon" not in lab,
             "ribbon":"with a ribbon" in lab and pg.locator("#bookRibbon").count()==1,
             "someone":"At 100, gold edges" in t,
             "gold":"gold edges and a clasp" in lab}[expect]
         rec("Book",f"{L} lines: {expect}",ok,(lab,t[:160].replace("\n"," | ")))
-    rec("Book","lines count in total, never in a row: gaps of three days still count","100 lines written" in t)
+    rec("Book","pages count in total, never in a row: gaps of three days still count",bool(re.search(r"(10\d|1[1-9]\d) pages in your journal",t)),t[:200])
     pg.tap("#bookRibbon"); pg.wait_for_timeout(500); m=mt(pg)
     rec("Ribbon","the ribbon opens to an old line","The ribbon falls open at" in m and "line " in m)
     bad+=["ribbon: "+v for v in axe(pg)]; closemodals(pg)
@@ -76,7 +78,7 @@ with sync_playwright() as p:
     rec("Damaged","broken feelings and ink are repaired",s["feel"]=={"2026-01-02":"hard"} and not s["cards"][0].get("ink") and all("ink" not in c for c in s["cards"][1:] if not c.get("ink")) and not pg._errs,s["feel"])
     s=st(pg); s["cards"][0]["ink"]="<img src=x onerror=alert(1)>"; load(pg,s); tabto(pg,"binder"); pg.evaluate(f"()=>{{const e=document.querySelector('#view-binder .card[data-cid=\"{s['cards'][0]['id']}\"]');e&&e.click()}}"); pg.wait_for_timeout(700)
     pg.evaluate("document.getElementById('inspFlip').click()"); pg.wait_for_timeout(700)
-    rec("Safe","ink lines show as text, never markup",pg.locator("#stage .cbk img").count()==0 and "<img src=x" in pg.inner_text("#stage .cbk"))
+    rec("Safe","ink lines show as text, never markup",pg.locator("#stage .cbk img").count()==0 and pg.locator("#inspBack img").count()==0 and "<img src=x" in pg.inner_text("#inspBack"))
     pg.evaluate("()=>{const b=document.getElementById('ovClose');b&&b.click()}"); closemodals(pg)
     s=st(pg); del s["feel"]; load(pg,s); rec("Migrate","an older save without feelings picks them up",st(pg)["feel"]=={})
     rec("A11y","axe: zero violations on Today's check-in, an inked card, the book, the ribbon and the month",not bad,bad[:3])

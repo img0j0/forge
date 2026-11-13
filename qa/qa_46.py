@@ -38,7 +38,7 @@ with sync_playwright() as p:
             v=axe(pg); rec("A11y","the album has no accessibility violations",not v,v)
             # Plain print stays after a reload
             s=st(pg); s["settings"]["hand"]=False; setst(pg,s); pg.reload(); pg.wait_for_timeout(800); closemodals(pg)
-            rec("Print","Plain print is remembered",pg.evaluate("document.documentElement.classList.contains('plainhand')") and pg.evaluate("getComputedStyle(document.getElementById('title')).fontFamily").startswith("Fredoka"))
+            rec("Print","Plain print is remembered",pg.evaluate("document.documentElement.classList.contains('plainhand')") and pg.evaluate("getComputedStyle(document.getElementById('title')).fontFamily").startswith('"Nunito Sans"'))
             # Plain look: no captions, no stamp
             s["settings"]["sky"]="plain"; setst(pg,s); pg.reload(); pg.wait_for_timeout(800); closemodals(pg); tabto(pg,"binder")
             rec("Plain","in the Plain look there are no captions or stamps",pg.evaluate("[...document.querySelectorAll('.jcap,.jstamp')].every(e=>getComputedStyle(e).display==='none')"))

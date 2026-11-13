@@ -22,7 +22,7 @@ with sync_playwright() as p:
     m=re.search(r"(https://\S+#statue=([A-Za-z0-9_-]+))",clip or "")
     rec("Share","the link goes to the live site and names the Forgeling",bool(m) and m.group(1).startswith("https://img0j0.github.io/forge/") and "Pip" in clip,clip[:160])
     raw=m.group(2); data=json.loads(base64.urlsafe_b64decode(raw+"="*(-len(raw)%4)))
-    rec("Privacy","the link holds only what the statue is built from",set(data)=={"v","e","t","d","r","k","n","a","p"} and data["n"]=="Pip" and data["p"]=="scarf" and data["e"]==c["seed"],sorted(data))
+    rec("Privacy","the link holds only what the statue is built from",set(data)=={"v","e","t","d","r","k","n","a","p","w"} and data["n"]=="Pip" and data["p"]=="scarf" and data["e"]==c["seed"],sorted(data))
     rec("Share","the report counts statue links sent",st(pg).get("statueLinks")==1)
     pg.tap("#ovClose"); pg.wait_for_timeout(500)
     before=st(pg); n0=len(before["cards"]); cur0=json.dumps(before["curios"],sort_keys=True)

@@ -22,10 +22,12 @@ with sync_playwright() as p:
         w=pg.evaluate("()=>{const box=document.querySelector('#view-today .weekbox');const ds=[...box.querySelectorAll('.dots .dot')];return {n:ds.length,letters:ds.map(d=>d.dataset.d).join(''),done:ds.filter(d=>d.classList.contains('done')).map(d=>getComputedStyle(d).backgroundImage.includes('svg')).every(Boolean),rest:ds.filter(d=>d.classList.contains('rest')).map(d=>getComputedStyle(d).backgroundImage.includes('svg')).every(Boolean),nrest:ds.filter(d=>d.classList.contains('rest')).length,now:ds.filter(d=>d.classList.contains('now')).length,labels:ds.every(d=>d.getAttribute('role')==='img'&&/: /.test(d.getAttribute('aria-label'))),finds:!!box.querySelector('.latest.shelf button'),txt:box.innerText}}")
         rec("Week",f"{ph}: the week is seven tiles with weekday letters, flames for days shown up and a moon for the rest day, today ringed",w["n"]==7 and len(w["letters"])==7 and w["done"] and w["rest"] and w["nrest"]>=1 and w["now"]==1 and w["labels"],w)
         rec("Week",f"{ph}: one This week panel holds the count and Latest finds, on a shelf","This week" in w["txt"] and "days showed up" in w["txt"] and "Latest finds" in w["txt"] and w["finds"])
-        pg.tap("#view-today [data-feel='hard']"); pg.wait_for_timeout(300)
-        fb=pg.evaluate("()=>[...document.querySelectorAll('#view-today .facebtn')].map(b=>({f:b.dataset.feel,svg:!!b.querySelector('svg.feelface'),h:b.querySelector('svg').getBoundingClientRect().height,t:b.innerText.trim(),p:b.getAttribute('aria-pressed')}))")
-        rec("Feel",f"{ph}: How did it feel? is three pixel faces with their words, and a tap still records it",len(fb)==3 and all(x["svg"] and x["h"]>=30 for x in fb) and [x["t"] for x in fb]==["Easy","Good","Hard"] and fb[2]["p"]=="true" and st(pg)["feel"].get(st(pg)["date"])=="hard",fb)
+        fb=pg.evaluate("()=>[...document.querySelectorAll('#view-today .facebtn')].map(b=>({f:b.dataset.ask,svg:!!b.querySelector('svg.feelface'),h:b.querySelector('svg').getBoundingClientRect().height,t:b.innerText.trim(),p:b.getAttribute('aria-pressed')}))")
+        rec("Feel",f"{ph}: How did it feel? is three pixel faces with their words, and a tap still records it",len(fb)==3 and all(x["svg"] and x["h"]>=30 for x in fb) and [x["t"] for x in fb]==["Easy","Good","Hard"],fb)
         sz=pg.evaluate("()=>[...document.querySelectorAll('#view-today .facebtn')].map(b=>[b.offsetWidth,b.offsetHeight])")
+        bad+=[f"{ph} today: "+v for v in axe(pg)]
+        pg.tap("#view-today .facebtn[data-ask='2']"); pg.wait_for_timeout(300)
+        rec("Feel",f"{ph}: a tap on a face records how it felt",st(pg)["feel"].get(st(pg)["date"])=="hard")
         rec("A11y",f"{ph}: face buttons are at least 44px",all(w_>=44 and h_>=44 for w_,h_ in sz),sz)
         bad+=[f"{ph} today: "+v for v in axe(pg)]
         # toasts
@@ -41,9 +43,8 @@ with sync_playwright() as p:
         rec("Fields",f"{ph}: text fields have stepped pixel corners (0.47: square paper with an ink rule in the journal)",fi[0] and fi[1]=="0px",fi)
         bad+=[f"{ph} margin: "+v for v in axe(pg)]; closemodals(pg)
         rec("All",f"{ph}: no page errors",not pg._errs,pg._errs[:1]); ctx.close()
-    ctx,pg=newpage(b,reduced_motion="reduce"); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"today")
-    pg.tap("#view-today [data-feel='good']"); pg.wait_for_timeout(200)
-    rec("Motion","with reduced motion the chosen face does not jump",pg.evaluate("()=>getComputedStyle(document.querySelector('[data-feel=good] svg')).transform")=="none"); ctx.close()
+    ctx,pg=newpage(b,reduced_motion="reduce"); pg.clock.set_fixed_time(datetime.datetime(2026,10,22,11,30)); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); tabto(pg,"today")
+    rec("Motion","with reduced motion the faces do not move",pg.evaluate("()=>[...document.querySelectorAll('.facebtn svg')].every(e=>getComputedStyle(e).transform==='none'&&!e.getAnimations().length)")); ctx.close()
     rec("A11y","axe: zero violations on the age check, Today with the week and faces, and the margin sheet, day and night",not bad,bad[:3])
     b.close()
 save_results("qa_385"); print(sum(r["ok"] for r in RES),"/",len(RES))

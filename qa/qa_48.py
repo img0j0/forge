@@ -36,8 +36,9 @@ with sync_playwright() as p:
         # ---------- the inked reveal, the same for all five ----------
         same=[];stamps=[];sparks=0
         for i in range(5):
-            if i: click(pg,"#packNext"); pg.wait_for_timeout(250)
-            click(pg,"#cover"); pg.wait_for_timeout(60)
+            # 0.72: the last card slides to the pile (300 ms) before the next is dealt; Rare and better build up first
+            if i: click(pg,"#packNext"); pg.wait_for_selector("#stage #cover",state="attached"); pg.wait_for_timeout(450)
+            click(pg,"#cover"); pg.wait_for_selector("#stage .jghost",state="attached",timeout=3000); pg.wait_for_timeout(60)
             g=pg.evaluate(ANIM,"#stage .jghost"); s_=pg.evaluate(ANIM,"#stage .jrstamp")
             same.append((g,s_)); stamps.append(pg.evaluate("()=>{const s=document.querySelector('#stage .jrstamp b'),st=document.querySelector('#stage .stars');return [s&&s.textContent,st&&st.getAttribute('aria-label')]}"))
             if i==0:

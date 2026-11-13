@@ -5,7 +5,7 @@ def axe(pg): pg.evaluate(AXE); return pg.evaluate("async()=>{const r=await axe.r
 def load(pg,s):
     setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def do_day(pg):
-    tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(500)
+    tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(500)
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnDone"); pg.wait_for_timeout(800)
     pg.evaluate("()=>{const m=[...document.querySelectorAll('#modal [data-mood]')].find(b=>/mix/i.test(b.textContent));m&&m.click()}"); pg.wait_for_timeout(600)
     pg.evaluate("()=>{const c=document.getElementById('cover');c&&c.click()}"); pg.wait_for_selector("#rvSkip",state="visible",timeout=8000); pg.tap("#rvSkip"); pg.wait_for_timeout(1500)
@@ -20,7 +20,7 @@ with sync_playwright() as p:
     # ---------- campfire backs ----------
     tabto(pg,"binder"); pg.evaluate(f"()=>{{const c=document.querySelector('#view-binder .card[data-cid=\"{fav['id']}\"]')||document.querySelector('#view-binder .card');c&&c.click()}}"); pg.wait_for_timeout(700)
     pg.evaluate("document.getElementById('inspFlip').click()"); pg.wait_for_timeout(900)
-    cb=pg.evaluate("(()=>{const e=document.querySelector('#stage .cbk');const cs=getComputedStyle(e);return {bg:cs.backgroundImage.slice(0,60),emb:!!e.querySelector('.emb'),txt:e.innerText,info:!!e.querySelector('.binfo')}})()")
+    cb=pg.evaluate("(()=>{const e=document.querySelector('#stage .cbk');const cs=getComputedStyle(e);const cap=document.getElementById('inspBack');return {bg:cs.backgroundImage.slice(0,60),emb:!!e.querySelector('.emb'),txt:cap?cap.innerText:'',info:!!e.querySelector('.binfo')}})()")  # 0.72.1: the back is clean art; its words sit under the card (#inspBack)
     rec("Back","every card back wears the campfire art",'svg' in cb["bg"] and cb["info"] and not cb["emb"],cb)
     rec("Back","the old FORGE wordmark is gone, the card's details remain","FORGE" not in cb["txt"] and ("Earned" in cb["txt"] or "Pulled" in cb["txt"]) and "No." in cb["txt"],cb["txt"][:120])
     bad+=["back: "+v for v in axe(pg)]
@@ -53,7 +53,7 @@ with sync_playwright() as p:
     do_day(pg); tabto(pg,"today")
     rec("Next day","the new day's find shows first again",pg.locator("#btnShowToday").count()==1 and "joined your binder" in hero(pg))
     # ---------- rest days ----------
-    dev(pg,"next"); closemodals(pg); tabto(pg,"today"); pg.tap("#btnTurnGo"); pg.wait_for_selector("#vBack",state="visible"); pg.tap("#vBack"); pg.wait_for_timeout(400)
+    dev(pg,"next"); closemodals(pg); tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(400)
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnRest"); pg.wait_for_timeout(500); closemodals(pg)
     rec("Rest","on a rest day the favourite sits on Today",pg.locator("#view-today #btnShowFav").count()==1 and "Resting today" in hero(pg))
     # ---------- unpicking, and no favourite at all ----------

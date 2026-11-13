@@ -55,7 +55,12 @@ with sync_playwright() as p:
         # the day's calling
         a=rng.random()
         if vis(pg,"#btnTurn"):
-            click(pg,"#btnTurn"); click(pg,"#vBack"); pg.wait_for_timeout(600); settle(pg)
+            click(pg,"#btnTurn")
+            # 0.64: three face-down cards; turn one and choose it (a first day still has the single card)
+            if pg.evaluate("!!document.querySelector('[data-chup]')"):
+                click(pg,'[data-chup="0"]'); click(pg,'[data-chgo="0"]'); pg.wait_for_timeout(900)
+            elif pg.evaluate("!!document.querySelector('#vBack')"): click(pg,"#vBack")
+            pg.wait_for_timeout(600); settle(pg)
             if a<0.12: click(pg,"#btnRest"); rests+=1
             elif vis(pg,"#btnDone"):
                 click(pg,"#btnAll" if a>0.85 else "#btnDone"); pg.wait_for_timeout(500); settle(pg); played+=1

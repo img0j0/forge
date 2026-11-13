@@ -31,7 +31,7 @@ with sync_playwright() as p:
     mm=re.search(r"#gift=([A-Za-z0-9_-]+)",clip); code=mm.group(1) if mm else ""
     rec("Send","sending copies a friendly message with a gift link","Pip found a moonlit mushroom and wants you to have it" in clip and clip.startswith("Pip") and "https://img0j0.github.io/forge/#gift=" in clip,clip[:160])
     g=dec(code) if code else {}
-    rec("Send","the link holds only the gift, the sender's name and look, the note and two random ids",set(g)=={"v","g","s","c","n","t","d","r","e","k","m"} and g["c"]=="mushroom" and g["n"]=="Pip" and g["m"]=="This one glows. <b>hi</b>",g)
+    rec("Send","the link holds only the gift, the sender's name and look, the note and two random ids",set(g)=={"v","g","s","c","n","t","d","r","e","k","m","w"} and g["c"]=="mushroom" and g["n"]=="Pip" and g["m"]=="This one glows. <b>hi</b>",g)
     sA=st(A); rec("Send","you keep your curio, and the send is counted",sA["curios"]["mushroom"]["n"]==2 and sA.get("giftsSent")==1 and isinstance(sA.get("sid"),str))
     A.wait_for_timeout(1200); rec("Send","the Kind Gesture ribbon is earned","gift1" in (st(A).get("ribbons") or {}) or "gift1" in json.dumps(st(A).get("ribbons")),str(st(A).get("ribbons"))[:120])
     # opening your own link
