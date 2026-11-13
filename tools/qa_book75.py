@@ -1,3 +1,5 @@
+# 0.75 book test (21 checks). Run from a folder holding lived_store.json (tools/lived_save.py) with the dev root served at
+#   http://127.0.0.1:8772/ : python3 qa_book75.py work.html|app.html en|ja HH:MM WIDTH. Screenshots go to ./b75/.
 import sys,os,json,datetime as dt
 sys.path.insert(0,'/home/claude/forge/qa'); B=sys.argv[1] if len(sys.argv)>1 else 'work.html'; os.environ['FORGE_HTML']='http://127.0.0.1:8772/'+B
 LANG=sys.argv[2] if len(sys.argv)>2 else 'en'; HH=sys.argv[3] if len(sys.argv)>3 else '16:00'; W=int(sys.argv[4]) if len(sys.argv)>4 else 390
