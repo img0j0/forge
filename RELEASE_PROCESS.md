@@ -110,3 +110,4 @@ Shipped 0.80.0: main/gh-pages bc2c197 (Pages success, live blob 56567eb matches)
 Update 0.81.0: patches read base81.html; base80.html removed. The Forge keeps its own count. Checked: tools/qa_forge81.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_35, qa_43.
 Shipped 0.81.0: main/gh-pages 0cdd1ef (Pages success, live blob b3d699f matches), ios-app 20e0fcc (Native builds success), Claude copy version 135.
 Update 0.81.1: patches read base811.html; base81.html removed. The Map/Tales switch takes its column count from --n. Checked: switch width and highlight, English 390 and Japanese 320.
+Shipped 0.81.1: main/gh-pages 1336c76 (Pages success, live blob 80fe41c matches), ios-app c0a7715 (Native builds success), Claude copy version 136.
