@@ -38,5 +38,12 @@ pushy, no exclamation-heavy hype. The app is for adults (18+): no childish baby 
 | Erase everything | すべて消去 | |
 | The Scribe | 書記 | arrives at 60 pages |
 | page (of the journal) | ページ | every done day writes one |
+| postcard / postcard from the road | ポストカード / 旅先からのポストカード | photo postcards (0.65), road postcards (0.68) |
+| A letter from … | …からの手紙 | milestone letters (0.67) |
+| Close the day | 一日をしめくくる | evening read-back (0.70) |
+| Keep it for later | あとのためにとっておく | the card pocket (0.69) |
+| On this day | この日のページ | (0.68) |
+| Your year in Forgelings | Forgelingsで過ごした一年 | (0.60) |
+| season names | 初灯り, 花の便り, ほたるの宵, 星のねがい, お月見, もみじの頃, 初雪 | First Lanterns … First Snow (0.59) |
 
 Forgeling names show in katakana in Japanese (0.57.1, `kanaName`); the save keeps the Latin name.

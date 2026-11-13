@@ -1,76 +1,49 @@
-# Release audit and working procedure
-Audited 2026-10-26.
+# Release process
+Written 2026-10-26 from a release audit; rules updated 2026-11-12. The log at the end records every release since 0.38.9.
 
-Update: 0.38.7 addresses the save-write warning, cache cleanup, HTTP fallback/cache-write lifetime and QA runner exit-status findings below. See RELEASE_0.38.7.md for validation and remaining limits; the audit bullets below describe the pre-fix state. Browser regression remains outstanding.
-
-## Branch ownership
-- dev/work.html is the editable source. dev includes pwa.py, historical builds, legal pages, art tooling, and qa/.
-- main is the generated website mirror, NOT the publishing trigger.
-- gh-pages publishes https://img0j0.github.io/forge/. A main merge alone does not deploy.
-- ios-app contains the Capacitor/Xcode project. forgelings.html is a source snapshot; build-www.py creates www/index.html. Source synchronization is not an iOS binary release.
-
-## Reconciliation completed
-The pre-update dev/work.html, transformed by pwa.py's page transformations, exactly matched the pre-update main/index.html.
-The They Remember changes have now been backported to dev/work.html and ios-app/forgelings.html.
-Repacking the reconciled source reproduces the current live index.html byte for byte.
-base386.html remains the historical pre-update snapshot. work.html is no longer identical to it.
-Update 0.38.9: base388.html is 0.38.8 as Hunter committed it; base389.html is identical to work.html again (They Remember, 0.38.7 and the 0.38.9 fix included). Patches from now on read base389.html.
-They Remember shipped without a version bump: VERSION and the service-worker cache still say 0.38.6. Do not use that version alone to identify this release; use commit 1031617c9ec46d9a7d433307a0515c8e73d1b1f9 or hAffection.
-Do not run a historical patch against base386 and replace work.html without retaining the memory changes.
-Update 0.40.2: the old root copies base34 to base401 (and base386/388/389) were removed; git history keeps them. Patches now read base402.html, which equals work.html. base.html, base12-14.html and forge-pilot.html stay because qa_mig and qa_15 load them.
-Update 0.41.0: patches now read base41.html (= work.html). base402.html was removed; git history keeps it.
-
-## Size budget
-The budget is 1 MB (qa_22, qa_30, qa_301) and is a soft guide set by Hunter on 2026-10-26: when a wanted feature needs more room, raise it and note it rather than cutting the feature. Prefer loading heavy optional extras on first use as separate cached files.
+## Branches
+- **dev**: the workspace. `work.html` (English source, equal to the current `baseNNN.html`), patches in `history/`, `pwa.py`, `i18n/`, `legal/`, art tools, `creatures/`, `qa/`.
+- **main**: the generated website (`pwa/` output). Not the publishing trigger.
+- **gh-pages**: publishes https://img0j0.github.io/forge/. It must equal main; advance it by fast-forward only.
+- **ios-app**: the Capacitor iPhone and Android project. `forgelings.html` is a copy of `app.html`; `build-www.py` makes `www/index.html` (store edition). Every push runs **Native builds** (Android debug APK, iPhone compile with the plugin and widget checks). Source on ios-app is not a TestFlight release.
 
 ## Every release
-1. Read this file, forge-handoff.md, and current branch heads. Fetch fresh source; do not reuse a prior chat's cached file.
-2. Work from dev/work.html. Use a focused branch/commit. Preserve local-storage key forge-app-v1, origin, and /forge/ path.
-3. Increment VERSION and title together. Update user-facing What's New/SEEN_V when appropriate. pwa.py derives its cache version from VERSION.
-4. Run JavaScript syntax checks, the new feature checks, and relevant existing QA suites. Before a broad release run qa/runall.sh and inspect both individual process exit codes and logs. The 0.38.7 runner returns nonzero for failed, crashed, empty or timed-out suites; still inspect individual logs.
-5. Exercise an existing save, a new player, save/reload, export/restore, reward caps, narrow layout, reduced motion, and offline navigation. Include real iPhone checks for native/browser behavior; Chromium cannot establish Safari equivalence.
-6. Run python3 pwa.py. Inspect generated changes, legal pages, manifest and assets. Ensure index.html is exactly the expected transformation of work.html.
-7. Commit generated output to main. Compare gh-pages...main: proceed with a non-forced fast-forward only when gh-pages has no independent commits. Use expected SHA to reject concurrent edits. Investigate divergence instead of overwriting it.
-8. Advance gh-pages to the tested release SHA. Watch the Pages workflow for THAT SHA until completed/success; an older green deployment does not count.
-9. Fetch the live HTML and verify a release identifier or feature marker. Only then claim the hosted release is verified. A resumed Home Screen process may still hold old JavaScript until navigation/relaunch; never clear player storage to refresh code.
-10. Sync source to ios-app/forgelings.html. Run build-www.py and the native sync/build process in a suitable environment. Report separately whether native source, binary build, device tests, and TestFlight upload are complete.
-11. Update handoff/version notes and save test results with the release commit references.
+Hunter ships without approving pushes first and tests each release himself (November 12). Don't run the full suite before pushing.
+
+1. Fresh clones (dev, main, ios-app); read this file, `forge-handoff.md` and the latest patch.
+2. Write `history/patchNNN.py` against the current base: count-asserted `rep()` edits, writes `work.html`, `node --check`. Bump `VERSION` and `<title>` together (`pwa.py` derives the cache version from `VERSION`); `SEEN_V` only with a What's New note. Keep the save key `forge-app-v1`, the origin and the `/forge/` path.
+3. Japanese for every new English string (`i18n/ja/*.json`); `cd i18n && node scan.mjs ../work.html` shows no "match nothing" or "untranslated markup" warning.
+4. `cp work.html baseNNN.html`, `git rm` the old base, `python3 pwa.py` (builds `app.html` and `pwa/`; `build.mjs` must report 0 refused).
+5. Targeted checks for what changed: screenshots in English and Japanese, by day and at night; `qa_axe` (and `qa_contrast` for new UI) when markup changes; the `creatures/` checks for art changes; existing suites that cover the changed code if cheap. A full `qa/runall.sh` belongs before an App Store submission.
+6. Update `README.md` (build line), `forge-handoff.md` (header, version row) and this file (an "Update" line naming the new base and what was checked).
+7. `SESSION=<chat session URL> tools/ship.sh "message"`: commits as img0j0 with the Co-Authored-By and Claude-Session lines, pushes dev, main, gh-pages (fast-forward only) and ios-app, prints the SHAs and the index.html blob. If gh-pages refuses, it has commits main lacks: carry them into dev and main yourself, rebuild and rerun. Never force it.
+8. Publish `app.html` to the Claude page (read it first; next version number), write the project copy `claude/Forge (prototype X).html` and delete the old one, and copy `forge-handoff.md` to `claude/Forge handoff (0.22.2).md`.
+9. Verify: the Pages run and the Native builds run succeed for those exact SHAs (`gh api "repos/img0j0/forge/actions/runs?head_sha=SHA"`), and the live gh-pages `index.html` blob equals the printed one. An older green run doesn't count. Then add the "Shipped" line here and push dev.
+10. Tell Hunter what to test. A resumed Home Screen copy may hold old code until relaunched; never clear player storage to refresh it.
 
 ## Recovery
-Keep the preceding release SHA. Prefer a revert commit on main, then fast-forward gh-pages to it, rather than rewriting branch history.
-Assess save schema compatibility BEFORE rollback. Older code may discard fields from a newer save.
-Never reset or clear player data as a deployment remedy.
+Keep the previous release SHA. Prefer a revert commit on main, then fast-forward gh-pages to it; don't rewrite history. Check save compatibility before rolling back (older code may drop fields from a newer save). Never reset or clear player data as a fix.
 
-## Audit findings / follow-up work
-- Extensive QA exists on dev; its presence was missed in the initial main-only review. It has not all been executed in this audit.
-- qa/README.md has stale version notes. Several tests encode historical size/layout behavior and need interpretation.
-- qa/runall.sh records output but does not aggregate failures into a reliable nonzero exit code; improve before using it as a CI gate.
-- No repository-owned CI workflow was found on main/dev/ios-app. Pages deployment is not a gameplay test.
-- save() swallows storage errors; user-visible failure/recovery handling remains needed. (Addressed in 0.43.1: save() returns success, Update/Restore respect it, a daily safety copy and a recovery sheet cover unreadable saves, and a second tab steps the first aside.)
-- sw.js deletes all other origin caches on activation. Scope deletion to this app in the pwa.py generator, not only generated sw.js.
-- Network-first navigation falls back on thrown errors/timeouts, but an HTTP failure response can be returned directly. Test server-error fallback.
-- The navigation cache write is not extended with event.waitUntil; test interrupted navigation/offline persistence.
-- Runtime sanitizer and backup/restore should get regression tests for snackKnown and firstFind, including malformed dates.
-- Native README's claim that storage can never be wiped is too absolute. Native persistence is additional protection, not an unconditional guarantee.
-- Native project exists, but no Xcode build or physical-device validation was performed here.
+## The October 26 audit: status
+- Done: save failures are visible with backup and retry (0.38.7, 0.43.1: `save()` returns success, safety copy, recovery sheet, one tab at a time); the service worker deletes only Forgelings caches, falls back on HTTP errors and keeps cache writes alive (0.38.7); `qa/runall.sh` exits nonzero on failure, crash, timeout or no output (0.38.7); snackKnown/firstFind regression checks (0.38.9); native builds run on GitHub (0.52).
+- Still open: no CI runs the browser tests on push; no Xcode build on a real device yet (TestFlight is Hunter's step); native storage is extra protection, not a guarantee.
+- History: They Remember shipped without a version bump (commit 1031617); base copies before the current one were removed from the root (git keeps them). `base.html`, `base12-14.html` and `forge-pilot.html` stay for `qa_mig` and `qa_15`.
 
-## They Remember focused checks already performed
-JavaScript parse check; first find is immutable after later finds; JSON round-trip preserves memory; origin callbacks distinguish daily and pack creatures; repeated affection does not consume visits or increase bond; sleeping state blocks affection.
-These are targeted checks, not a substitute for full browser regression.
+## Size budget
+1.15 MB for `work.html` since 0.73 (qa_22, qa_30, qa_301). A soft guide set by Hunter: when a wanted feature needs room, raise it and note it rather than cut the feature. Prefer loading heavy optional extras on first use.
+
+## Log
+Update 0.38.9: base388.html is 0.38.8 as Hunter committed it; base389.html is identical to work.html again (They Remember, 0.38.7 and the 0.38.9 fix included). Patches from now on read base389.html.
+Update 0.40.2: the old root copies base34 to base401 (and base386/388/389) were removed; git history keeps them. Patches now read base402.html, which equals work.html. base.html, base12-14.html and forge-pilot.html stay because qa_mig and qa_15 load them.
+Update 0.41.0: patches now read base41.html (= work.html). base402.html was removed; git history keeps it.
 Update 0.41.1: patches now read base411.html (= work.html); base41.html removed (git keeps it).
 Update 0.42.0: patches now read base42.html (= work.html); base411.html removed (git keeps it). qa_17 and qa_181 run over http in runall.sh.
-
 Update 0.43.0: patches now read base43.html (= work.html); base42.html removed (git keeps it). qa_43 caps page lengths; put new features in sheets.
 Update 0.43.1: patches now read base431.html (= work.html); base43.html removed (git keeps it). runall.sh now also runs qa_431, qa_ref (fixed-seed appearance references in qa/ref; regenerate with REF_UPDATE=1 only when art changes on purpose, and say so in the handoff) and reliability.cjs.
-
 Update 0.44.0: patches now read base44.html (= work.html); base431.html removed (git keeps it). runall.sh now also runs qa_44; qa_ref adds the Meadow island reference (isle00).
-
 Update 0.44.1: patches now read base441.html (= work.html); base44.html removed (git keeps it). runall.sh adds qa_441 and runs qa_21 and qa_clock over http with qa_17/qa_181 (their failures were the file:// storage wipe, not the time of day).
-
 Update 0.44.2: patches now read base442.html (= work.html); base441.html removed (git keeps it). runall.sh adds qa_contrast (day and night, light and dark text contrast on every screen).
-
 Update 0.45.0: patches now read base45.html (= work.html); base442.html removed (git keeps it). runall.sh adds qa_45.
-
 Update 0.46.0: patches now read base46.html (= work.html); base45.html removed (git keeps it). patch46.py reads journal46.css (kept in history/ with it) and the Caveat subset from the scratchpad at build time; base46.html already contains both, so later patches need neither. runall.sh adds qa_46.
 Update 0.47.0: patches now read base47.html (= work.html); base46.html removed (git keeps it). patch47.py reads journal47.css (both in history/). qa_ref references regenerated on purpose (journal backdrop at the card corners; art unchanged).
 Update 0.47.1: patches now read base471.html (= work.html); base47.html removed (git keeps it).
@@ -85,7 +58,6 @@ Update 0.50.1: patches now read base501.html (= work.html); base50.html removed 
 Update 0.50.2: patches now read base502.html (= work.html); base501.html removed (git keeps it). qa_502 joins runall.sh. Shipped 2026-11-08: main/gh-pages f9d751d (Pages deploy success, live index.html blob 2496b59 matches), ios-app 2254166, Claude copy version 94. Full run: all 81 suites pass; monkeys 1–6 pass.
 Update 0.51.0: patches now read base51.html (= work.html); base502.html removed (git keeps it). qa_51 joins runall.sh. The Map/Tales/Journal highlight also fills the chosen button once its slide ends, so the contrast check reads it. Shipped: main/gh-pages 9ddbb99 (Pages run success, live index.html blob 1062fb2 matches), ios-app 1b885eb, Claude copy version 95.
 Update 0.52.0: patches now read base52.html (= work.html); base51.html removed (git keeps it). qa_52 joins runall.sh. The ios-app branch now also holds the Android project (android/, android-setup.py) and .github/workflows/native.yml, which builds a debug APK and compiles the iPhone app on every push to ios-app; check that run as part of shipping. reliability.cjs stubs cloudSoon. Shipped: main/gh-pages e99366d (Pages run success, live index.html blob 24c3b82 matches), ios-app 55d7a02 (Native builds success), Claude copy version 96.
-
 Update (Nov 12, 2026): Hunter tests each release himself. Do not run the full suite (runall.sh, journey, monkeys) before pushing; run only the checks for what changed, then ship and tell him what to test.
 Update 0.53.0: patches now read base53.html (= work.html); base52.html removed (git keeps it). Checked qa_axe and qa_contrast plus day/night screenshots; full suite not run (Hunter tests). Shipped: main/gh-pages bc20532 (Pages run success, live index.html blob 0d66868 matches), ios-app b7c2fc9 (Native builds success), Claude copy version 97.
 Update 0.54.0: patches now read base54.html (= work.html); base53.html removed (git keeps it). Creature art source and checks in creatures/ (same.py must print SAME). Shipped: main/gh-pages 034ef50 (Pages run success, live index.html blob 6b724b4 matches), ios-app 0633992 (Native builds success), Claude copy version 98.
@@ -121,4 +93,3 @@ Update 0.73.0: patches read base73.html; base721.html removed. Full suite run on
 Shipped 0.73.0: main/gh-pages ebfeb18 (Pages success, live blob 3c5bfa7 matches), ios-app eccf72a (Native builds success), Claude copy version 125.
 Update 0.73.1: patches read base731.html; base73.html removed. Checked: the Maple Days row done and fresh, day and lamp.
 Shipped 0.73.1: main/gh-pages 22ff2ac (Pages success, live blob 54aaefd matches), ios-app 31d4a76 (Native builds success), Claude copy version 126.
-Update (Nov 12, Hunter): ship without asking first; he fixes things afterward. tools/ship.sh now pushes gh-pages fast-forward only (no force); if it is rejected, carry gh-pages' extra commits into dev/main yourself and rerun, never overwrite them.

@@ -3,7 +3,7 @@
 The English build (`work.html`, from the patches) stays the source. `build.mjs` makes the shipped app from it:
 
 ```
-cd i18n && npm install        # once (acorn)
+cd i18n && npm install        # once per fresh clone (acorn); pwa.py needs it
 node scan.mjs ../work.html    # what still needs Japanese: i18n/todo/<area>.json
 node build.mjs ../work.html ../app.html
 ```
@@ -17,7 +17,7 @@ node build.mjs ../work.html ../app.html
 - The app runs in Japanese when the phone's language is Japanese, or when Settings saves `forge-lang`.
 - `GLOSSARY.md`: the terms. Keep them consistent.
 
-## Shipping (0.57)
+## Shipping (since 0.57)
 - `pwa.py` runs the build and packs `app.html`, so the website, the iPhone/Android source (`ios-app/forgelings.html`),
   the Claude page and the project copy all get `app.html`, never `work.html` alone.
 - The phone's language picks the language; Settings > Look and feel > Language (English / 日本語) overrides it. The
@@ -28,8 +28,8 @@ node build.mjs ../work.html ../app.html
 - `units.mjs` `FORCE` lists text the detector misses (only punctuation or numbers around placeholders).
 - Words that differ by place are keyed by area (`Calm@cardHTML` a stat, `Calm@WANTS` a wish); the build keeps them apart.
 - Card backs' news from away is stored as an event (`c.gev`), so it shows in the app's current language.
-- Size: the Japanese adds about 190 K characters (about 0.2 MB as UTF-8); the app is about 1.2 MB. A native speaker
-  should review the Japanese before a Japanese launch.
+- Size (0.73.1): about 2,700 Japanese units, 232 KB; `app.html` is about 1.24 MB. A native speaker should review the
+  Japanese (especially the Forgelings' voices: bright ones say ぼく, dark ones おれ) before a Japanese launch.
 - Forgeling names (0.57.1): in Japanese a name reads in katakana from its two syllables (`KANA_P`, `KANA_S`); a new
   syllable in `PRE`/`SUF` needs its reading there. The save keeps the Latin name (`jaName`, a card's `toJSON`).
 - After a patch, `node scan.mjs ../work.html` must print no "match nothing" or "untranslated markup" warning: a changed English

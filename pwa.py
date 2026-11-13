@@ -53,7 +53,7 @@ self.addEventListener('fetch',e=>{
 });
 """ % (ver, ver))
 open(f'{OUT}/.nojekyll','w').write('')
-open(f'{OUT}/README.md','w').write(f"# Forge\n\nOne small thing a day. A small creature to keep it.\n\nA cozy pixel-creature habit app. Prototype {ver}. Everything stays on your device.\n\nOpen it on your phone, then add it to your home screen.\n")
+open(f'{OUT}/README.md','w').write(f"# Forgelings\n\nOne small thing a day. A small creature to keep it.\n\nA cozy pixel-creature habit journal, in English and Japanese. Prototype {ver}. Everything stays on your device.\n\nOpen https://img0j0.github.io/forge/ on your phone, then add it to your home screen. The build workspace is the dev branch; the iPhone and Android apps are on ios-app.\n")
 print('pwa built', ver, sorted(os.listdir(OUT)))
 
 # ---- public pages (privacy, terms, support) for the site and App Store Connect ----
