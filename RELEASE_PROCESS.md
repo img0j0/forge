@@ -93,3 +93,4 @@ Update 0.73.0: patches read base73.html; base721.html removed. Full suite run on
 Shipped 0.73.0: main/gh-pages ebfeb18 (Pages success, live blob 3c5bfa7 matches), ios-app eccf72a (Native builds success), Claude copy version 125.
 Update 0.73.1: patches read base731.html; base73.html removed. Checked: the Maple Days row done and fresh, day and lamp.
 Shipped 0.73.1: main/gh-pages 22ff2ac (Pages success, live blob 54aaefd matches), ios-app 31d4a76 (Native builds success), Claude copy version 126.
+Update 0.74.0: patches read base74.html; base731.html removed. Type scale and fading how-to lines (`tipFade`). Checked: screenshots English and Japanese, day and night; qa_axe, qa_axe2, qa_contrast, qa_43, qa_fit, qa_384, qa_301; a 12-check fading test.

@@ -2,7 +2,7 @@
 
 Everything needed to keep building Forgelings in a fresh session. The live site is on `gh-pages` (mirrored on `main`); the iPhone and Android project is on `ios-app`.
 
-**Current build: prototype 0.73.1** (`work.html` = `base731.html`). Read `forge-handoff.md` (state, rules, what's next) and `RELEASE_PROCESS.md` (how to ship) first.
+**Current build: prototype 0.74.0** (`work.html` = `base74.html`). Read `forge-handoff.md` (state, rules, what's next) and `RELEASE_PROCESS.md` (how to ship) first.
 
 ## Set up a new session (about 2 minutes)
 
@@ -17,7 +17,7 @@ Everything needed to keep building Forgelings in a fresh session. The live site 
 
 | Path | What it is |
 |---|---|
-| `work.html`, `base731.html` | The current build in English (identical files). Patches read the base |
+| `work.html`, `base74.html` | The current build in English (identical files). Patches read the base |
 | `app.html` (built) | What ships: `work.html` with its Japanese built in. `python3 pwa.py` makes it and the website in `pwa/` |
 | `history/patchNNN.py` | Every version's patch script; copy the shape of the latest |
 | `i18n/` | Japanese: `ja/*.json`, `scan.mjs` (what needs translating), `build.mjs`, `GLOSSARY.md`, `README.md` |

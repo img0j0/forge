@@ -1,6 +1,6 @@
 # Forgelings handoff (start of a new chat)
 
-Current build: **prototype 0.73.1**, shipped November 12, 2026. Live at https://img0j0.github.io/forge/ (gh-pages/main 22ff2ac), ios-app 31d4a76, Claude page version 126. This file and `RELEASE_PROCESS.md` (dev branch) are the source of truth; `README.md` has the short version. It replaces the 0.16.0 handoff PDF.
+Current build: **prototype 0.74.0**, shipped November 12, 2026. Live at https://img0j0.github.io/forge/; SHAs for each release are in `RELEASE_PROCESS.md`. Claude page version 127. This file and `RELEASE_PROCESS.md` (dev branch) are the source of truth; `README.md` has the short version. It replaces the 0.16.0 handoff PDF.
 
 **Forgelings** is a cozy pixel-creature daily-habit app in one HTML/JS file. Each day you choose one of three face-down cards, each with one small thing to do. Do it and a one-of-a-kind Forgeling is inked into your journal. Forgelings sit by your Hearth, wander the Map, bring back curios, and get made into charms, relics and 3D statues at the Forge. It runs in English and Japanese, on the web (installable, offline) and as iPhone and Android apps (Capacitor).
 
@@ -35,7 +35,7 @@ Current build: **prototype 0.73.1**, shipped November 12, 2026. Live at https://
 
 ## Where things stand and what's next
 
-**Next: Hunter's call.** All planned work through 0.73 is done: the five enhancements (0.58 to 0.62), the daily card and journal rework (0.63 to 0.65), the brainstorm plan (0.66 to 0.71), animations (0.72) and launch readiness (0.73; report https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ: ready for TestFlight, not yet the App Store).
+**Next: Hunter's call.** 0.74 was the polish pass (type scale, explanations that fade, one focal point at the Hearth). All planned work before it is done too: the five enhancements (0.58 to 0.62), the daily card and journal rework (0.63 to 0.65), the brainstorm plan (0.66 to 0.71), animations (0.72) and launch readiness (0.73; report https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ: ready for TestFlight, not yet the App Store).
 
 Open items:
 
@@ -49,7 +49,7 @@ Open items:
 ## Key technical facts
 
 **Build and patches**
-- `work.html` (English, about 1.0 MB) is the source; it equals the current `baseNNN.html` (now `base731.html`). Each release is `history/patchNNN.py`: read the base, count-asserted `rep(old,new)` edits, write `work.html`, `node --check` the extracted script. Bump `VERSION` and `<title>` together; bump `SEEN_V` (now 55) only with a What's New note (eight kept).
+- `work.html` (English, about 1.0 MB) is the source; it equals the current `baseNNN.html` (now `base74.html`). Each release is `history/patchNNN.py`: read the base, count-asserted `rep(old,new)` edits, write `work.html`, `node --check` the extracted script. Bump `VERSION` and `<title>` together; bump `SEEN_V` (now 55) only with a What's New note (eight kept).
 - What ships is **`app.html`**: `pwa.py` runs `i18n/build.mjs` over `work.html` (Japanese embedded, about 1.24 MB), then packs `pwa/` (index.html, manifest, `sw.js`, icons, legal pages). The website, `ios-app/forgelings.html`, the Claude page and the project copy are all `app.html`.
 - Size budget: 1.15 MB for `work.html` (qa_22, qa_30, qa_301). It is a soft guide: raise it and note it rather than cut a feature Hunter wants. Heavy optional extras load on first use.
 - The script runs in a closure, so tests drive the screen and read pixels rather than call functions.
@@ -69,6 +69,8 @@ Open items:
 - Curios: `curios/sprites.py` then `tojs.py`. Card backs: `art/cardback72.py`. Icons: `art/make_icons.py` (copy the 1024 and splash to ios-app `art/`). New pixel-art SVGs go through `slim/svgslim.py`; new font weights need a reason.
 
 **UI rules**
+- Type scale (0.74): plain text 12 (tab and button captions only), 14, 16, 18, 20 px; handwriting 44 (page titles), 36 (reveals), 28 (section headings), 22 (everything else). Use these sizes; card faces and icons keep their fitted sizes. Inputs stay at 16 px or more (iPhone zooms on smaller).
+- How-to lines that stop being useful after a few days go through `tipFade(key, el)` after render (shown on the first five days seen; device-level `forge-tips-v1`), not into the template.
 - Field journal look (0.46+): paper by day, lamplight (`data-page="lamp"`) at dusk, night or Dark; Plain keeps the old flat look. Three hands: your words handwritten (`--hand`, Caveat 700, never under 20 px), the world's words in italic world ink, the Forge's stamps in VT323. Journal variables are `--j…` (never reuse `--paper` or `--stamp`).
 - Motion (0.48, 0.72): under two seconds, a tap skips, base CSS is the final state so reduced motion leaves things still and finished. Since 0.72 Rare and up build up before the turn (`chargeThen`); everything else times the same for every rarity.
 - Keep pages short (qa_43 caps page lengths): new features go in sheets (`openHSheet`, `jSheet`, `.csheet`). The Map never shows counts or progress bars.
@@ -123,6 +125,7 @@ Earlier versions are in the 0.16.0 handoff PDF. Each release's SHAs are in `RELE
 
 | Version | What |
 |---|---|
+| 0.74.0 | **A calmer, easier read** (Hunter, November 12: asked whether the UI was optimized to the highest level, then "Let's do it" to the polish pass). Type scale: every 13/15/17 px rule moves one step to 14/16/18 (card faces and icons excluded); handwriting from 12 sizes to 44/36/28/22 (Binder captions 19 to 22, Forge section headings and `h2.sub3` 28, row titles 22). The five tabs went from 14 text sizes to 8. `tipFade(k,el)` removes the Forge's long explanation, the choose sheet's how-to line, the Map's tap hint and the "book in two inks" line after the first five days they are seen (`forge-tips-v1`, device only). Hearth focal point: when an action is ready, the others draw a 1 px frame; the extras list is plain type. Japanese fixes: Binder captions widened the grid at 22 px (`.jcap{width:0;min-width:100%}`); found in passing (already in 0.73.1): the Hearth showed the companion line as saved (now `compLine` when shown), Settings glued "normal volume" and "Forgeling+s" (whole phrases now, with Japanese). Checked: screenshots English and Japanese, day and night; qa_axe, qa_axe2, qa_contrast 8/8, qa_43 49/49, qa_fit, qa_384 12/12, qa_301; fading tests 12/12. |
 | 0.73.1 | **The season stamp reads clearly** (Hunter: the Maple Days icon was hard to make out). An unpressed stamp draws in the row's ink (`currentColor`, 80%) instead of pale grey at 45%; a done day presses the stamp on Today if it was missed (his card was done before 0.59 arrived, so the row still asked him to turn over today's card). |
 | 0.73.0 | **Launch readiness** (report: https://claude.ai/artifact/2iJe26L5URZ16jemQswqTZ, "Forgelings launch readiness"): a calmer first week, and the full test run (Hunter, November 12: plan by voice, then "Go"). Played days 1 to 7 as a new player (English by day, Japanese at night; screenshots in ux/week). Fixes: "This week" days in seven fixed columns (Tuesday sat at the far right); the postcard offer starts at 3 pages and "Make your cards yours" at 2; a pressed season row shows only that day; at 60 pages the letter's notice no longer hides the Scribe's arrival (qa_38); long unbroken words under a flipped card wrap (qa_fit); card backs packed under 9,000 characters (cardback72.packed, qa_301); pwa.py builds from any folder (qa_402, qa_pwa). Full suite: tests brought up to date with 0.53 to 0.72 (turn_card helper in qa/lib.py for choosing a card; feel faces are the question every third day; Scribe at 60 pages; `w` in share links; card details under the card; size budget 1.15 MB; Hearth and Journal length limits 1.3 and 1.95); appearance references regenerated (realm accessories, statue one pixel taller). qa_52's "newer iCloud save while open" fails about half the time, also on 0.62: check on real devices. |
 | 0.72.1 | **A flipped card shows the clean back** (Hunter: "I was expecting the words to be taken off. Just the clean art"). `.cbk` now uses `--cbP` with its glint and hides `.bsp`/`.binfo`; `backCap()` copies the binfo words under the card (`#inspBack`, in place of `#inspHint`) while it is flipped. |
