@@ -1,0 +1,16 @@
+{
+ "Folded and kept for you": "たたんで、しまってあります",
+ "This week": "今週",
+ "The Scribe reads your week back": "書記が今週を読み返してくれます",
+ "Your month in words": "ことばで見るこの1か月",
+ "The Scribe’s account of {0}": "書記がつづる{0}",
+ "Seasons@bkBack": "季節",
+ "The stamps you have pressed": "押してきたスタンプ",
+ "Your year": "あなたの一年",
+ "A keepsake of the year so far": "ここまでの一年の記念に",
+ "Open to an old page": "昔のページを開く",
+ "Let the ribbon fall open somewhere": "しおりの落ちたページをひらく",
+ "All your pages": "すべてのページ",
+ "Every page, newest first": "新しい順に、すべてのページ",
+ "<div class=\"zpage bback\"><p class=\"zk\">At the back</p>{0}<p class=\"zend\">More pages are written every day you show up.</p></div>": "<div class=\"zpage bback\"><p class=\"zk\">うしろのページ</p>{0}<p class=\"zend\">来るたびに、ページが書き足されていきます。</p></div>"
+}
