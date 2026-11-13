@@ -27,6 +27,7 @@ with sync_playwright() as p:
     s=st(pg); s["journal"]=pages(s,58); load(pg,s); tabto(pg,"hearth"); pg.wait_for_timeout(600)
     rec("Before","with 58 pages there is no Scribe yet",scribe_px(pg)==0 and "Scribe" not in pg.inner_text("#hmsg"))
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
+    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkPrev')&&!document.getElementById('bkPrev').disabled;i++)document.getElementById('bkPrev').click()})()"); pg.wait_for_timeout(200)  # 0.82: the cover keeps the binding line
     rec("Before","the book promises someone will come at 60","At 60, someone will come to the fire to read with you." in pg.inner_text("#view-chronicle"))
     # the 59th and 60th lines: the arrival
     s=st(pg); s["journal"]=pages(s,59); s["status"]="rest"; load(pg,s); tabto(pg,"today")
@@ -45,8 +46,9 @@ with sync_playwright() as p:
     tabto(pg,"today"); tabto(pg,"hearth"); m2=pg.inner_text("#hmsg")
     rec("Read","it does not read again the same day","Scribe opens your book" not in m2 or m2==m)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
+    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkPrev')&&!document.getElementById('bkPrev').disabled;i++)document.getElementById('bkPrev').click()})()"); pg.wait_for_timeout(200)
     rec("Book","the book says the Scribe sits by your fire","The Scribe sits by your fire" in pg.inner_text("#view-chronicle"))
-    rec("Ribbon","the ribbon The Scribe is earned","The Scribe" in pg.inner_text("#view-chronicle") and "scribe" in (st(pg).get("ribbons") or []))
+    rec("Ribbon","the Scribe goal is still kept in the save (ribbons retired 0.80)","scribe" in (st(pg).get("ribbons") or []))
     # removing lines never takes it away? lines are totals: removing the 60th line drops below 60, so it leaves gently
     # (totals only grow in normal use; this checks nothing breaks)
     s=st(pg); s["journal"]=lines(s,10); load(pg,s); tabto(pg,"hearth"); pg.wait_for_timeout(500)

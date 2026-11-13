@@ -32,7 +32,7 @@ with sync_playwright() as p:
     rec("Realm page","a card on the realm page opens the card viewer",bool(mt(pg)) and not pg._errs,pg._errs[:1]); closemodals(pg)
     # merged journal
     pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300)
-    t=txt(pg); rec("Journal","Journal now holds the weekly recap and calendar as well as entries","This week" in t and "Private" in t or "journal starts" in t.lower(),t[:120].replace("\n"," | "))
+    t=txt(pg); rec("Journal","the Book tab is the book itself (0.82)",pg.locator("#view-chronicle .jbook").count()==1,t[:120].replace("\n"," | "))
     # theme text
     tabto(pg,"today"); T=pg.inner_text("#view-today")
     rec("Theme","'Something to sit with' is gone from Today",("Something to sit with" not in T))

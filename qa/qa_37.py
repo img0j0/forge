@@ -8,7 +8,7 @@ def axe(pg):
 def load(pg,s):
     s["opens"]=s.get("opens",[])+[s["date"]]; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def journal(pg):
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(500); return pg.inner_text("#view-chronicle")
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(500); pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkPrev')&&!document.getElementById('bkPrev').disabled;i++)document.getElementById('bkPrev').click()})()"); pg.wait_for_timeout(200); return pg.inner_text("#view-chronicle")  # 0.82: the tab is the book; read its cover
 def write(pg,txt):
     tabto(pg,"today"); pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); pg.fill("#jIn",txt); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
 with sync_playwright() as p:
@@ -26,8 +26,9 @@ with sync_playwright() as p:
     pg.tap("#askAgain"); pg.wait_for_timeout(300)
     rec("Feel","Change the answer takes it back",st(pg)["feel"]=={})
     pg.tap("#view-today .facebtn[data-ask='2']"); pg.wait_for_timeout(300)
-    t=journal(pg); rec("Journal","the Journal's page for the day says how it felt","hard" in t.lower(),t[:300])
-    rec("Book","the book says every day you show up writes a page (0.63: writing is never needed)","Your book" in t and "Every day you show up writes one for you" in t,t[:200])
+    t=journal(pg); pg.evaluate("document.getElementById('bkLatest')&&document.getElementById('bkLatest').click()"); pg.wait_for_timeout(200); t=pg.inner_text("#view-chronicle")  # 0.82: the latest spread
+    rec("Journal","the Journal's page for the day says how it felt","hard" in t.lower(),t[:300])
+    rec("Book","the book's cover keeps its pages and what binding comes next (0.82)","Your book" in (t:=journal(pg)) and ("pages" in t or "One page" in t) and pg.locator("#view-chronicle .bcovnx").count()==1,t[:200])
     # ink
     write(pg,"Scared to start. Started anyway."); s=st(pg); c=[x for x in s["cards"] if x["id"]==s["todayCard"]][0]
     rec("Ink","writing a line on a done day inks today's Forgeling",c.get("ink")=="Scared to start. Started anyway.")
@@ -52,13 +53,14 @@ with sync_playwright() as p:
     for L,expect in [(1,"plain"),(10,"leather"),(30,"ribbon"),(60,"someone"),(100,"gold")]:
         s=st(pg); s["journal"]={daysago(i*3+1):{"v":i%12,"text":f"line {i}"} for i in range(L)}; load(pg,s); t=journal(pg)
         lab=pg.get_attribute("#view-chronicle .book","aria-label")
-        ok={"plain":"leather" not in lab and "in your journal" in t,
+        ok={"plain":"leather" not in lab and ("One page" in t or " pages" in t),
             "leather":"bound in leather" in lab and "ribbon" not in lab,
-            "ribbon":"with a ribbon" in lab and pg.locator("#bookRibbon").count()==1,
+            "ribbon":"with a ribbon" in lab,
             "someone":"At 100, gold edges" in t,
             "gold":"gold edges and a clasp" in lab}[expect]
         rec("Book",f"{L} lines: {expect}",ok,(lab,t[:160].replace("\n"," | ")))
-    rec("Book","pages count in total, never in a row: gaps of three days still count",bool(re.search(r"(10\d|1[1-9]\d) pages in your journal",t)),t[:200])
+    rec("Book","pages count in total, never in a row: gaps of three days still count",bool(re.search(r"(10\d|1[1-9]\d) pages",t)),t[:200])
+    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)  # 0.82: the old page sits at the back of the book
     pg.tap("#bookRibbon"); pg.wait_for_timeout(500); m=mt(pg)
     rec("Ribbon","the ribbon opens to an old line","The ribbon falls open at" in m and "line " in m)
     bad+=["ribbon: "+v for v in axe(pg)]; closemodals(pg)
@@ -67,7 +69,7 @@ with sync_playwright() as p:
     s["history"]=[h for h in s["history"] if not h["date"].startswith(ym)]+[{"date":d,"status":"done","v":4} for d in days[:5]]+[{"date":days[5],"status":"rest","v":2}]
     s["feel"]={days[0]:"good",days[1]:"good",days[2]:"hard",days[3]:"hard",days[4]:"good"}
     s["owns"]=[{"id":1,"text":"Text Mom","k":2,"days":days[:2]}]
-    load(pg,s); t=journal(pg); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
+    load(pg,s); t=journal(pg); pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
     rec("Month","the month reads in words (0.76: the Scribe tells it, no counts): how it felt, hard days done anyway",
         "Your month in words" in t and "Some days were hard, and you did them anyway." in t and not re.search(r"\b5 days\b",t),
         [l for l in t.split("\n") if "In " in l][:2])

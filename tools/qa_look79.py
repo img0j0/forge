@@ -29,7 +29,7 @@ with sync_playwright() as p:
     has=pg.locator('#btnOtd').count()==1;chk('noon: On this day offered (a page from a month ago exists)',has,lbs(pg))
     if has:
         pg.click('#btnOtd');pg.wait_for_timeout(600)
-        chk('…and opens the book at that day',pg.locator('#modal .jbook .bday').count()==1 and pg.evaluate("()=>JSON.parse(localStorage.getItem('forge-app-v1')).bookAt")=='d:'+mago,pg.evaluate("()=>JSON.parse(localStorage.getItem('forge-app-v1')).bookAt"))
+        chk('…and opens the book at that day',pg.locator('#view-chronicle .jbook .bday').count()==1 and pg.evaluate("()=>JSON.parse(localStorage.getItem('forge-app-v1')).bookAt")=='d:'+mago,pg.evaluate("()=>JSON.parse(localStorage.getItem('forge-app-v1')).bookAt"))
         closemodals(pg);chk('…once a day',pg.locator('#btnOtd').count()==0)
     # the echo: no page a month ago, so the Forgeling found two weeks ago comes back
     s=copy.deepcopy(S);s.pop('otd',None);s.pop('echo',None);[L.update(read=True) for L in s.get('letters',[])]
@@ -38,12 +38,12 @@ with sync_playwright() as p:
     chk('echo: the row names when it was found',bool(ttl) and pg.locator('.echo').count()==0,ttl)
     if ttl:
         pg.screenshot(path=f'{out}/echo_row.png');pg.click('#btnOtd');pg.wait_for_timeout(600)
-        sp=pg.locator('#modal .jbook .bday').count()==1;chk('…opens that day in the book',sp)
-        chk('…where the second reading is one tap away',pg.locator('#modal .bday [data-kept]').count()==1)
+        sp=pg.locator('#view-chronicle .jbook .bday').count()==1;chk('…opens that day in the book',sp)
+        chk('…where the second reading is one tap away',pg.locator('#view-chronicle .bday [data-kept]').count()==1)
         pg.screenshot(path=f'{out}/echo_book.png');pg.add_script_tag(content=AXE)
         v=pg.evaluate("axe.run(document,{runOnly:['wcag2a','wcag2aa']}).then(r=>r.violations.map(v=>v.id+':'+v.nodes.length))");chk('axe on the spread',not v,v)
-        h=pg.evaluate("(()=>{const r=document.querySelector('#modal .bday [data-kept]').getBoundingClientRect();return r.height})()");chk('second reading is 44 pt',h>=44,h)
-        pg.click('#modal .bday [data-kept]');pg.wait_for_timeout(500);chk('…and opens it',pg.locator('#keptBack').count()==1);closemodals(pg)
+        h=pg.evaluate("(()=>{const r=document.querySelector('#view-chronicle .bday [data-kept]').getBoundingClientRect();return r.height})()");chk('second reading is 44 pt',h>=44,h)
+        pg.click('#view-chronicle .bday [data-kept]');pg.wait_for_timeout(500);chk('…and opens it',pg.locator('#keptBack').count()==1);closemodals(pg)
     tabto(pg,'today');pg.add_script_tag(content=AXE)
     v=pg.evaluate("axe.run(document,{runOnly:['wcag2a','wcag2aa']}).then(r=>r.violations.map(v=>v.id+':'+v.nodes.length))");chk('axe on Today',not v,v)
     chk('no page errors',not pg._errs,pg._errs[:2]);b.close()

@@ -100,6 +100,7 @@ with sync_playwright() as p:
     pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     nm=pg.locator("#view-chronicle .medal").count()
     rec("Ribbons","ribbons are retired from the book (0.80)",nm==0 and pg.locator("#view-chronicle .ribp").count()==0,nm)
+    pg.evaluate("(()=>{const n=document.getElementById('bkNext');for(let i=0;i<400&&n&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(300)  # 0.82: they sit at the back of the book
     tap(pg,"#jWeek"); rec("Journal","This week opens as a sheet","This week" in mt(pg) and pg.locator("#modal .scribe").count()>=1,mt(pg)[:80]); closemodals(pg)
     if pg.locator("#jMonth").count(): tap(pg,"#jMonth"); rec("Journal","the month in words opens as a sheet","Your month in words" in mt(pg)); closemodals(pg)
     s=st(pg); d0=s["date"]
@@ -107,7 +108,8 @@ with sync_playwright() as p:
     for i in range(6):
         k=(datetime.date.fromisoformat(d0)-datetime.timedelta(days=i)).isoformat(); s["journal"][k]={"text":f"Line number {i}","v":0}
     load(pg,s); tabto(pg,"chronicle"); pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
-    rec("Journal","the Journal shows your three latest lines and a way to the rest",pg.locator("#view-chronicle .calling").count()==3 and pg.locator("#jLines").count()==1)
+    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)
+    rec("Journal","the back of the book has a way to all your pages (0.82)",pg.locator("#jLines").count()==1)
     tap(pg,"#jLines"); rec("Journal","…which lists them all",pg.locator("#modal .calling").count()>=6,pg.locator("#modal .calling").count()); closemodals(pg)
     bad+=["journal dark: "+v for v in axe(pg)]
     tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400); bad+=["tales dark: "+v for v in axe(pg)]
