@@ -120,3 +120,4 @@ Shipped 0.72.1: main/gh-pages c4160e4 (Pages success, live blob c134d60 matches)
 Update 0.73.0: patches read base73.html; base721.html removed. Full suite run on 0.72.1 (27 of 89 failing, nearly all tests expecting older screens), tests updated, failures re-run one by one on 0.73.0: all pass except qa_52's intermittent iCloud-while-open check (also on 0.62). qa_journey (125 days) 9/9. qa/ref regenerated on purpose (REF_UPDATE=1). qa/lib.py has turn_card(pg) for the three-card choice.
 Shipped 0.73.0: main/gh-pages ebfeb18 (Pages success, live blob 3c5bfa7 matches), ios-app eccf72a (Native builds success), Claude copy version 125.
 Update 0.73.1: patches read base731.html; base73.html removed. Checked: the Maple Days row done and fresh, day and lamp.
+Shipped 0.73.1: main/gh-pages 22ff2ac, ios-app 31d4a76, Claude copy version 126.
