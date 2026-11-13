@@ -20,6 +20,5 @@
  "<p class=\"rv-title\">Your {0}</p><img class=\"shareimg\" src=\"{1}\" alt=\"A picture of your {2} in Forgelings: {3} pages and {4} Forgelings found\">\n    <p class=\"rv-hint\">{5} No photos and none of your words are in it. It's made on this phone, and nothing is uploaded.</p>\n    <div class=\"btnrow\"><button class=\"primary\" id=\"shDo\">{6}</button><button class=\"ghost\" data-close>Close</button></div>": "<p class=\"rv-title\">あなたの{0}</p><img class=\"shareimg\" src=\"{1}\" alt=\"Forgelingsで過ごした{2}の画像：{3}ページ、見つけたフォージリング{4}体\">\n    <p class=\"rv-hint\">{5}写真も、あなたが書いた言葉も入っていません。この端末で作られ、どこにもアップロードされません。</p>\n    <div class=\"btnrow\"><button class=\"primary\" id=\"shDo\">{6}</button><button class=\"ghost\" data-close>閉じる</button></div>",
  "Your {0} is bound": "{0}の本ができました",
  "The Scribe stitched your {0} pages into a little book. Flip through it.": "書記が{0}のページを小さな本にとじてくれました。めくってみましょう。",
- "Your {0} pages are stitched into a little book. Flip through it.": "{0}のページが小さな本にとじられました。めくってみましょう。",
- "<button class=\"outline\" id=\"bookZines\" style=\"margin-top:6px\">Monthly books</button>": "<button class=\"outline\" id=\"bookZines\" style=\"margin-top:6px\">月ごとの本</button>"
+ "Your {0} pages are stitched into a little book. Flip through it.": "{0}のページが小さな本にとじられました。めくってみましょう。"
 }

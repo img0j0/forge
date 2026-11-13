@@ -95,3 +95,4 @@ Update 0.73.1: patches read base731.html; base73.html removed. Checked: the Mapl
 Shipped 0.73.1: main/gh-pages 22ff2ac (Pages success, live blob 54aaefd matches), ios-app 31d4a76 (Native builds success), Claude copy version 126.
 Update 0.74.0: patches read base74.html; base731.html removed. Type scale and fading how-to lines (`tipFade`). Checked: screenshots English and Japanese, day and night; qa_axe, qa_axe2, qa_contrast, qa_43, qa_fit, qa_384, qa_301; a 12-check fading test.
 Shipped 0.74.0: main/gh-pages ec8094d (Pages success, live blob 5d2ba5b matches), ios-app c180f8b (Native builds success), Claude copy version 127.
+Update 0.75.0: patches read base75.html; base74.html removed. The book in chapters. Checked: a 21-check book test (English day, 320 px, 768 px; Japanese night), qa_axe2, qa_contrast, qa_43.
