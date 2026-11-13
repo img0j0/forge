@@ -1,7 +1,7 @@
-# Forge
+# Forgelings
 
 One small thing a day. A small creature to keep it.
 
-A cozy pixel-creature habit app. Prototype 0.73.1. Everything stays on your device.
+A cozy pixel-creature habit journal, in English and Japanese. Prototype 0.73.1. Everything stays on your device.
 
-Open it on your phone, then add it to your home screen.
+Open https://img0j0.github.io/forge/ on your phone, then add it to your home screen. The build workspace is the dev branch; the iPhone and Android apps are on ios-app.
