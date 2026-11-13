@@ -22,6 +22,7 @@ Everything needed to keep building Forgelings in a fresh session. The live site 
 | `history/patchNNN.py` | Every version's patch script; copy the shape of the latest |
 | `i18n/` | Japanese: `ja/*.json`, `scan.mjs` (what needs translating), `build.mjs`, `GLOSSARY.md`, `README.md` |
 | `tools/ship.sh` | Commits and pushes dev, main, gh-pages (fast-forward only) and ios-app; prints SHAs |
+| `tools/lived_save.py` | Plays the build for N days through real taps and saves a lived-in save (store screenshots, demos) |
 | `qa/` | The regression suite (`qa/README.md`). Full run about 75 minutes; before store submissions, not every release |
 | `creatures/` | Forgeling art source and its checks (`creatures/README.md`) |
 | `curios/`, `art/`, `slim/` | Curio sprites, card backs and icons, the SVG slimming tool |

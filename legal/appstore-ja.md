@@ -50,13 +50,14 @@ Forgelingsは、初期のテスターのみなさんと一緒に育ててきた�
 
 ## Screenshots
 
-The English set is from 0.48 and needs retaking too. For Japanese screenshots, run the same `shots.py` with the phone's language set to
-Japanese (or `forge-lang` saved as `ja` in the save), then `compose.py` with these captions:
+`ios-app/store/screens-ja/forgelings-1.png` to `-8.png` (retaken November 12, 2026 from 0.73.1; how to rebuild them is in
+`store/listing.md`). Captions:
 
 1. 一日ひとつ、小さなこと
-2. どの子も、あなたのために描かれる
-3. 火のそばで、いつも一緒
-4. 少しずつ埋まっていくバインダー
-5. ひとりでに描かれていく地図
-6. 一緒にものづくり
-7. やさしさを大切に
+2. どの子も、あなたのために
+3. ひとりでに書かれていく日記
+4. 火のそばで、いつも一緒
+5. 少しずつ埋まっていくバインダー
+6. ひとりでに描かれていく地図
+7. 一緒にものづくり
+8. やさしさを大切に
