@@ -18,8 +18,8 @@ with sync_playwright() as p:
             s["journal"]={ (datetime.date.today()-datetime.timedelta(days=i)).isoformat():{"v":i%12,"text":"a line"} for i in range(3)}
             setst(pg,s); pg.reload(); pg.wait_for_timeout(800); closemodals(pg)
             L=f"{theme}/{mood}"
-            for t in ["today","hearth","binder","chronicle","settings"]: tabto(pg,t); pg.wait_for_timeout(250); audit(pg,L+"/"+t)
-            for sub in ["tales","journal"]:
+            for t in ["today","hearth","binder","chronicle","book","settings"]: tabto(pg,t); pg.wait_for_timeout(250); audit(pg,L+"/"+t)
+            for sub in ["tales"]:
                 tabto(pg,"chronicle"); pg.evaluate("s=>document.querySelector('[data-sub=\"'+s+'\"]').click()",sub); pg.wait_for_timeout(250); audit(pg,L+"/chron-"+sub)
             tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"map\"]').click()"); pg.evaluate("()=>document.querySelector('.mphit[data-realm=\"2\"]').dispatch_event?0:document.querySelector('.mphit[data-realm=\"2\"]').dispatchEvent(new MouseEvent('click',{bubbles:true}))"); pg.wait_for_timeout(300); audit(pg,L+"/map-realm-open")
             tabto(pg,"binder"); pick_calling(pg,"2"); audit(pg,L+"/binder-calling-note")

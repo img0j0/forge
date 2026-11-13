@@ -101,3 +101,4 @@ Update 0.76.0: patches read base76.html; base75.html removed. The Scribe's chapt
 Shipped 0.76.0: main/gh-pages 594251c (Pages success, live blob 58ca4d1 matches), ios-app b400ff0 (Native builds success), Claude copy version 129.
 Update 0.77.0: patches read base77.html; base76.html removed. Keepsakes on their day, margin notes, doodles, Say more. Checked: tools/qa_tuck77.py (English day, Japanese night), qa_axe2, qa_contrast, qa_43, qa_37.
 Shipped 0.77.0: main/gh-pages 92a03a9 (Pages success, live blob bbd66a3 matches), ios-app 65b5368 (Native builds success), Claude copy version 130.
+Update 0.78.0: patches read base78.html; base77.html removed. One voice for the day's question; Book tab. Suites reach the Journal through the Book tab. Checked: tab78, qa_axe2, qa_contrast, qa_43, qa_37, qa_13, qa_22, qa_35, qa_38, book/Scribe/tucked-in tools.

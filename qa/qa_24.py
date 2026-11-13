@@ -120,7 +120,7 @@ with sync_playwright() as p:
     # ---------- your own small things: since 0.36 they live on the card (qa_36). The Journal still marks their days ----------
     s=grown(base); s["history"]=[{"date":D(s,i),"status":"done","v":i%12} for i in range(1,11)]; s["owns"]=[{"id":1,"text":"Drink a glass of water","k":-1,"days":[D(s,i) for i in (0,1,3,5,40)]}]; ready(pg,s)
     rec("Own","Today has no separate tick row any more (own small things come up on the card)",pg.locator("#btnOwn").count()==0)
-    tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('#view-chronicle [data-sub=\"journal\"]');if(b)b.click()}"); pg.wait_for_timeout(500)
+    tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('.tab[data-tab=\"book\"]');if(b)b.click()}"); pg.wait_for_timeout(500)
     own=pg.evaluate("[...document.querySelectorAll('.cal .c.own')].map(c=>c.getAttribute('aria-label'))"); txt=pg.inner_text("#view-chronicle")
     rec("Own","the Journal calendar marks the days you did one (within five weeks)",len(own)==4 and all("your own small thing done" in a for a in own),own)
     rec("Own","…and says how many",("You did your own small thing on 4 of these days" in txt) and "your own small thing" in pg.inner_text(".calkey"),[l for l in txt.split("\n") if "own small" in l])

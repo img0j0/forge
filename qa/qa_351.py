@@ -23,7 +23,7 @@ with sync_playwright() as p:
             tabto(pg,t); pg.wait_for_timeout(500); bad+=[f"{scheme} {ph} {t}: "+v for v in axe(pg)]
         if ph=="dusk":
             tabto(pg,"hearth"); pg.evaluate("document.getElementById('hForge').click()"); pg.wait_for_timeout(600); bad+=["forge sheet: "+v for v in axe(pg)]; closemodals(pg)
-            tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('[data-sub=\"journal\"]');b&&b.click()}"); pg.wait_for_timeout(600); bad+=["journal: "+v for v in axe(pg)]
+            tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('.tab[data-tab=\"book\"]');b&&b.click()}"); pg.wait_for_timeout(600); bad+=["journal: "+v for v in axe(pg)]
             pg.evaluate("()=>{const b=document.querySelector('[data-sub=\"tales\"]');b&&b.click()}"); pg.wait_for_timeout(600); bad+=["tales: "+v for v in axe(pg)]
         if ph=="day" and scheme=="light":
             tabto(pg,"today"); pr=pg.evaluate("()=>{const b=document.querySelector('#view-today .primary');const cs=getComputedStyle(b);return {bg:cs.backgroundImage.slice(0,40),r:cs.borderTopLeftRadius}}")

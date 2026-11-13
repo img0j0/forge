@@ -77,7 +77,7 @@ with sync_playwright() as p:
     h=[{"date":"2026-12-0"+str(i),"status":"done","v":4} for i in (2,5,8)]+[{"date":"2026-11-28","status":"done","v":4},{"date":"2026-12-03","status":"done","v":2},{"date":"2026-12-04","status":"rest","v":4}]
     t=scenario(pg,base,"2026-12-10",[("2026-11-28","daily")],hist=h)
     rec("Mirror","counts only this month, this kind of thing, and only days done","That's 4 times this month you've reached out to someone." in t,t[:300].replace("\n"," | "))
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400); pg.evaluate("document.getElementById('jWeek').click()"); pg.wait_for_timeout(400); j=pg.inner_text("#modal"); pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400); pg.evaluate("document.getElementById('jWeek').click()"); pg.wait_for_timeout(400); j=pg.inner_text("#modal"); pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
     rec("Mirror","the Journal lists what you've done in the last five weeks","In these five weeks you've:" in j and "reached out to someone, 5 times" in j and "given something your full attention" in j,j[j.find("In these"):j.find("In these")+200].replace("\n"," | "))
     rec("Mirror","…with no junk text and no scores",not JUNK.search(j) and "score" not in j.lower())
     tabto(pg,"today")
@@ -146,7 +146,7 @@ if AXE:
                 ax("today with echo")
                 pg.evaluate("document.querySelector('#view-today .echo [data-kept]').click()"); pg.wait_for_timeout(500); ax("second reading from echo"); closemodals(pg)
                 pg.evaluate("()=>{const b=document.getElementById('keptBack');if(b)b.click();}"); pg.wait_for_timeout(300)
-                tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400); ax("journal with mirror")
+                tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400); ax("journal with mirror")
                 ctx.close()
         b.close()
     rec("A11y","axe: zero violations on the echo, its Second reading, and the Journal list, light and dark, both moods",not bad,bad[:3])

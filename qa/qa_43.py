@@ -30,9 +30,9 @@ with sync_playwright() as p:
     tabto(pg,"binder"); rec("Length","the Binder still fits one screen",screens(pg)<=1.05,screens(pg))
     tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400); t=screens(pg)
     rec("Length","Tales fits about one screen (was 5.3)",t<=1.2,t)
-    pg.evaluate("document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400); j=screens(pg)
+    pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400); j=screens(pg)
     rec("Length","the Journal is under two screens (was 5; 0.73: Letters and Monthly books)",j<=1.95,j)
-    pg.evaluate("document.querySelector('[data-sub=\"map\"]').click()"); pg.wait_for_timeout(400); m=screens(pg)
+    tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"map\"]').click()"); pg.wait_for_timeout(400); m=screens(pg)
     rec("Length","the Map stays under one and a half screens",m<=1.5,m)
     tabto(pg,"settings",fold=True); sf=screens(pg); rec("Length","Settings opens with every section folded and fits one screen",sf<=1.1 and pg.evaluate("[...document.querySelectorAll('#view-settings details.setsec')].every(d=>!d.open)"),sf)
     tabto(pg,"today"); td=screens(pg); rec("Length","Today on a settled day fits about one and a half screens (was 2)",td<=1.5,td)
@@ -97,7 +97,7 @@ with sync_playwright() as p:
         tap(pg,"#modal [data-edit]"); rec("Tales","…and Add a name or tale opens from there","tale" in mt(pg).lower() and pg.locator("#modal textarea,#modal input").count()>=1,mt(pg)[:80])
     closemodals(pg)
     # ---------- Journal ----------
-    pg.evaluate("document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     nm=pg.locator("#view-chronicle .medal").count(); on=pg.locator("#view-chronicle .medal.on").count()
     rec("Ribbons","ribbons are a grid of medals, earned ones gold",nm>=30 and 1<=on<nm and f"{on} of {nm} earned" in pg.inner_text("#view-chronicle .ribp"),(nm,on))
     rec("Ribbons","every medal is a 44-point button named for its ribbon",not small(pg,"#view-chronicle .medals") and "First Spark" in pg.inner_text("#view-chronicle .medals"))
@@ -109,11 +109,11 @@ with sync_playwright() as p:
     import datetime
     for i in range(6):
         k=(datetime.date.fromisoformat(d0)-datetime.timedelta(days=i)).isoformat(); s["journal"][k]={"text":f"Line number {i}","v":0}
-    load(pg,s); tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    load(pg,s); tabto(pg,"chronicle"); pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     rec("Journal","the Journal shows your three latest lines and a way to the rest",pg.locator("#view-chronicle .calling").count()==3 and pg.locator("#jLines").count()==1)
     tap(pg,"#jLines"); rec("Journal","…which lists them all",pg.locator("#modal .calling").count()>=6,pg.locator("#modal .calling").count()); closemodals(pg)
     bad+=["journal dark: "+v for v in axe(pg)]
-    pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400); bad+=["tales dark: "+v for v in axe(pg)]
+    tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400); bad+=["tales dark: "+v for v in axe(pg)]
     tabto(pg,"hearth"); bad+=["hearth dark: "+v for v in axe(pg)]
     rec("All","no page errors",not pg._errs,pg._errs[:2]); ctx.close()
     # ---------- light, plain sky, 320 px ----------
@@ -123,7 +123,7 @@ with sync_playwright() as p:
     rec("Layout","Hearth buttons stay 44 points at 320 px",not small(pg,"#view-hearth"),small(pg,"#view-hearth")); bad+=["hearth light: "+v for v in axe(pg)]
     tabto(pg,"chronicle"); pg.evaluate("document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(400)
     rec("Layout","no sideways scroll on Tales at 320 px",pg.evaluate("document.documentElement.scrollWidth")<=320); bad+=["tales light: "+v for v in axe(pg)]
-    pg.evaluate("document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     rec("Layout","no sideways scroll on the Journal at 320 px",pg.evaluate("document.documentElement.scrollWidth")<=320); bad+=["journal light: "+v for v in axe(pg)]
     tap(pg,"#view-chronicle .medal"); bad+=["ribbon light: "+v for v in axe(pg)]; closemodals(pg)
     tabto(pg,"hearth"); tap(pg,"#hKeeps"); bad+=["keeps light: "+v for v in axe(pg)]; closemodals(pg)

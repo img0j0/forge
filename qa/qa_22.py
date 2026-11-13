@@ -56,7 +56,7 @@ with sync_playwright() as p:
     # ---------- Journal ----------
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#ageGo, #titleGo"); first_card(pg); closemodals(pg)
     s=hist(build(base,[2,2,2,1,1]),30); s["seen"]=99; setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg)
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     cells=pg.evaluate("[...document.querySelectorAll('.cal span.c')].map(c=>[c.className,getComputedStyle(c).backgroundImage.includes('svg'),c.getAttribute('aria-label')])")
     done=[c for c in cells if " done" in c[0]]; rest=[c for c in cells if " rest" in c[0]]; miss=[c for c in cells if " skipped" in c[0] or c[0].strip()=="c"]
     rec("Journal","days you showed up get a flame stamp, rest days a moon, other days nothing",done and rest and all(c[1] for c in done) and all(c[1] for c in rest) and not any(c[1] for c in miss),(len(done),len(rest),len(miss)))
@@ -103,7 +103,7 @@ with sync_playwright() as p:
         closemodals(pg); pg.evaluate("()=>{const o=document.getElementById('vOk');if(o)o.click();}"); pg.wait_for_timeout(300)
         pg.evaluate("document.getElementById('btnPack').click()"); pg.wait_for_timeout(700); axe(pg,"pack",scheme)
         pg.evaluate("()=>{document.getElementById('modal').hidden=true;document.getElementById('modal').innerHTML='';}")
-        tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400); axe(pg,"journal",scheme)
+        tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400); axe(pg,"journal",scheme)
         tabto(pg,"binder"); pg.evaluate("document.getElementById('btnFilter').click()"); pg.wait_for_timeout(400); axe(pg,"filter sheet",scheme)
         ctx.close()
     rec("A11y","axe: zero violations on Today, the card face, the pack, the Journal and the filter sheet, light and dark",not bad,bad[:3])

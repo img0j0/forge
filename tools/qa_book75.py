@@ -16,7 +16,7 @@ with sync_playwright() as p:
     pg.add_style_tag(content="#toast{display:none!important}")
     def snap(n): pg.wait_for_timeout(450); pg.screenshot(path=f'{out}/{n}.png')
     def txt(): return pg.inner_text('#modal .zbox')
-    openmap(pg);pg.evaluate("document.querySelector('[data-sub=journal]').click()");pg.wait_for_timeout(400)
+    openmap(pg);pg.evaluate("document.querySelector('.tab[data-tab=book]').click()");pg.wait_for_timeout(400)
     chk('Journal has Open your book',pg.evaluate("!!document.getElementById('bookOpen')"))
     chk('Monthly books button gone',not pg.evaluate("!!document.getElementById('bookZines')"))
     pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(500)
@@ -80,7 +80,7 @@ with sync_playwright() as p:
     # reduced motion
     b=p.chromium.launch();ctx,pg=newpage(b,W,844,timezone_id='America/New_York',reduced_motion='reduce')
     pg.add_init_script(CLK);pg.goto(P);pg.wait_for_selector('#titleGo');first_card(pg);closemodals(pg);setst(pg,S);pg.reload();pg.wait_for_timeout(1200);closemodals(pg)
-    openmap(pg);pg.evaluate("document.querySelector('[data-sub=journal]').click()");pg.wait_for_timeout(300);pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(300)
+    openmap(pg);pg.evaluate("document.querySelector('.tab[data-tab=book]').click()");pg.wait_for_timeout(300);pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(300)
     pg.evaluate("document.getElementById('bkNext').click()");pg.wait_for_timeout(300)
     chk('reduced motion: no turn animation',pg.evaluate("document.getAnimations().filter(a=>a.animationName&&a.animationName.startsWith('bkIn')).length")==0)
     b.close()

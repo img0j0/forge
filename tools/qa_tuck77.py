@@ -26,7 +26,7 @@ with sync_playwright() as p:
     for name,k,sel in cases:
         if not k: chk(f'{name}: a day exists in the save',False);continue
         s2=copy.deepcopy(S);s2['bookAt']='d:'+k;setst(pg,s2);pg.evaluate("l=>localStorage.setItem('forge-lang',l)",LANG);pg.reload();pg.wait_for_timeout(1300);closemodals(pg)
-        openmap(pg);pg.evaluate("document.querySelector('[data-sub=journal]').click()");pg.wait_for_timeout(300);pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(500)
+        openmap(pg);pg.evaluate("document.querySelector('.tab[data-tab=book]').click()");pg.wait_for_timeout(300);pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(500)
         chk(f'{name} on {k}',pg.locator(sel).count()>=1,pg.inner_text('#modal .bday').replace('\n',' / ')[:260]);pg.screenshot(path=f'{out}/{name}.png',full_page=False)
         if name=='letter':
             pg.evaluate("document.querySelector('#modal .bletter').click()");pg.wait_for_timeout(400);chk('letter opens from the page',pg.evaluate("!!document.querySelector('#modal .lpaper')"))

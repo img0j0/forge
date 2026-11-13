@@ -55,7 +55,7 @@ with sync_playwright() as p:
     pg.tap("[data-mecho='did']"); pg.wait_for_timeout(500); h=pg.inner_text("#view-hearth"); s2=st(pg)
     rec("Echo","answering 'I did it' shows the Forgeling's reply and keeps the line",s2["journal"][ago(10)].get("reply")=="did" and s2["mEcho"]["ans"]=="did" and s2["mEcho"]["line"] in pg.inner_text(".mecho") and pg.locator("[data-mecho]").count()==0,h[:300])
     rec("Echo","answering uses no visit",st(pg)["hearth"]["visits"]==vis_before)
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300)
     pg.evaluate("()=>{const b=document.getElementById('jLines');b&&b.click()}"); pg.wait_for_timeout(400)  # 0.63: every done day is a page; older ones are under "All your pages"
     rec("Echo","the Journal shows how it went","Later: you did it." in pg.inner_text("#view-chronicle")+mt(pg))
     pg.reload(); pg.wait_for_timeout(800); closemodals(pg); tabto(pg,"hearth")

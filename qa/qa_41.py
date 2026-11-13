@@ -35,7 +35,7 @@ with sync_playwright() as p:
     rec("Hidden","the curio shelf counts the 20 front curios only","of 20" in shelf and pg.locator("#view-hearth .sside").count()==0,shelf)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300)
     rec("Hidden","no Shade tales before the lantern","Tales from the other side" not in pg.inner_text("#view-chronicle"))
-    pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300)
+    pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300)
     rec("Hidden","the two Shade ribbons stay hidden","Lantern Light" not in pg.inner_text("#view-chronicle") and "Both Sides" not in pg.inner_text("#view-chronicle"))
     # ---------- Meadow charted: the lantern comes first and the panel says so ----------
     s=st(pg); s["explore"]={"0":4}; days(s,8)
@@ -98,7 +98,7 @@ with sync_playwright() as p:
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300); pg.evaluate("document.querySelector('[data-tside=\"1\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
     rec("Tales","Tales shows the other side: Bramble's tale begun, the rest untold","Other side" in t and "The Keepers of the Edge" in t and t.count("an untold tale")>=4,(t.find("Tales from"),t[:200]))
     settle(pg); bad+=["tales: "+v for v in axe(pg)]
-    pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
+    pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300); t=pg.inner_text("#view-chronicle")
     rec("Ribbons","with the lantern, Lantern Light is earned and Both Sides is listed","Lantern Light" in t and "Both Sides" in t and "cross1" in (st(pg).get("ribbons") or []))
     # ---------- a ward ----------
     s=st(pg); s["curios"]["nest"]={"n":3,"cid":0,"at":s["date"]}; days(s,4); load(pg,s); tabto(pg,"hearth"); pg.tap("#hForge"); pg.wait_for_timeout(500); m=mt(pg)

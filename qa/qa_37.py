@@ -8,7 +8,7 @@ def axe(pg):
 def load(pg,s):
     s["opens"]=s.get("opens",[])+[s["date"]]; setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
 def journal(pg):
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(500); return pg.inner_text("#view-chronicle")
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(500); return pg.inner_text("#view-chronicle")
 def write(pg,txt):
     tabto(pg,"today"); pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); pg.fill("#jIn",txt); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
 with sync_playwright() as p:

@@ -93,5 +93,9 @@
  "A letter": "手紙",
  "<button class=\"bletter\" data-letter=\"{0}\"><b>{1}</b><span>Tap to read</span></button>": "<button class=\"bletter\" data-letter=\"{0}\"><b>{1}</b><span>タップして読む</span></button>",
  "<p class=\"saylead\"><i>{0}</i> You answered: {1}.</p>": "<p class=\"saylead\"><i>{0}</i> あなたの答え：{1}</p>",
- "<button class=\"ghost\" id=\"askMore\" style=\"min-height:44px\">Say more</button>": "<button class=\"ghost\" id=\"askMore\" style=\"min-height:44px\">もう少し書く</button>"
+ "<button class=\"ghost\" id=\"askMore\" style=\"min-height:44px\">Say more</button>": "<button class=\"ghost\" id=\"askMore\" style=\"min-height:44px\">もう少し書く</button>",
+ "<p class=\"saylead\">{0} asked: <i>{1}</i> You answered: {2}.</p>": "<p class=\"saylead\">{0}のたずねごと：<i>{1}</i> あなたの答え：{2}</p>",
+ "Your book": "あなたの本",
+ "Book": "本",
+ "<p class=\"saylead\">{0} would like to know: <i>{1}</i></p>": "<p class=\"saylead\">{0}が知りたがっています：<i>{1}</i></p>"
 }

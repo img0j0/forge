@@ -2,7 +2,7 @@
 
 Everything needed to keep building Forgelings in a fresh session. The live site is on `gh-pages` (mirrored on `main`); the iPhone and Android project is on `ios-app`.
 
-**Current build: prototype 0.77.0** (`work.html` = `base77.html`). Read `forge-handoff.md` (state, rules, what's next) and `RELEASE_PROCESS.md` (how to ship) first.
+**Current build: prototype 0.78.0** (`work.html` = `base78.html`). Read `forge-handoff.md` (state, rules, what's next) and `RELEASE_PROCESS.md` (how to ship) first.
 
 ## Set up a new session (about 2 minutes)
 

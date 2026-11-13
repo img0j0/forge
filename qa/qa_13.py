@@ -9,7 +9,7 @@ with sync_playwright() as p:
     tabto(pg,"chronicle")
     rec("Nav","opening the tab lands on the map itself, with the page title 'The Map'",pg.evaluate("!!document.querySelector('.mapsvg')") and pg.inner_text("#title")=="The Map",pg.inner_text("#title"))
     chips=pg.eval_on_selector_all('#view-chronicle .chips .chip',"e=>e.map(x=>x.textContent)")
-    rec("Tabs","sections are consolidated to Map, Tales, Journal",chips==["Map","Tales","Journal"],chips)
+    rec("Tabs","sections are consolidated to Map and Tales; the Journal has its own Book tab (0.78)",chips==["Map","Tales"] and pg.locator('.tab[data-tab="book"]').count()==1,chips)
     rec("Map","before any tap, the page invites a tap and no realm page is open","Tap a corner" in txt(pg) and pg.locator(".realmpage").count()==0)
     # tap a drawn realm via real touch on its hit area
     n=pg.locator(".mphit").count(); rec("Map","five tappable realms",n==5,n)
@@ -31,7 +31,7 @@ with sync_playwright() as p:
     pg.locator(".realmpage [data-insp]").first.dispatch_event("click"); pg.wait_for_timeout(500)
     rec("Realm page","a card on the realm page opens the card viewer",bool(mt(pg)) and not pg._errs,pg._errs[:1]); closemodals(pg)
     # merged journal
-    pg.evaluate("document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(300)
+    pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300)
     t=txt(pg); rec("Journal","Journal now holds the weekly recap and calendar as well as entries","This week" in t and "Private" in t or "journal starts" in t.lower(),t[:120].replace("\n"," | "))
     # theme text
     tabto(pg,"today"); T=pg.inner_text("#view-today")
@@ -42,10 +42,10 @@ with sync_playwright() as p:
     ok="Your own words" not in T and (has==(stt in ("done","rest")))
     if has:
         pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); m=mt(pg)
-        ok=ok and "Your own words" in m and "The Forge asks" in m
+        ok=ok and "Your own words" in m and "The Forge asks" not in m and pg.locator("#modal .sheet i").count()>=1
         pg.fill("#jIn","A line from the sheet"); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
-        ok=ok and st(pg)["journal"].get(st(pg)["date"],{}).get("text")=="A line from the sheet" and pg.evaluate("document.getElementById('modal').hidden") and "Edit today’s line" in pg.inner_text("#view-today")
-    rec("Theme","the margin is off Today; after the day's card, a link opens 'Your own words' (0.63; was 'In the margin') with 'The Forge asks', and saving goes to the journal",ok,(stt,has))
+        ok=ok and st(pg)["journal"].get(st(pg)["date"],{}).get("text")=="A line from the sheet" and pg.evaluate("document.getElementById('modal').hidden") and "Edit your own words" in pg.inner_text("#view-today")
+    rec("Theme","the margin is off Today; after the day's card, a link opens 'Your own words' (0.63; was 'In the margin') with the question in one voice (0.78), and saving goes to the journal",ok,(stt,has))
     html=open(S+"/work.html").read(); rec("Theme","no 'Something to sit with' remains anywhere in the app","Something to sit with" not in html)
     # preview tool still lands on the map
     dev(pg,"mappreview"); rec("Dev","Preview the map lands on the map",pg.evaluate("!!document.querySelector('.mapsvg')") and not pg._errs)

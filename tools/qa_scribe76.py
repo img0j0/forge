@@ -13,7 +13,7 @@ with sync_playwright() as p:
     b=p.chromium.launch();ctx,pg=newpage(b,390,844,timezone_id='America/New_York',device_scale_factor=2,reduced_motion='reduce')
     pg.add_init_script(clk(day,HH));pg.goto(P);pg.wait_for_selector('#titleGo');first_card(pg);closemodals(pg);setst(pg,S);pg.evaluate("l=>localStorage.setItem('forge-lang',l)",LANG);pg.reload();pg.wait_for_timeout(1500);closemodals(pg)
     pg.add_style_tag(content="#toast{display:none!important}")
-    openmap(pg);pg.evaluate("document.querySelector('[data-sub=journal]').click()");pg.wait_for_timeout(400)
+    openmap(pg);pg.evaluate("document.querySelector('.tab[data-tab=book]').click()");pg.wait_for_timeout(400)
     pg.evaluate("document.getElementById('bookOpen').click()");pg.wait_for_timeout(400)
     n=pg.evaluate("document.querySelectorAll('[data-bkgo]').length")
     for i in range(n):

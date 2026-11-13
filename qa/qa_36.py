@@ -93,7 +93,7 @@ with sync_playwright() as p:
     s=st(pg); before=len([x for x in s["owns"] if x["id"]==mv["id"]][0]["days"])
     tabto(pg,"settings"); pg.evaluate(f"document.querySelector('[data-ownrm=\"{mv['id']}\"]').click()"); pg.wait_for_timeout(300); s=st(pg)
     rec("Remove","removing one keeps its past days for the Journal",all(x["id"]!=mv["id"] for x in s["owns"]) and len(s["own"]["days"])>=before and before>0 and pg.locator("#ownIn").count()==1,(before,len(s["own"]["days"])))
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(500)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(500)
     rec("Journal","the Journal calendar still marks those days",pg.locator("#view-chronicle .cal .c.own").count()>=1)
     # migration from the old single own small thing
     s=st(pg); s["owns"]=[]; s["own"]={"text":"Drink a glass of water","days":["2026-01-02","2026-01-05"]}; del s["want"]; del s["wantAsked"]; del s["settings"]["ownMix"]; load(pg,s); s=st(pg)

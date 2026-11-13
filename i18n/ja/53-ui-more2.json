@@ -87,7 +87,6 @@
  "Saved to your downloads. Keep it somewhere safe.": "ダウンロードに保存しました。安全な場所にとっておきましょう。",
  "Map@renderChronicle": "地図",
  "Tales@renderChronicle": "お話",
- "Journal@renderChronicle": "日記",
  "<p class=\"muted small\" style=\"margin-top:14px\">A book in two inks. <span class=\"inkw\">The Forge writes the world.</span> <span class=\"inkm\">You write your Forgelings.</span></p>": "<p class=\"muted small\" style=\"margin-top:14px\">二色のインクで書かれた本。<span class=\"inkw\">鍛冶場が世界を書き、</span><span class=\"inkm\">あなたがフォージリングを書く。</span></p>",
  "<p class=\"muted small\">Find a {0} Forgeling to open this note.</p>": "<p class=\"muted small\">{0}のフォージリングを見つけると、このメモが開きます。</p>",
  "<p class=\"world\"><b>A rumor.</b> A Legend is said to keep this calling: {0}. {1}</p>": "<p class=\"world\"><b>うわさ。</b>この道しるべを守るレジェンドがいるといいます：{0}。{1}</p>",

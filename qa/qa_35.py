@@ -114,7 +114,7 @@ with sync_playwright() as p:
     rec("Hearth","the iron stand's legs and the copper kettle are drawn into the fire scene (sampled over a second, past the sparks)",pm[0]==3 and pm[1],pm)
     t=forge_sheet(pg)
     rec("Hearth","made pieces show their signature instead of a Make button",t.count("Forged by ")==6 and pg.locator("#modal [data-fmake]").count()<=4 and pg.locator("#modal [data-fmake='kettle'],#modal [data-fmake='bell'],#modal [data-fmake='compass']").count()==0,t.count("Forged by "))
-    closemodals(pg); tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('[data-sub=\"journal\"]');b&&b.click()}"); pg.wait_for_timeout(400); rb=pg.inner_text("#view-chronicle")
+    closemodals(pg); tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('.tab[data-tab=\"book\"]');b&&b.click()}"); pg.wait_for_timeout(400); rb=pg.inner_text("#view-chronicle")
     rec("Ribbons","the ribbons list names First Forging and Smith","First Forging" in rb and "Smith" in rb)
     # ---------- older saves, damaged saves ----------
     s=st(pg); del s["forge"]; load(pg,s); s2=st(pg); tabto(pg,"hearth")

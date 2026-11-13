@@ -26,7 +26,7 @@ with sync_playwright() as p:
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg); dev(pg,"week"); closemodals(pg)
     s=st(pg); s["journal"]=pages(s,58); load(pg,s); tabto(pg,"hearth"); pg.wait_for_timeout(600)
     rec("Before","with 58 pages there is no Scribe yet",scribe_px(pg)==0 and "Scribe" not in pg.inner_text("#hmsg"))
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     rec("Before","the book promises someone will come at 60","At 60, someone will come to the fire to read with you." in pg.inner_text("#view-chronicle"))
     # the 59th and 60th lines: the arrival
     s=st(pg); s["journal"]=pages(s,59); s["status"]="rest"; load(pg,s); tabto(pg,"today")
@@ -44,7 +44,7 @@ with sync_playwright() as p:
     s=st(pg); rec("Read","…and remembers it has read today",s.get("scribeDay")==s["date"])
     tabto(pg,"today"); tabto(pg,"hearth"); m2=pg.inner_text("#hmsg")
     rec("Read","it does not read again the same day","Scribe opens your book" not in m2 or m2==m)
-    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"journal\"]').click()"); pg.wait_for_timeout(400)
+    tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     rec("Book","the book says the Scribe sits by your fire","The Scribe sits by your fire" in pg.inner_text("#view-chronicle"))
     rec("Ribbon","the ribbon The Scribe is earned","The Scribe" in pg.inner_text("#view-chronicle") and "scribe" in (st(pg).get("ribbons") or []))
     # removing lines never takes it away? lines are totals: removing the 60th line drops below 60, so it leaves gently
