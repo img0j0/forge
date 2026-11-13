@@ -108,3 +108,4 @@ Shipped 0.79.0: main/gh-pages 5730522 (Pages success, live blob b3ae84a matches)
 Update 0.80.0: patches read base80.html; base79.html removed. Ribbons retired (backdrops unlock in words), no visits counter. Checked: tools/qa_quiet80.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_43.
 Shipped 0.80.0: main/gh-pages bc2c197 (Pages success, live blob 56567eb matches), ios-app 914a553 (Native builds success), Claude copy version 134.
 Update 0.81.0: patches read base81.html; base80.html removed. The Forge keeps its own count. Checked: tools/qa_forge81.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_35, qa_43.
+Shipped 0.81.0: main/gh-pages 0cdd1ef (Pages success, live blob b3d699f matches), ios-app 20e0fcc (Native builds success), Claude copy version 135.
