@@ -1,6 +1,6 @@
 # Forgelings handoff (start of a new chat)
 
-Current build: **prototype 0.78.0**, shipped November 13, 2026. Live at https://img0j0.github.io/forge/; SHAs for each release are in `RELEASE_PROCESS.md`. Claude page version 131. This file and `RELEASE_PROCESS.md` (dev branch) are the source of truth; `README.md` has the short version. It replaces the 0.16.0 handoff PDF.
+Current build: **prototype 0.78.0**, shipped November 13, 2026. Live at https://img0j0.github.io/forge/; SHAs for each release are in `RELEASE_PROCESS.md`. Claude page version 132. This file and `RELEASE_PROCESS.md` (dev branch) are the source of truth; `README.md` has the short version. It replaces the 0.16.0 handoff PDF.
 
 **Forgelings** is a cozy pixel-creature daily-habit app in one HTML/JS file. Each day you choose one of three face-down cards, each with one small thing to do. Do it and a one-of-a-kind Forgeling is inked into your journal. Forgelings sit by your Hearth, wander the Map, bring back curios, and get made into charms, relics and 3D statues at the Forge. It runs in English and Japanese, on the web (installable, offline) and as iPhone and Android apps (Capacitor).
 
