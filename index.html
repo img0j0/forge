@@ -2153,7 +2153,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.73.0',APPVER='1.0.0';
+const VERSION='prototype 0.73.1',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?(LJ?JA[124]:'First Edition'):(LJ?JA[125]:'Pilot Edition');
@@ -2761,8 +2761,8 @@ function seasonNow(k){k=k||todayKey();const md=k.slice(5),y=+k.slice(0,4);
     if(inS)return {s,y:wrap&&md<=s.to?y-1:y};}
   return null;}
 const seasonKey=n=>n.s.id+'-'+n.y;
-function seasonStampSVG(s,px,on){const W=12,c=s.sc;let r='';s.st.forEach((row,y)=>{for(let x=0;x<W;x++){const ch=row[x];if(ch&&ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${on?c[ch]:'#B9B0A0'}"/>`;}});
-  return `<svg viewBox="0 0 12 12" width="${px}" height="${px}" shape-rendering="crispEdges" aria-hidden="true" style="opacity:${on?1:.45}">${r}</svg>`;}
+function seasonStampSVG(s,px,on){const W=12,c=s.sc;let r='';s.st.forEach((row,y)=>{for(let x=0;x<W;x++){const ch=row[x];if(ch&&ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${on?c[ch]:'currentColor'}"/>`;}});
+  return `<svg viewBox="0 0 12 12" width="${px}" height="${px}" shape-rendering="crispEdges" aria-hidden="true" style="opacity:${on?1:.8}">${r}</svg>`;}
 const seasonEnd=n=>{const [m,d]=n.s.to.split('-').map(Number);return dateLabel(dkey(new Date(n.s.from>n.s.to?n.y+1:n.y,m-1,d)));};
 /* pressed when today's card is turned over during the season */
 function seasonPress(){const n=seasonNow();if(!n)return false;state.seasons=state.seasons||{};const k=seasonKey(n);if(state.seasons[k])return false;state.seasons[k]=state.date;return true;}
@@ -3268,6 +3268,7 @@ function renderToday(){
   {const o=otdKey();if(o&&state.otd!==todayKey())rows.unshift(row('btnOtd',IC.pack,(LJ?JA[694]:'On this day'),o.y?(LJ?JA[695]:'A year ago today, you wrote a page. Have a look.'):(LJ?JA[696]:'A month ago today, you wrote a page. Have a look.'),'',true));}
   letterCheck();{const ui2=(state.letters||[]).map((L,i)=>[L,i]).filter(x=>!x[0].read).pop();if(ui2)rows.unshift(row('btnLetter',ENVELOPE,(LJ?Lt(697,[esc(letterFrom(ui2[0]))]):`A letter from ${esc(letterFrom(ui2[0]))}`),(LJ?Lt(698,[ui2[0].n]):`For your first ${ui2[0].n} pages. It is waiting for you.`),'',true));}
   if(yearReady())rows.unshift(row('btnYear',IC.pack,(LJ?JA[699]:'Your year in Forgelings is ready'),(LJ?Lt(700,[yearShown()]):`A keepsake of ${yearShown()}: the days you showed up, the Forgelings you found and the lines you wrote.`),'',true));
+  {const n=seasonNow();if(n&&state.cards.length&&s==='done'&&!(state.seasons&&state.seasons[seasonKey(n)])&&seasonPress())save();}
   {const n=seasonNow();if(n&&state.cards.length){const got=state.seasons&&state.seasons[seasonKey(n)];
     if(!got||got===state.date)rows.unshift(row('btnSeason',seasonStampSVG(n.s,24,!!got),n.s.name,got?(LJ?Lt(701,[seasonEnd(n)]):`Its stamp is pressed into your journal. Until ${seasonEnd(n)}.`):(LJ?Lt(702,[n.s.line,seasonEnd(n)]):`${n.s.line} Turn over today's card to press its stamp. Until ${seasonEnd(n)}.`),'',!got&&s==='done'));}}
   {const ml=state.cards.length&&state.settings.lore!==false?mapLatest():'';if(ml&&worldEvent(dnum(todayKey())))rows.push(row('btnMapGo',IC.map,(LJ?JA[703]:'The Map'),esc(ml)));}
