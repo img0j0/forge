@@ -16,7 +16,6 @@
  " joined your binder": "がバインダーに加わりました",
  "Today’s Forgeling is in your binder": "今日のフォージリングはバインダーにいます",
  "<button class=\"ghost favswap\" id=\"btnFavBack\">Show {0} here</button>": "<button class=\"ghost favswap\" id=\"btnFavBack\">ここに{0}を表示</button>",
- "{0}<h2>Resting today</h2><p class=\"muted\">Your progress is safe and nothing is lost. A new card arrives tomorrow.</p><button class=\"ghost\" id=\"btnUnrest\">Actually, show me today's card</button><div style=\"width:100%;text-align:left\">{1}</div>": "{0}<h2>今日はお休み</h2><p class=\"muted\">これまでの歩みはそのまま。何も失われません。新しいカードは明日届きます。</p><button class=\"ghost\" id=\"btnUnrest\">やっぱり今日のカードを見る</button><div style=\"width:100%;text-align:left\">{1}</div>",
  "A pack is ready": "パックが届いています",
  "Five new Forgelings, earned by showing up.": "毎日の積み重ねで手に入れた、5体の新しいフォージリング。",
  "Next pack": "次のパック",
@@ -42,11 +41,8 @@
  "It all lives on this phone. A copy once a month keeps it safe.": "すべてこの端末の中にあります。月に一度コピーしておくと安心です。",
  "Keep Forgelings on your home screen": "Forgelingsをホーム画面に",
  "A browser can clear a website’s saved data if it sits unopened for a while. On your home screen, your collection is kept.": "ブラウザは、しばらく開いていないサイトの保存データを消すことがあります。ホーム画面に置けば、コレクションは守られます。",
- "<h2 class=\"sub3\">Latest finds</h2><div class=\"latest shelf\">{0}</div>": "<h2 class=\"sub3\">最近の発見</h2><div class=\"latest shelf\">{0}</div>",
- "{0}<div class=\"herowrap\"><div class=\"hero pixcut\">{1}</div></div>{2}{3}\n    <div class=\"panel-box weekbox\"><div class=\"weekhead\"><h2 class=\"sub3\">This week</h2><span class=\"muted small\">{4} {5} showed up</span></div><div class=\"dots\" role=\"group\" aria-label=\"This week\">{6}</div>\n    {7}</div>": "{0}<div class=\"herowrap\"><div class=\"hero pixcut\">{1}</div></div>{2}{3}\n    <div class=\"panel-box weekbox\"><div class=\"weekhead\"><h2 class=\"sub3\">今週</h2><span class=\"muted small\">{4}{5}来ました</span></div><div class=\"dots\" role=\"group\" aria-label=\"今週\">{6}</div>\n    {7}</div>",
  "day@renderToday": "日",
  "days@renderToday": "日",
  "visit@renderToday": "回",
- "visits@renderToday": "回",
- "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}\">{1}</button><h2>{2} is keeping you company</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>": "<button class=\"herocard\" id=\"btnShowFav\" aria-label=\"{0}\">{1}</button><h2>{2}がそばにいます</h2><p class=\"muted\">{3}{4}</p>{5}{6}{7}<div style=\"width:100%;text-align:left\">{8}</div>"
+ "visits@renderToday": "回"
 }
