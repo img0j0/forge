@@ -21,7 +21,6 @@
  "ember@renderHearth": "残り火",
  "embers@renderHearth": "残り火",
  "{0} is out wandering. Visits start again when they are back.": "{0}は旅に出ています。帰ってきたら、また会いに行けます。",
- "Visits left today: {0} of 3. Play any of the five games.": "今日のふれあい：あと{0}回（3回中）。5つのゲームのどれでも遊べます。",
  "Today's bond visits are complete. Sit together or play just for fun.": "今日の絆のふれあいはおしまい。一緒に座ったり、お楽しみで遊んだりできます。",
  " · has a statue": " · 像あり",
  "<button class=\"chip\" id=\"hCompass\">Ask the compass</button>": "<button class=\"chip\" id=\"hCompass\">羅針盤にたずねる</button>",

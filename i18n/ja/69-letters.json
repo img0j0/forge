@@ -39,7 +39,5 @@
  "<div class=\"csheet\" data-k=\"letters\"><h2>Letters</h2><p class=\"muted small\">Your Forgelings write to you when your book reaches 10, 30, 60 and 100 pages, and on from there.</p><div class=\"group\">{0}</div><div class=\"stack\"><button class=\"ghost\" data-close>Close</button></div></div>": "<div class=\"csheet\" data-k=\"letters\"><h2>手紙</h2><p class=\"muted small\">本が10、30、60、100ページになると、フォージリングが手紙を書いてくれます。その先も続きます。</p><div class=\"group\">{0}</div><div class=\"stack\"><button class=\"ghost\" data-close>閉じる</button></div></div>",
  "<button class=\"outline\" id=\"bookLetters\" style=\"margin-top:6px\">Letters ({0})</button>": "<button class=\"outline\" id=\"bookLetters\" style=\"margin-top:6px\">手紙（{0}）</button>",
  "A letter from {0}": "{0}からの手紙",
- "For your first {0} pages. It is waiting for you.": "最初の{0}ページの記念に。あなたを待っています。",
- "New ribbon: {0}": "新しいリボン：{0}",
- "New ribbon: {0}, and {1} more": "新しいリボン：{0}、ほか{1}本"
+ "For your first {0} pages. It is waiting for you.": "最初の{0}ページの記念に。あなたを待っています。"
 }

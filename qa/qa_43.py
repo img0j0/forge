@@ -98,11 +98,8 @@ with sync_playwright() as p:
     closemodals(pg)
     # ---------- Journal ----------
     pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
-    nm=pg.locator("#view-chronicle .medal").count(); on=pg.locator("#view-chronicle .medal.on").count()
-    rec("Ribbons","ribbons are a grid of medals, earned ones gold",nm>=30 and 1<=on<nm and f"{on} of {nm} earned" in pg.inner_text("#view-chronicle .ribp"),(nm,on))
-    rec("Ribbons","every medal is a 44-point button named for its ribbon",not small(pg,"#view-chronicle .medals") and "First Spark" in pg.inner_text("#view-chronicle .medals"))
-    tap(pg,"#view-chronicle .medal:not(.on)"); mm=mt(pg)
-    rec("Ribbons","tapping a medal shows what it is for and how close you are","so far" in mm and pg.locator("#modal .medal.big").count()==1,mm[:100]); bad+=["ribbon: "+v for v in axe(pg)]; closemodals(pg)
+    nm=pg.locator("#view-chronicle .medal").count()
+    rec("Ribbons","ribbons are retired from the book (0.80)",nm==0 and pg.locator("#view-chronicle .ribp").count()==0,nm)
     tap(pg,"#jWeek"); rec("Journal","This week opens as a sheet","This week" in mt(pg) and pg.locator("#modal .scribe").count()>=1,mt(pg)[:80]); closemodals(pg)
     if pg.locator("#jMonth").count(): tap(pg,"#jMonth"); rec("Journal","the month in words opens as a sheet","Your month in words" in mt(pg)); closemodals(pg)
     s=st(pg); d0=s["date"]
@@ -125,7 +122,6 @@ with sync_playwright() as p:
     rec("Layout","no sideways scroll on Tales at 320 px",pg.evaluate("document.documentElement.scrollWidth")<=320); bad+=["tales light: "+v for v in axe(pg)]
     pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
     rec("Layout","no sideways scroll on the Journal at 320 px",pg.evaluate("document.documentElement.scrollWidth")<=320); bad+=["journal light: "+v for v in axe(pg)]
-    tap(pg,"#view-chronicle .medal"); bad+=["ribbon light: "+v for v in axe(pg)]; closemodals(pg)
     tabto(pg,"hearth"); tap(pg,"#hKeeps"); bad+=["keeps light: "+v for v in axe(pg)]; closemodals(pg)
     rec("A11y","zero accessibility violations on the new pages and sheets, dark and light",not bad,bad[:4])
     rec("All","no page errors (light, 320 px)",not pg._errs,pg._errs[:2]); ctx.close()

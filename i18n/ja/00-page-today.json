@@ -24,7 +24,6 @@
  "The fire has burned low and your Forgelings are asleep.": "火が小さくなり、フォージリングたちは眠っています。",
  "Something new is waiting by the fire. ": "炉ばたに何か新しいものが届いています。",
  "{0} has a small request. ": "{0}からちいさなお願いがあります。",
- "{0} {1} left today.": "今日はあと{0}{1}。",
  "Your companions are here for company.": "仲間たちがそばにいてくれます。",
  "{0} is back from wandering": "{0}が旅から帰ってきました",
  "{0} is out wandering": "{0}は旅に出ています",
@@ -42,7 +41,5 @@
  "Keep Forgelings on your home screen": "Forgelingsをホーム画面に",
  "A browser can clear a website’s saved data if it sits unopened for a while. On your home screen, your collection is kept.": "ブラウザは、しばらく開いていないサイトの保存データを消すことがあります。ホーム画面に置けば、コレクションは守られます。",
  "day@renderToday": "日",
- "days@renderToday": "日",
- "visit@renderToday": "回",
- "visits@renderToday": "回"
+ "days@renderToday": "日"
 }
