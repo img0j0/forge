@@ -4,7 +4,6 @@
  "<img class=\"chb\" src=\"{0}\" alt=\"Wearing the {1}\" title=\"{2}\">": "<img class=\"chb\" src=\"{0}\" alt=\"{1}を身につけています\" title=\"{2}\">",
  "<i class=\"stb\" role=\"img\" aria-label=\"Has a statue\" title=\"Has a statue\"></i>": "<i class=\"stb\" role=\"img\" aria-label=\"像があります\" title=\"像があります\"></i>",
  "<div class=\"cover\" id=\"cover\" role=\"button\" tabindex=\"0\" aria-label=\"Turn the card over\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3l7 6-7 12L5 9z\"/><path d=\"M5 9h14M9 9l3 12M15 9l-3 12\"/></svg></div>": "<div class=\"cover\" id=\"cover\" role=\"button\" tabindex=\"0\" aria-label=\"カードをめくる\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3l7 6-7 12L5 9z\"/><path d=\"M5 9h14M9 9l3 12M15 9l-3 12\"/></svg></div>",
- "<div class=\"chips seg\" role=\"group\" aria-label=\"Map sections\" style=\"--i:{0};--p:{1}\">{2}</div>{3}{4}": "<div class=\"chips seg\" role=\"group\" aria-label=\"地図のセクション\" style=\"--i:{0};--p:{1}\">{2}</div>{3}{4}",
  "<svg class=\"pi inkdrop\" viewBox=\"0 0 6 8\" width=\"6\" height=\"8\" aria-label=\"Ink-touched\" role=\"img\"><path fill=\"#B9A6FF\" d=\"M2 0h2v2h-2zM1 2h4v2h-4zM0 4h6v3h-6zM1 7h4v1h-4z\"/></svg>": "<svg class=\"pi inkdrop\" viewBox=\"0 0 6 8\" width=\"6\" height=\"8\" aria-label=\"インクが入ったしるし\" role=\"img\"><path fill=\"#B9A6FF\" d=\"M2 0h2v2h-2zM1 2h4v2h-4zM0 4h6v3h-6zM1 7h4v1h-4z\"/></svg>",
  "<label class=\"field\"><span>{0}</span><textarea id=\"fb_{1}\" maxlength=\"400\" rows=\"2\" placeholder=\"Totally optional\">{2}</textarea></label>": "<label class=\"field\"><span>{0}</span><textarea id=\"fb_{1}\" maxlength=\"400\" rows=\"2\" placeholder=\"まったくの任意です\">{2}</textarea></label>",
  "<img src=\"{0}\" alt=\"{1}, the Forgeling who sent it\">": "<img src=\"{0}\" alt=\"送り主のフォージリング、{1}\">",
@@ -43,5 +42,6 @@
  " would like to visit": "が遊びに行きたがっています",
  "{0} packs a little bag, ready to visit.": "{0}は小さなかばんに荷物をつめて、出かける準備ができました。",
  "{0} waves goodbye and heads home.": "{0}は手をふって、家に帰っていきました。",
- "<button class=\"chip\" id=\"hVisit\">Send {0} to visit a friend</button>": "<button class=\"chip\" id=\"hVisit\">{0}を友だちのところへ</button>"
+ "<button class=\"chip\" id=\"hVisit\">Send {0} to visit a friend</button>": "<button class=\"chip\" id=\"hVisit\">{0}を友だちのところへ</button>",
+ "<div class=\"chips seg\" role=\"group\" aria-label=\"Map sections\" style=\"--i:{0};--p:{1};--n:{2}\">{3}</div>{4}{5}": "<div class=\"chips seg\" role=\"group\" aria-label=\"地図のセクション\" style=\"--i:{0};--p:{1};--n:{2}\">{3}</div>{4}{5}"
 }
