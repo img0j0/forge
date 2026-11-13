@@ -103,7 +103,7 @@ with sync_playwright() as p:
     rec("Ribbons","every medal is a 44-point button named for its ribbon",not small(pg,"#view-chronicle .medals") and "First Spark" in pg.inner_text("#view-chronicle .medals"))
     tap(pg,"#view-chronicle .medal:not(.on)"); mm=mt(pg)
     rec("Ribbons","tapping a medal shows what it is for and how close you are","so far" in mm and pg.locator("#modal .medal.big").count()==1,mm[:100]); bad+=["ribbon: "+v for v in axe(pg)]; closemodals(pg)
-    tap(pg,"#jWeek"); rec("Journal","This week opens as a sheet","This week" in mt(pg) and "showed up" in mt(pg),mt(pg)[:80]); closemodals(pg)
+    tap(pg,"#jWeek"); rec("Journal","This week opens as a sheet","This week" in mt(pg) and pg.locator("#modal .scribe").count()>=1,mt(pg)[:80]); closemodals(pg)
     if pg.locator("#jMonth").count(): tap(pg,"#jMonth"); rec("Journal","the month in words opens as a sheet","Your month in words" in mt(pg)); closemodals(pg)
     s=st(pg); d0=s["date"]
     import datetime

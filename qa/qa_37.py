@@ -68,8 +68,8 @@ with sync_playwright() as p:
     s["feel"]={days[0]:"good",days[1]:"good",days[2]:"hard",days[3]:"hard",days[4]:"good"}
     s["owns"]=[{"id":1,"text":"Text Mom","k":2,"days":days[:2]}]
     load(pg,s); t=journal(pg); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
-    rec("Month","the month reads in words: days shown up, rests, your own things, how it felt, the hardest week, lines",
-        "Your month in words" in t and "you showed up on 5 days, and rested on 1" in t and "You did “Text Mom” twice." in t and "Most days felt good." in t and "Your hardest week was the first." in t,
+    rec("Month","the month reads in words (0.76: the Scribe tells it, no counts): how it felt, hard days done anyway",
+        "Your month in words" in t and "Some days were hard, and you did them anyway." in t and not re.search(r"\b5 days\b",t),
         [l for l in t.split("\n") if "In " in l][:2])
     rec("Month","no percentages or charts",not re.search(r"\d+\s*%",t))
     bad+=["journal: "+v for v in axe(pg)]
