@@ -27,9 +27,11 @@ This branch holds everything needed to keep building Forgelings in a fresh sessi
 
 ## Making the next version
 
-1. Write `patch57.py` at the top of this folder. It reads `base561.html`, applies count-asserted `rep(old, new)` edits and writes `work.html`. Copy the shape of `history/patch561.py`. Bump the title, `VERSION`, `SEEN_V` (to 57) and add a What's New entry.
-2. Check the script: extract the `<script>` and run `node --check` on it.
-3. Add `qa/qa_44.py` for the new feature, add it to `qa/runall.sh`, and run the full suite.
-4. Ship: `python3 pwa.py`, copy `pwa/` into a clone of `main`, commit, then `git push origin main` and `git push origin main:gh-pages`.
-5. Copy `work.html` to the `ios-app` branch as `forgelings.html`, then run `npm run sync` (and `npm run sync:android`) there, and push. GitHub's Native builds then builds the Android app and compiles the iPhone app.
-6. Here: `cp work.html base57.html`, `git rm` the previous base copy, move `patch57.py` into `history/`, update `forge-handoff.md`, and push this branch.
+`RELEASE_PROCESS.md` is the source of truth; in short:
+
+1. Write `history/patchNNN.py`: it reads the current `baseNNN.html` (see the table above), applies count-asserted `rep(old, new)` edits, writes `work.html` and runs `node --check`. Copy the shape of the latest patch. Bump the title and `VERSION`.
+2. New English text needs its Japanese in `i18n/ja/*.json`; `node i18n/scan.mjs work.html` must show no warnings.
+3. `cp work.html baseNNN.html`, `git rm` the old base, `python3 pwa.py` (builds `app.html` and `pwa/`).
+4. Targeted checks only (Hunter tests each release himself; don't run the full suite): screenshots in English and Japanese, day and night, and `qa_axe` when markup changes.
+5. Update this file's build line, `forge-handoff.md` and `RELEASE_PROCESS.md`, then `SESSION=<chat session URL> tools/ship.sh "message"` (pushes dev, main, gh-pages fast-forward only, and ios-app).
+6. Publish `app.html` to the Claude page, swap the project copy, check the Pages and Native builds runs for the printed SHAs and the live blob, then add the "Shipped" line.
