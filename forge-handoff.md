@@ -78,7 +78,7 @@ Open items:
 - Keep pages short (qa_43 caps page lengths): new features go in sheets (`openHSheet`, `jSheet`, `.csheet`). The Map never shows counts or progress bars.
 - Check class names before adding one: taken include `.fgh`, `.jstamp`, `.rib`, `.face`, `.back`, `.dcard`. CSS keyframe names are global.
 - Games: play pieces draw in front of the Forgeling, never on the fire; check new game art at 320 wide and test with real touch (qa_242 style).
-- Tabs are Today, Hearth, Binder, Map, Settings. Never send players to "the Chronicle".
+- Tabs are Today, Hearth, Binder, Map, Book, Settings (Book since 0.78; it renders inside #view-chronicle). Never send players to "the Chronicle". Six tabs fit at 320 px only with the narrow media query; a seventh needs a rethink.
 
 **World**
 - The world calendar is a pure function of the date (epoch 2026-01-01); ERAS and EVENTS are append-only, so history never changes. Seasons (0.59) are seven fixed real-calendar windows, stamped once a year.
