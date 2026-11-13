@@ -106,3 +106,5 @@ Shipped 0.78.0: main/gh-pages e05903a (Pages success, live blob a9f196a matches)
 Update 0.79.0: patches read base79.html; base78.html removed. One look-back line on Today; On this day and the echo open the book; second reading on the spread; This week off Today. Checked: tools/qa_look79.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_43, qa_37, qa_13.
 Shipped 0.79.0: main/gh-pages 5730522 (Pages success, live blob b3ae84a matches), ios-app e6e8e3f (Native builds success), Claude copy version 133.
 Update 0.80.0: patches read base80.html; base79.html removed. Ribbons retired (backdrops unlock in words), no visits counter. Checked: tools/qa_quiet80.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_43.
+Shipped 0.80.0: main/gh-pages bc2c197 (Pages success, live blob 56567eb matches), ios-app 914a553 (Native builds success), Claude copy version 134.
+Update 0.81.0: patches read base81.html; base80.html removed. The Forge keeps its own count. Checked: tools/qa_forge81.py (English noon, Japanese night), qa_axe2, qa_contrast, qa_35, qa_43.

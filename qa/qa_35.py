@@ -6,7 +6,7 @@ def axe(pg): pg.evaluate(AXE); return pg.evaluate("async()=>{const r=await axe.r
 def load(pg,s):
     s["opens"]=s.get("opens",[])+[s["date"]]  # the dev clock skipped days; an open today keeps the fire from sleeping
     setst(pg,s); pg.reload(); pg.wait_for_timeout(900); closemodals(pg)
-def embers(pg): return pg.evaluate("()=>{const t=document.getElementById('hEmbers');return t?+t.textContent.split(' ')[0]:-1}")
+def embers(pg): return pg.evaluate("()=>{const s=JSON.parse(localStorage.getItem('forge-app-v1'));const seen=new Set();let n=0;(s.history||[]).forEach(h=>{if(h&&h.status==='done'&&!seen.has(h.date)){seen.add(h.date);n+=h.allIn?2:1;}});return Math.max(0,n-((s.forge&&s.forge.spent)||0));}")  # 0.81: the count lives only in the Forge sheet
 def forge_sheet(pg):
     tabto(pg,"hearth")
     if not pg.locator("#hForge").count(): print("DEBUG no hForge; modal:",mt(pg)[:200],"| hearth:",pg.inner_text("#view-hearth")[:200])
@@ -26,12 +26,12 @@ with sync_playwright() as p:
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#titleGo"); first_card(pg); closemodals(pg)
     # ---------- embers from showing up ----------
     tabto(pg,"hearth")
-    rec("Panel","the Forge panel sits at the Hearth, with the ember count and Open the Forge",pg.locator("#view-hearth #hForge").count()==1 and "Forge" in pg.inner_text("#hForge") and embers(pg)==1,embers(pg))
+    rec("Panel","the Forge sits at the Hearth (0.81: no ember count on its button)",pg.locator("#view-hearth #hForge").count()==1 and "Forge" in pg.inner_text("#hForge") and embers(pg)==1,embers(pg))
     s=st(pg); rec("Panel","a fresh save carries the forge record",isinstance(s.get("forge"),dict) and s["forge"]["spent"]==0 and s["forge"]["made"]==[])
     dev(pg,"next"); closemodals(pg); t=do_day(pg); tabto(pg,"hearth")
-    rec("Embers","a done day adds one ember, and the reveal says so","An ember for the Forge" in t and embers(pg)==2,(t[:80],embers(pg)))
+    rec("Embers","a done day adds one ember (0.81: the reveal no longer says so)","for the Forge" not in t and embers(pg)==2,(t[:80],embers(pg)))
     dev(pg,"next"); closemodals(pg); t=do_day(pg,allin=True); tabto(pg,"hearth")
-    rec("Embers","an all-in day adds two","Two embers for the Forge" in t and embers(pg)==4,embers(pg))
+    rec("Embers","an all-in day adds two",embers(pg)==4,embers(pg))
     dev(pg,"next"); closemodals(pg); tabto(pg,"today"); turn_card(pg); pg.wait_for_timeout(400)
     pg.evaluate("()=>{const o=document.getElementById('vOk');o&&o.click()}"); pg.wait_for_timeout(300); pg.tap("#btnRest"); pg.wait_for_timeout(500); closemodals(pg); tabto(pg,"hearth")
     rec("Embers","a rest day adds none and takes none",embers(pg)==4)
@@ -40,7 +40,7 @@ with sync_playwright() as p:
     # ---------- the sheet: every recipe visible, nothing affordable without spares ----------
     t=forge_sheet(pg)
     names=["Charm of Meadow","Charm of Ember","Charm of Tide","Charm of Frost","Charm of Dusk","Wanderer’s bell","Compass","A copper kettle","An iron stand","Wind chimes"]
-    rec("Sheet","all ten recipes are listed (with the 0.41 lantern and the 0.45 relics, sixteen), each saying what it needs",all(n in t for n in names) and t.count("Needs ")==16 and "0 of 16 pieces made" in t,t[:200])
+    rec("Sheet","all ten recipes are listed (with the 0.41 lantern and the 0.45 relics, sixteen), each saying what it needs",all(n in t for n in names) and t.count("Needs ")==16 and "pieces made" not in t,t[:200])
     rec("Sheet","with no spares, nothing can be made yet, and the reason is shown",pg.locator("#modal [data-fmake]").count()==0 and "(you have 0 and" in t)
     rec("Sheet","the sheet says who signs the piece",re.search(r"Today that is \S",t) is not None)
     bad+=["forge sheet: "+v for v in axe(pg)]
@@ -109,13 +109,13 @@ with sync_playwright() as p:
         s=st(pg); s["forge"]["spent"]=0; load(pg,s)
         forge_sheet(pg); pg.tap(f"#modal [data-fmake='{pid}']"); pg.wait_for_timeout(500); closemodals(pg)
     s=st(pg); tabto(pg,"hearth")
-    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and ("6 of 16 pieces made" in (pg.evaluate("document.getElementById('hForge').click()") or "")+mt(pg)) and closemodals(pg) is None)
+    rec("Hearth","kettle, stand and chimes are made and listed as forged",all(x in s["forge"]["made"] for x in ("kettle","stand","chimes")) and ("pieces made" not in (pg.evaluate("document.getElementById('hForge').click()") or "")+mt(pg)) and closemodals(pg) is None)
     pm=pg.evaluate("async()=>{const cv=document.getElementById('hearthCv'),x=cv.getContext('2d');const px=(X,Y)=>Array.from(x.getImageData(X,Y,1,1).data).slice(0,3);const diff=(a,b)=>Math.max(...a.map((v,i)=>Math.abs(v-b[i])));let best=0,kettle=false;for(let s=0;s<8;s++){let legs=0;for(let y=55;y<=57;y++){if(diff(px(57,y),px(55,y))>12&&diff(px(71,y),px(73,y))>12)legs++;}best=Math.max(best,legs);const k=px(78,58);if(k[0]>k[1]&&k[1]>k[2]&&k[0]<240)kettle=true;await new Promise(r=>setTimeout(r,120));}return [best,kettle]}")
     rec("Hearth","the iron stand's legs and the copper kettle are drawn into the fire scene (sampled over a second, past the sparks)",pm[0]==3 and pm[1],pm)
     t=forge_sheet(pg)
     rec("Hearth","made pieces show their signature instead of a Make button",t.count("Forged by ")==6 and pg.locator("#modal [data-fmake]").count()<=4 and pg.locator("#modal [data-fmake='kettle'],#modal [data-fmake='bell'],#modal [data-fmake='compass']").count()==0,t.count("Forged by "))
     closemodals(pg); tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('.tab[data-tab=\"book\"]');b&&b.click()}"); pg.wait_for_timeout(400); rb=pg.inner_text("#view-chronicle")
-    rec("Ribbons","the ribbons list names First Forging and Smith","First Forging" in rb and "Smith" in rb)
+    rec("Ribbons","ribbons are retired (0.80): no list to name First Forging and Smith","First Forging" not in rb)
     # ---------- older saves, damaged saves ----------
     s=st(pg); del s["forge"]; load(pg,s); s2=st(pg); tabto(pg,"hearth")
     rec("Migrate","a save without the Forge gets one, with embers for every day shown up so far",s2["forge"]["spent"]==0 and s2["forge"]["made"]==[] and embers(pg)==4,(s2["forge"],embers(pg)))

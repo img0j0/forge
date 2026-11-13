@@ -46,7 +46,7 @@ with sync_playwright() as p:
     rec("Hearth","one grid holds Sit with, Snack, Story, Play, Wander and Forge",ids==["hAffection","hSnack","hStory","hPlay","hWander","hForge"],ids)
     rec("Hearth","every Hearth button is 44 points or more",not small(pg,"#view-hearth"),small(pg,"#view-hearth"))
     rec("Hearth","no folding sections are left on the Hearth",pg.locator("#view-hearth details").count()==0)
-    rec("Hearth","the ember count is on the Forge button",re.search(r"\d+ embers?",pg.inner_text("#hEmbers")) is not None,pg.inner_text("#hEmbers"))
+    rec("Hearth","the Forge button counts nothing (0.81)",re.search(r"\d",pg.inner_text("#hForge")) is None,pg.inner_text("#hForge"))
     tap(pg,"#hShelf"); mm=mt(pg)
     rec("Sheets","Curio shelf opens as a sheet with the planks and Send a curio",pg.locator("#modal .shelf .scur").count()>=20 and pg.locator("#modal #hGift").count()==1 and "Curio shelf" in mm,mm[:80])
     bad+=["shelf: "+v for v in axe(pg)]
