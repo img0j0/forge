@@ -112,3 +112,4 @@ Shipped 0.81.0: main/gh-pages 0cdd1ef (Pages success, live blob b3d699f matches)
 Update 0.81.1: patches read base811.html; base81.html removed. The Map/Tales switch takes its column count from --n. Checked: switch width and highlight, English 390 and Japanese 320.
 Shipped 0.81.1: main/gh-pages 1336c76 (Pages success, live blob 80fe41c matches), ios-app c0a7715 (Native builds success), Claude copy version 136.
 Update 0.82.0: patches read base82.html; base811.html removed. The Book tab is the book. Checked: tools/qa_booktab82.py (English noon 390, Japanese night 320), qa_axe2, qa_contrast, qa_43, qa_37, qa_13, qa_38, qa_scribe76, qa_tuck77, qa_look79.
+Shipped 0.82.0: main/gh-pages d936c2d (Pages success, live blob 528e8ee matches), ios-app a758149 (Native builds success), Claude copy version 137.
