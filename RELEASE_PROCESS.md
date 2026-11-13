@@ -98,3 +98,4 @@ Shipped 0.74.0: main/gh-pages ec8094d (Pages success, live blob 5d2ba5b matches)
 Update 0.75.0: patches read base75.html; base74.html removed. The book in chapters. Checked: a 21-check book test (English day, 320 px, 768 px; Japanese night), qa_axe2, qa_contrast, qa_43.
 Shipped 0.75.0: main/gh-pages d55fd68 (Pages success, live blob 3efee1f matches), ios-app 7df29bd (Native builds success), Claude copy version 128.
 Update 0.76.0: patches read base76.html; base75.html removed. The Scribe's chapters. qa_43 and qa_37 updated on purpose. Checked: tools/qa_scribe76.py (English day, Japanese night), qa_axe2, qa_contrast, qa_43, qa_37.
+Shipped 0.76.0: main/gh-pages 594251c (Pages success, live blob 58ca4d1 matches), ios-app b400ff0 (Native builds success), Claude copy version 129.
