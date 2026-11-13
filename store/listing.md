@@ -56,20 +56,25 @@ Forgelings is a small, independent app, shaped by a group of early testers. Than
 
 ## Screenshots
 
-`screens/forgelings-1.png` to `forgelings-7.png`, 1320 x 2868 (iPhone 6.9-inch), in the field journal look. **They date from 0.48 (October 31): retake them before submission** so they show the three-card choice, the 0.72 card backs, a written page with a postcard and a season by the fire. Apple scales these
-down for the smaller iPhone sizes, so one set is enough. Upload them in order:
+`screens/forgelings-1.png` to `forgelings-8.png` (English) and `screens-ja/` (Japanese), 1320 x 2868 (iPhone 6.9-inch), no
+alpha. Retaken November 12, 2026 from 0.73.1, from a 110-day save played through real taps (184 Forgelings, ending
+December 15 with First Snow at the Hearth). Apple scales these down for the smaller iPhone sizes, so one set per language
+is enough. Upload them in order:
 
-1. One small thing a day (Today)
-2. Each one drawn just for you (a rare Forgeling, close up)
-3. They keep you company (the Hearth, by lamplight)
-4. A binder that fills up (the Binder)
-5. A map that draws itself (the Map)
-6. Make things together (the Forge)
-7. Kind by design
+1. One small thing a day (the three-card choice on a fresh morning)
+2. Each one drawn just for you (a Forgeling close up)
+3. A journal that writes itself (Closing the day: the page, a photo postcard and your words)
+4. They keep you company (the Hearth at night)
+5. A binder that fills up (the Binder)
+6. A map that draws itself (the Map)
+7. Make things together (the Forge)
+8. Kind by design
 
-Rebuild: `python3 build-www.py`, serve `www/` over http, then `shots.py URL SAVE.json RAW_DIR QA_DIR` (raw captures of the
-store edition from a lived-in save; the dev branch's `qa/` supplies the helpers) and `compose.py RAW_DIR FONTS_CSS screens`
-(captions, desk, tape). FONTS_CSS is the app's own `@font-face` rules, pulled out of the build.
+Rebuild: on the dev branch, `python3 tools/lived_save.py SAVE.json 2026-08-27 110 11` (about an hour; then give the last
+day a postcard and your words if it has none). Here: `python3 build-www.py`, serve `www/` over http, then
+`python3 store/shots.py URL SAVE.json RAW_DIR ../forge/qa [en|ja]` and
+`python3 store/compose.py RAW_DIR FONTS_CSS screens [en|ja]` (FONTS_CSS: the build's `@font-face` rules). For the
+Japanese set, write the last day's own words in Japanese in the save first.
 
 ## App Privacy
 

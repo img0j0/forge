@@ -112,4 +112,4 @@ Then press Play again. To rebuild a native project from scratch: delete `ios/` (
 | `ios/App/ForgelingsWidget/` | The iPhone widget extension: the home-screen widget and the wandering Live Activity (`ForgelingsWidget.swift`). The app feeds it through `App/WidgetBridgePlugin.swift` and the App Group; `App/WanderAttributes.swift` is shared by both |
 | `tools/add-widget.cjs` | Added the widget extension target to the Xcode project (already done; safe to run again) |
 | `.github/workflows/native.yml` | Builds the Android app and compiles the iPhone app on GitHub, checking the plugin and widget extension are inside |
-| `store/` | App Store listing (`listing.md`), screenshots (`screens/`, from 0.48; retake before submission) and the scripts that make them (`shots.py`, `compose.py`) |
+| `store/` | App Store listing (`listing.md`), screenshots (`screens/` English, `screens-ja/` Japanese, from 0.73.1) and the scripts that make them (`shots.py`, `compose.py`) |
