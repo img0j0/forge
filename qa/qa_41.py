@@ -32,7 +32,7 @@ with sync_playwright() as p:
     labels=pg.evaluate("[...document.querySelectorAll('.mapsvg text')].map(t=>t.textContent)")
     rec("Names","a dark-mood player sees the bright names on the front of the map","Meadow" in labels and "Bramble" not in labels,labels)
     tabto(pg,"hearth"); shelf=pg.inner_text("#hShelf")
-    rec("Hidden","the curio shelf counts the 20 front curios only","of 20" in shelf and pg.locator("#view-hearth .sside").count()==0,shelf)
+    rec("Hidden","before the lantern the shelf shows only the front side (no count since 0.83.1)",pg.locator("#view-hearth .sside").count()==0,shelf)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('[data-sub=\"tales\"]').click()"); pg.wait_for_timeout(300)
     rec("Hidden","no Shade tales before the lantern","Tales from the other side" not in pg.inner_text("#view-chronicle"))
     pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(300)
@@ -89,7 +89,7 @@ with sync_playwright() as p:
     closemodals(pg)
     # ---------- shelf, tales, ribbons ----------
     hsheet(pg,"shelf"); shelf=mt(pg)
-    rec("Shelf","the shelf turns over too: ten planks, the other side labelled, counting 40","The other side" in shelf and "of 40" in shelf and pg.locator("#modal .srow").count()==10 and "Across from Ember, not crossed yet" in shelf,shelf[:200])
+    rec("Shelf","the shelf turns over too: ten planks, the other side labelled, no count since 0.83.1","The other side" in shelf and pg.locator("#modal .srow").count()==10 and "Across from Ember, not crossed yet" in shelf,shelf[:200])
     pg.tap(f"#modal [data-cur='{got[0]}']"); pg.wait_for_timeout(400); m=mt(pg)
     rec("Shelf","a Shade curio opens with its own art and tale page",pg.locator("#modal .cbig img").count()==1 and "The Keepers of the Edge" in m,m[:120]); closemodals(pg)
     other=[k for k in ("cinder","obsidian") if k not in st(pg)["curios"]][0]

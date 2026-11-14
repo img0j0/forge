@@ -40,6 +40,6 @@ with sync_playwright() as p:
     s2=st(pg); ok=isinstance(s2,dict) and isinstance(s2.get("cards"),list)
     rec("Monkey",f"seed {SEED}: {n} random actions, no page errors",not fails,fails[:2])
     rec("Monkey",f"seed {SEED}: the save is still valid and loads cleanly afterwards",ok and bool(pg.reload() or True) and not pg._errs,"")
-    pg.wait_for_timeout(500); rec("Monkey",f"seed {SEED}: still renders after reload",pg.locator('.tab').count()==5 and not pg._errs,pg._errs[:1])
+    pg.wait_for_timeout(500); rec("Monkey",f"seed {SEED}: still renders after reload",pg.locator('.tab').count()==6 and not pg._errs,pg._errs[:1])
     b.close()
 print(sum(r["ok"] for r in RES),"/",len(RES))

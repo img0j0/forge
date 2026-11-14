@@ -39,7 +39,7 @@ with sync_playwright() as p:
         ms=pg.evaluate("(s)=>new Date(s).getTime()-window.__real()",day+"T"+rng.choice(["08:10","12:30","19:45","22:20"])+":00"); pg.evaluate("(v)=>window.__setOff(v)",ms); pg.reload(); pg.wait_for_timeout(700)
     pg.goto(P); pg.wait_for_selector("#ageGo, #titleGo")
     start=datetime.date(2026,10,20); go(start.isoformat()); first_card(pg); settle(pg)
-    day=start; played=0; echoes=0; packs_opened=0; visits=0; wanders=0; collected=0; journal=0; rests=0; gaps=0; mirrors=0; relights=0
+    day=start; looks=0; played=0; echoes=0; packs_opened=0; visits=0; wanders=0; collected=0; journal=0; rests=0; gaps=0; mirrors=0; relights=0
     while (day-start).days<DAYS:
         r=rng.random()
         if r<0.08: day+=datetime.timedelta(days=rng.choice([3,4,6])); gaps+=1
@@ -69,12 +69,20 @@ with sync_playwright() as p:
                 else: bad(k,"no mirror line after doing the calling")
         else: bad(k,"no Turn over button on a fresh day")
         # echo
-        if pg.locator("#view-today .echo").count():
-            echoes+=1; echo_days.append(day); et=pg.inner_text("#view-today .echo")
+        # 0.79: the echo is the On this day line, titled with when it was found; it opens the book at that day,
+        # where the second reading is one tap away (or the second reading itself when the day has no page)
+        lb=pg.evaluate("()=>['btnClose','btnLetter','btnYear','btnZine','btnOtd'].filter(i=>document.getElementById(i))")
+        if len(lb)>1: bad(k,"more than one look-back line: "+",".join(lb))
+        if lb: looks+=1
+        if pg.locator("#view-today #btnOtd").count():
+            et=pg.inner_text("#view-today #btnOtd")
+            if pg.inner_text("#view-today #btnOtd b").strip()!="On this day": echoes+=1; echo_days.append(day)
             if JUNK.search(et): bad(k,"junk in echo: "+et)
-            click(pg,"#view-today .echo [data-kept]"); m=pg.evaluate("document.getElementById('modal').innerText")
-            if "Second reading" not in m: bad(k,"echo did not open a Second reading")
-            settle(pg)
+            click(pg,"#view-today #btnOtd"); pg.wait_for_timeout(400)
+            if pg.locator("#view-chronicle .bday [data-kept]").count(): click(pg,"#view-chronicle .bday [data-kept]")
+            m=pg.evaluate("document.getElementById('modal').innerText")
+            if "Second reading" not in m and not pg.locator("#view-chronicle .bday").count(): bad(k,"On this day opened neither its page nor a Second reading")
+            settle(pg); tabto(pg,"today")
         # packs
         while vis(pg,"#btnPack"):
             n0=len(st(pg)["cards"]); click(pg,"#btnPack"); settle(pg,40); packs_opened+=1
@@ -124,7 +132,7 @@ with sync_playwright() as p:
     final=st(pg)
     rec("Journey",f"{DAYS} days of real use (seed {SEED}) with no errors and a consistent save",not problems,problems[:4])
     rec("Journey","every day the calling was done, the mirror line appeared",played>0 and mirrors==played,(played,mirrors))
-    rec("Journey","echoes appeared on anniversaries and opened their Second reading",echoes>=3,echoes)
+    rec("Journey","Today offers one look-back line on most days, never two; On this day opens its page or its Second reading (0.79)",looks>=DAYS//3,(looks,echoes))
     gapsE=[(b2-a2).days for a2,b2 in zip(echo_days,echo_days[1:])]
     rec("Journey","echoes stay occasional: never two within a week",all(g>=7 for g in gapsE) and echoes<=DAYS//7+1,(echoes,min(gapsE) if gapsE else None))
     rec("Journey","packs earned along the way all opened with five cards",packs_opened>=3,packs_opened)

@@ -119,3 +119,5 @@ Update 0.82.2: patches read base822.html; base821.html removed. A way out of the
 Shipped 0.82.2: main/gh-pages dfc0ceb (Pages success, live blob e578cc6 matches), ios-app 9bfbdc6 (Native builds success), Claude copy version 139.
 Update 0.83.0: patches read base83.html; base822.html removed. What's New current (SEEN_V 56); unused code and 30 orphaned Japanese entries removed. Checked: qa_17 over http, qa_axe2, qa_contrast, qa_43, tools/qa_booktab82.py, What's New en/ja.
 Shipped 0.83.0: main/gh-pages 3c12576 (Pages success, live blob d0e9ac6 matches), ios-app c50229e (Native builds success), Claude copy version 140.
+Full run on 0.83.0 (November 14): every suite passes after bringing 23 suites up to date with 0.74 to 0.83 (they still expected the Journal calendar, ribbons, This week on Today, the ember count, eight What's New notes, five tabs, the three-part switch); qa_ref regenerated; qa_52 intermittent (device check).
+Update 0.83.1: patches read base831.html; base83.html removed. The curio shelf stops counting. Checked: qa_41 47/47, qa_axe2, shelf chip and sheet en/ja.
