@@ -26,7 +26,6 @@
  "You wanted a clear head, so I took the quietest path I could find.": "頭をすっきりさせたいって言ってたから、いちばん静かな道を選んだよ。",
  "You were somewhere far away, dreaming, so I followed the strangest trail.": "遠くで夢を見てたみたいだから、いちばん不思議な道をたどってみた。",
  "<div class=\"road\"><p class=\"muted small\" style=\"margin:0 0 6px\">A postcard from the road</p><figure class=\"pcard gift\"><img src=\"{0}\" alt=\"A drawing of {1}, sent by {2}\" width=\"{3}\" height=\"{4}\"><figcaption>{5}</figcaption></figure><p class=\"small\" style=\"margin:6px 0 0;text-align:right\">— {6}</p></div>": "<div class=\"road\"><p class=\"muted small\" style=\"margin:0 0 6px\">旅先からのポストカード</p><figure class=\"pcard gift\"><img src=\"{0}\" alt=\"{2}が送ってくれた、{1}の絵\" width=\"{3}\" height=\"{4}\"><figcaption>{5}</figcaption></figure><p class=\"small\" style=\"margin:6px 0 0;text-align:right\">— {6}</p></div>",
- "<p class=\"muted center small\">{0}</p><h2 class=\"center\">{1}</h2>{2}{3}{4}{5}<div class=\"stack\"><button class=\"primary\" data-close>Close the book</button></div>": "<p class=\"muted center small\">{0}</p><h2 class=\"center\">{1}</h2>{2}{3}{4}{5}<div class=\"stack\"><button class=\"primary\" data-close>本を閉じる</button></div>",
  "A postcard came from the road. ": "旅先からポストカードが届きました。",
  "On this day": "この日のページ",
  "A year ago today, you wrote a page. Have a look.": "一年前の今日、ページを書いていました。のぞいてみましょう。",

@@ -164,10 +164,6 @@
  "At 10 pages, it is bound in leather.": "10ページで、革の装丁になります。",
  "At 30, it gets a ribbon that opens to an old page.": "30ページで、昔のページを開くリボンがつきます。",
  "Every page from here is just for you.": "ここから先のページは、すべてあなただけのものです。",
- "page@bookHTML": "ページ",
- "pages@bookHTML": "ページ",
- "No pages yet. Every day you show up writes one for you.": "まだページはありません。来た日ごとに、1ページ書かれていきます。",
- "<button class=\"outline\" id=\"bookRibbon\" style=\"margin-top:6px\">Open to an old page</button>": "<button class=\"outline\" id=\"bookRibbon\" style=\"margin-top:6px\">昔のページを開く</button>",
  "Sixty pages. The Scribe has come to your Hearth.": "60ページ。書記が炉ばたにやってきました。",
  "<p class=\"muted\">Your journal starts with your first card. Every day you show up writes a page. It stays on this device.</p>": "<p class=\"muted\">日記は最初のカードから始まります。来た日ごとに1ページ書かれます。この端末の中だけに残ります。</p>",
  "<button class=\"outline\" id=\"jLines\" style=\"width:100%;margin-top:6px\">All your pages ({0})</button>": "<button class=\"outline\" id=\"jLines\" style=\"width:100%;margin-top:6px\">すべてのページ（{0}）</button>",
@@ -181,7 +177,6 @@
  "Add your own words, and ink today’s Forgeling": "自分のことばを添えて、今日のフォージリングを描き入れる",
  "Add your own words to the journal": "日記に自分のことばを添える",
  "A mailbox": "郵便受け",
- "{0} {1} in your journal. Every day you show up writes one for you.": "日記に{0}{1}。来た日ごとに、1ページ書かれていきます。",
  "A {0} day.": "「{0}」の日。",
  "{0} asks: {1}": "{0}からの問い：{1}"
 }

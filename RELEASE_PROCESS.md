@@ -117,3 +117,4 @@ Update 0.82.1: patches read base821.html; base82.html removed. The back of the b
 Shipped 0.82.1: main/gh-pages 6a5a90b (Pages success, live blob 740ed45 matches), ios-app 5c8c350 (Native builds success), Claude copy version 138.
 Update 0.82.2: patches read base822.html; base821.html removed. A way out of the book (cover = closed book, Close the book inside). Checked: tools/qa_booktab82.py, qa_axe2, qa_contrast, qa_43, qa_37, qa_38.
 Shipped 0.82.2: main/gh-pages dfc0ceb (Pages success, live blob e578cc6 matches), ios-app 9bfbdc6 (Native builds success), Claude copy version 139.
+Update 0.83.0: patches read base83.html; base822.html removed. What's New current (SEEN_V 56); unused code and 30 orphaned Japanese entries removed. Checked: qa_17 over http, qa_axe2, qa_contrast, qa_43, tools/qa_booktab82.py, What's New en/ja.

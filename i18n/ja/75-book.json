@@ -6,7 +6,6 @@
  "<div class=\"zpage zback\">{0}<p class=\"zend\">The end of {1}.</p><div class=\"stack\"><button class=\"ghost\" data-bkpic=\"{2}\">Save {3} as a picture</button></div></div>": "<div class=\"zpage zback\">{0}<p class=\"zend\">{1}はここでおしまい。</p><div class=\"stack\"><button class=\"ghost\" data-bkpic=\"{2}\">{3}を画像として保存</button></div></div>",
  "{0}, still being written": "{0}（まだ書きかけ）",
  "one page": "1ページ",
- "<button class=\"primary\" id=\"bookOpen\" style=\"margin-top:6px\">Open your book</button>": "<button class=\"primary\" id=\"bookOpen\" style=\"margin-top:6px\">本をひらく</button>",
  "A month by the fire": "火のそばのひと月",
  "A month of good company": "いい仲間に恵まれたひと月",
  "Friends by the fire": "火のそばの友だち",
