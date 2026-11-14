@@ -50,12 +50,12 @@ Forgelingsは、初期のテスターのみなさんと一緒に育ててきた�
 
 ## Screenshots
 
-`ios-app/store/screens-ja/forgelings-1.png` to `-8.png` (retaken November 12, 2026 from 0.73.1; how to rebuild them is in
+`ios-app/store/screens-ja/forgelings-1.png` to `-8.png` (retaken November 14, 2026 from 0.83.1; how to rebuild them is in
 `store/listing.md`). Captions:
 
 1. 一日ひとつ、小さなこと
 2. どの子も、あなたのために
-3. ひとりでに書かれていく日記
+3. あなたの日々が、一冊の本に
 4. 火のそばで、いつも一緒
 5. 少しずつ埋まっていくバインダー
 6. ひとりでに描かれていく地図
