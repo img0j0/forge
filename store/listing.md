@@ -57,8 +57,8 @@ Forgelings is a small, independent app, shaped by a group of early testers. Than
 ## Screenshots
 
 `screens/forgelings-1.png` to `forgelings-8.png` (English) and `screens-ja/` (Japanese), 1320 x 2868 (iPhone 6.9-inch), no
-alpha. Retaken November 12, 2026 from 0.73.1, from a 110-day save played through real taps (184 Forgelings, ending
-December 15 with First Snow at the Hearth). Apple scales these down for the smaller iPhone sizes, so one set per language
+alpha. Retaken November 14, 2026 from 0.83.1 (slide 3 is now the book), from a 110-day save played through real taps
+(184 Forgelings, ending December 15 with First Snow at the Hearth). Apple scales these down for the smaller iPhone sizes, so one set per language
 is enough. Upload them in order:
 
 1. One small thing a day (the three-card choice on a fresh morning)
