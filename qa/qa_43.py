@@ -108,7 +108,7 @@ with sync_playwright() as p:
     for i in range(6):
         k=(datetime.date.fromisoformat(d0)-datetime.timedelta(days=i)).isoformat(); s["journal"][k]={"text":f"Line number {i}","v":0}
     load(pg,s); tabto(pg,"chronicle"); pg.evaluate("document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
-    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)
+    pg.evaluate("(()=>{const o=document.getElementById('bkOpenB');if(o)o.click();for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)
     rec("Journal","the back of the book has a way to all your pages (0.82)",pg.locator("#jLines").count()==1)
     tap(pg,"#jLines"); rec("Journal","…which lists them all",pg.locator("#modal .calling").count()>=6,pg.locator("#modal .calling").count()); closemodals(pg)
     bad+=["journal dark: "+v for v in axe(pg)]

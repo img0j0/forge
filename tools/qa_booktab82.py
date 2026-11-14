@@ -32,17 +32,20 @@ with sync_playwright() as p:
     chk('Back and Next turn pages in place',a1!='d:2026-12-01' and at(pg)=='d:2026-12-01',a1)
     pg.click('#bkLatest');pg.wait_for_timeout(300);chk('Latest page goes to the newest spread',at(pg)=='d:'+max(k for k in [h['date'] for h in S['history'] if h['status']=='done']),at(pg))
     chk('…and is disabled there',pg.evaluate("document.getElementById('bkLatest').disabled"))
-    pg.click('#bkToc');pg.wait_for_timeout(300);chk('Contents',at(pg)=='t')
+    rb=at(pg);pg.click('#bkToc');pg.wait_for_timeout(300);chk('Contents (the ribbon stays where it was, 0.82.2)',pg.locator('#view-chronicle .btoc').count()==1 and at(pg)==rb,at(pg))
     rows=pg.locator('#view-chronicle .bkwk').count();chk('the last five weeks are rows in the contents',rows>=4,rows)
     chk('every contents row and book button is 44 pt',small(pg,'#view-chronicle .btrow, #view-chronicle .jbook button')==0,small(pg,'#view-chronicle .btrow, #view-chronicle .jbook button'))
     chk('no sideways scroll on the contents',not wide(pg));pg.screenshot(path=f'{out}/contents.png',full_page=True)
     v=axe(pg);chk('axe on the contents',not v,v)
     pg.locator('#view-chronicle .bkwk').first.click();pg.wait_for_timeout(300);chk('a week row opens its first page',(at(pg) or '').startswith('d:') and pg.locator('#view-chronicle .bday').count()==1,at(pg))
     # cover
-    pg.evaluate("()=>{for(let i=0;i<300&&!document.getElementById('bkPrev').disabled;i++)document.getElementById('bkPrev').click()}");pg.wait_for_timeout(300)
-    chk('the cover keeps the binding line',pg.locator('#view-chronicle .bcovnx').count()==1 and at(pg)=='c',at(pg));v=axe(pg);chk('axe on the cover',not v,v);pg.screenshot(path=f'{out}/cover.png')
+    pg.evaluate("()=>{for(let i=0;i<300&&document.getElementById('bkPrev');i++)document.getElementById('bkPrev').click()}");pg.wait_for_timeout(300)
+    chk('0.82.2: the cover is the closed book (Open the book, no Back)',pg.locator('#bkOpenB').count()==1 and pg.locator('#bkPrev').count()==0)
+    rib=at(pg);pg.click('#bkOpenB');pg.wait_for_timeout(300);chk('0.82.2: Open the book goes back to the ribbon (the last page read)',at(pg)==rib and pg.locator('#bkClose').count()==1,(rib,at(pg)))
+    pg.click('#bkClose');pg.wait_for_timeout(300);chk('0.82.2: Close the book from the tab goes to the cover',pg.locator('#bkOpenB').count()==1)
+    chk('the cover keeps the binding line',pg.locator('#view-chronicle .bcovnx').count()==1);v=axe(pg);chk('axe on the cover',not v,v);pg.screenshot(path=f'{out}/cover.png')
     # back
-    pg.evaluate("()=>{for(let i=0;i<400&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()}");pg.wait_for_timeout(300)
+    pg.evaluate("document.getElementById('bkOpenB')&&document.getElementById('bkOpenB').click()");pg.wait_for_timeout(200);pg.evaluate("()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()}");pg.wait_for_timeout(300)
     ids=pg.evaluate("[...document.querySelectorAll('#view-chronicle .bback button')].map(b=>b.id)")
     chk('the back holds what sat beside the book',all(x in ids for x in ['jWeek','jSeasons','jYear','jLines','bookLetters','bookRibbon']),ids)
     v=axe(pg);chk('axe on the back',not v,v);pg.screenshot(path=f'{out}/back.png',full_page=True)
@@ -55,6 +58,7 @@ with sync_playwright() as p:
     if pg.locator('#btnOtd').count():
         pg.click('#btnOtd');pg.wait_for_timeout(600)
         chk('On this day opens the Book tab at that day',pg.evaluate("document.querySelector('.tab[data-tab=book]').getAttribute('aria-current')")=='page' and at(pg)=='d:'+mago and pg.locator('#view-chronicle .bday').count()==1,at(pg))
+        pg.click('#bkClose');pg.wait_for_timeout(400);chk('0.82.2: Close the book goes back to Today',pg.evaluate("document.querySelector('.tab[data-tab=today]').getAttribute('aria-current')")=='page')
     else: chk('On this day offered',False)
     # the echo: second reading shows on its day
     s3=copy.deepcopy(s2);s3['history']=[h for h in s3['history'] if h['date']!=mago];s3['journal'].pop(mago,None);(s3.get('ask') or {}).pop(mago,None);(s3.get('posts') or {}).pop(mago,None)

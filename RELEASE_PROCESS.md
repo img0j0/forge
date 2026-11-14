@@ -115,3 +115,4 @@ Update 0.82.0: patches read base82.html; base811.html removed. The Book tab is t
 Shipped 0.82.0: main/gh-pages d936c2d (Pages success, live blob 528e8ee matches), ios-app a758149 (Native builds success), Claude copy version 137.
 Update 0.82.1: patches read base821.html; base82.html removed. The back of the book is an index; the book's ink holds at night. Checked: tools/qa_booktab82.py (English day and night 390, Japanese night 320), qa_contrast.
 Shipped 0.82.1: main/gh-pages 6a5a90b (Pages success, live blob 740ed45 matches), ios-app 5c8c350 (Native builds success), Claude copy version 138.
+Update 0.82.2: patches read base822.html; base821.html removed. A way out of the book (cover = closed book, Close the book inside). Checked: tools/qa_booktab82.py, qa_axe2, qa_contrast, qa_43, qa_37, qa_38.

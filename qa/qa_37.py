@@ -26,7 +26,7 @@ with sync_playwright() as p:
     pg.tap("#askAgain"); pg.wait_for_timeout(300)
     rec("Feel","Change the answer takes it back",st(pg)["feel"]=={})
     pg.tap("#view-today .facebtn[data-ask='2']"); pg.wait_for_timeout(300)
-    t=journal(pg); pg.evaluate("document.getElementById('bkLatest')&&document.getElementById('bkLatest').click()"); pg.wait_for_timeout(200); t=pg.inner_text("#view-chronicle")  # 0.82: the latest spread
+    t=journal(pg); pg.evaluate("(document.getElementById('bkOpenB')&&document.getElementById('bkOpenB').click(),document.getElementById('bkLatest')&&document.getElementById('bkLatest').click())"); pg.wait_for_timeout(200); t=pg.inner_text("#view-chronicle")  # 0.82: the latest spread
     rec("Journal","the Journal's page for the day says how it felt","hard" in t.lower(),t[:300])
     rec("Book","the book's cover keeps its pages and what binding comes next (0.82)","Your book" in (t:=journal(pg)) and ("pages" in t or "One page" in t) and pg.locator("#view-chronicle .bcovnx").count()==1,t[:200])
     # ink
@@ -60,7 +60,7 @@ with sync_playwright() as p:
             "gold":"gold edges and a clasp" in lab}[expect]
         rec("Book",f"{L} lines: {expect}",ok,(lab,t[:160].replace("\n"," | ")))
     rec("Book","pages count in total, never in a row: gaps of three days still count",bool(re.search(r"(10\d|1[1-9]\d) pages",t)),t[:200])
-    pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)  # 0.82: the old page sits at the back of the book
+    pg.evaluate("(()=>{const o=document.getElementById('bkOpenB');if(o)o.click();for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.wait_for_timeout(200)  # 0.82: the old page sits at the back of the book
     pg.tap("#bookRibbon"); pg.wait_for_timeout(500); m=mt(pg)
     rec("Ribbon","the ribbon opens to an old line","The ribbon falls open at" in m and "line " in m)
     bad+=["ribbon: "+v for v in axe(pg)]; closemodals(pg)
@@ -69,7 +69,7 @@ with sync_playwright() as p:
     s["history"]=[h for h in s["history"] if not h["date"].startswith(ym)]+[{"date":d,"status":"done","v":4} for d in days[:5]]+[{"date":days[5],"status":"rest","v":2}]
     s["feel"]={days[0]:"good",days[1]:"good",days[2]:"hard",days[3]:"hard",days[4]:"good"}
     s["owns"]=[{"id":1,"text":"Text Mom","k":2,"days":days[:2]}]
-    load(pg,s); t=journal(pg); pg.evaluate("(()=>{for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
+    load(pg,s); t=journal(pg); pg.evaluate("(()=>{const o=document.getElementById('bkOpenB');if(o)o.click();for(let i=0;i<400&&document.getElementById('bkNext')&&!document.getElementById('bkNext').disabled;i++)document.getElementById('bkNext').click()})()"); pg.evaluate("document.getElementById('jMonth').click()"); pg.wait_for_timeout(300); t+="\n"+mt(pg); closemodals(pg)  # 0.43: the month opens as a sheet
     rec("Month","the month reads in words (0.76: the Scribe tells it, no counts): how it felt, hard days done anyway",
         "Your month in words" in t and "Some days were hard, and you did them anyway." in t and not re.search(r"\b5 days\b",t),
         [l for l in t.split("\n") if "In " in l][:2])
