@@ -117,13 +117,12 @@ with sync_playwright() as p:
         setst(p2,ss); p2.reload(); p2.wait_for_timeout(500); closemodals(p2); texts.add(p2.inner_text("#view-today .taskface p"))
     rec("Variety","over ten days the same calling is asked in at least 3 different ways",len(texts)>=3,texts); c2.close()
 
-    # ---------- your own small things: since 0.36 they live on the card (qa_36). The Journal still marks their days ----------
+    # ---------- your own small things: since 0.36 they live on the card (qa_36). The book keeps their pages ----------
     s=grown(base); s["history"]=[{"date":D(s,i),"status":"done","v":i%12} for i in range(1,11)]; s["owns"]=[{"id":1,"text":"Drink a glass of water","k":-1,"days":[D(s,i) for i in (0,1,3,5,40)]}]; ready(pg,s)
     rec("Own","Today has no separate tick row any more (own small things come up on the card)",pg.locator("#btnOwn").count()==0)
     tabto(pg,"chronicle"); pg.evaluate("()=>{const b=document.querySelector('.tab[data-tab=\"book\"]');if(b)b.click()}"); pg.wait_for_timeout(500)
-    own=pg.evaluate("[...document.querySelectorAll('.cal .c.own')].map(c=>c.getAttribute('aria-label'))"); txt=pg.inner_text("#view-chronicle")
-    rec("Own","the Journal calendar marks the days you did one (within five weeks)",len(own)==4 and all("your own small thing done" in a for a in own),own)
-    rec("Own","…and says how many",("You did your own small thing on 4 of these days" in txt) and "your own small thing" in pg.inner_text(".calkey"),[l for l in txt.split("\n") if "own small" in l])
+    txt=pg.inner_text("#view-chronicle")
+    rec("Own","the book keeps own-thing days as pages and never counts them (0.82: the calendar and its count left with the old Journal)","You did your own small thing on" not in txt and pg.locator("#view-chronicle .jbook").count()==1)
     # damaged
     for bad in ("x",None,[1],{"text":5,"days":"no"},{"text":"ok","days":["2026-01-01","2026-01-01","nope",7]}):
         s=st(pg); s["own"]=bad; s["backup"]=bad; ready(pg,s); o=st(pg)["own"]; bk=st(pg)["backup"]

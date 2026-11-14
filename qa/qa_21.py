@@ -82,7 +82,7 @@ with sync_playwright() as p:
     seen=[]
     pg.evaluate("document.querySelector('#modal [data-close]').click()")
     for _ in range(10): pg.wait_for_timeout(200); seen.append(pg.inner_text("#toast") if pg.evaluate("document.getElementById('toast').classList.contains('show')") else "")
-    rec("First day","…and the First Spark ribbon note comes after it, once nothing else is on screen",any("New ribbon: First Spark" in x for x in seen),seen)
+    rec("First day","…and no ribbon note follows it (ribbons retired 0.80)",not any("New ribbon" in x for x in seen),seen)
     # ---------- the greeting and the arrival ----------
     lbl=pg.inner_text("#dateLabel")
     rec("Greeting","Today greets you for the time of day, before the day count",lbl.startswith("Good evening · Day 1,"),lbl)

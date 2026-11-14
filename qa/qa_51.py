@@ -81,8 +81,8 @@ with sync_playwright() as p:
     ctx,pg=boot(b,w,hr,red); L=f"{w} {'night' if hr==22 else 'day'}{' reduced' if red else ''}"
     tabto(pg,'chronicle'); pg.wait_for_timeout(300)
     seg=pg.locator("#view-chronicle .seg")
-    rec("Switch",f"{L}: Map, Tales and Journal are one joined switch",seg.count()==1 and seg.locator("button").count()==3 and pg.evaluate("()=>{const b=[...document.querySelectorAll('.seg button')].map(x=>x.getBoundingClientRect());return Math.abs(b[0].top-b[2].top)<1&&b[1].left-b[0].right<2&&b.every(r=>r.height>=44)}"))
-    for i,s in enumerate(['tales','journal','map']):
+    rec("Switch",f"{L}: Map and Tales are one joined switch (the Journal is the Book tab since 0.78)",seg.count()==1 and seg.locator("button").count()==2 and pg.evaluate("()=>{const b=[...document.querySelectorAll('.seg button')].map(x=>x.getBoundingClientRect());return Math.abs(b[0].top-b[1].top)<1&&b[1].left-b[0].right<2&&b.every(r=>r.height>=44)}"))
+    for i,s in enumerate(['tales','map']):
       pg.evaluate(f"document.querySelector('.seg [data-sub={s}]').click()"); pg.wait_for_timeout(450)
       ok=pg.evaluate("s=>{const g=document.querySelector('.seg'),b=g.querySelector('[data-sub='+s+']'),m=new DOMMatrix(getComputedStyle(g,'::before').transform),gl=g.getBoundingClientRect().left+3+m.m41;return b.getAttribute('aria-pressed')==='true'&&Math.abs(gl-b.getBoundingClientRect().left)<3}",s)
       rec("Switch",f"{L}: the highlight sits under {s.title()}",ok)

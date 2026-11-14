@@ -57,16 +57,12 @@ with sync_playwright() as p:
     ctx,pg=newpage(b); pg.goto(P); pg.wait_for_selector("#ageGo, #titleGo"); first_card(pg); closemodals(pg)
     s=hist(build(base,[2,2,2,1,1]),30); s["seen"]=99; setst(pg,s); pg.reload(); pg.wait_for_timeout(700); closemodals(pg)
     tabto(pg,"chronicle"); pg.evaluate("()=>document.querySelector('.tab[data-tab=\"book\"]').click()"); pg.wait_for_timeout(400)
-    cells=pg.evaluate("[...document.querySelectorAll('.cal span.c')].map(c=>[c.className,getComputedStyle(c).backgroundImage.includes('svg'),c.getAttribute('aria-label')])")
-    done=[c for c in cells if " done" in c[0]]; rest=[c for c in cells if " rest" in c[0]]; miss=[c for c in cells if " skipped" in c[0] or c[0].strip()=="c"]
-    rec("Journal","days you showed up get a flame stamp, rest days a moon, other days nothing",done and rest and all(c[1] for c in done) and all(c[1] for c in rest) and not any(c[1] for c in miss),(len(done),len(rest),len(miss)))
-    rec("Journal","…and each day still says what happened for screen readers",all("showed up" in c[2] for c in done) and all("rested" in c[2] for c in rest))
-    rec("Journal","a small key explains the stamps",pg.locator(".calkey").count()==1 and "showed up" in pg.inner_text(".calkey"))
-    # 0.43: ribbons are medals; earned ones are gold and say so, the rest say how close; details open on tap, never a progress bar
-    ribs=pg.evaluate("[...document.querySelectorAll('#view-chronicle .medal')].map(r=>[r.classList.contains('on'),r.querySelector('.sr').textContent,r.offsetHeight,r.querySelector('.pb')?1:0])")
-    rec("Journal","ribbons are medals: earned ones say so, the rest say how close, never a progress bar",ribs and all(r[3]==0 for r in ribs) and all(r[1].endswith("Earned")==r[0] for r in ribs) and all(r[2]>=44 for r in ribs),ribs[:4])
-    bad=[r for r in ribs if not r[0] and not re.search(r"\d+ of \d+$",r[1])]
-    rec("Journal","…and the dots match the count",not bad,bad[:2])
+    # 0.82: the calendar lives in the book's contents as one row a week (flame-red days you showed up, dashed rest days)
+    pg.evaluate("()=>{const t=document.getElementById('bkToc');t&&!t.disabled&&t.click()}"); pg.wait_for_timeout(300)
+    wk=pg.evaluate("[...document.querySelectorAll('#view-chronicle .bkwk')].map(r=>[r.querySelectorAll('.wkd i.done').length,r.querySelectorAll('.wkd i.rest').length,r.innerText.replace(/\\s+/g,' ').trim(),r.getBoundingClientRect().height])")
+    rec("Journal","the contents show the last weeks, marking days you showed up and rest days",wk and sum(w[0] for w in wk)>0 and sum(w[1] for w in wk)>0,wk[:2])
+    rec("Journal","…each row names its dates for screen readers and is a 44 pt target",all(w[2] and w[3]>=44 for w in wk))
+    rec("Journal","ribbons are retired (0.80): no medals, never a progress bar",pg.locator("#view-chronicle .medal, #view-chronicle .pb").count()==0)
     # ---------- Binder ----------
     s=st(pg); s["cards"][0]["fav"]=True
     for i,c in enumerate(s["cards"]): c["v"]=2 if i<3 else 4; c["dark"]=(i%2==1)

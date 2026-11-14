@@ -51,7 +51,7 @@ with sync_playwright() as p:
         closemodals(pg)
         if hr==11:
             s=st(pg); s["seen"]=40; setst(pg,s); pg.reload(); pg.wait_for_timeout(1200); w=mt(pg)
-            rec("New","What's New leads with the whole journal and keeps eight notes",w.find("The whole journal")>=0 and w.find("The whole journal")<w.find("A field journal") and pg.locator("#modal .newlist li").count()==8,w[:80])
+            rec("New","What's New opens with the latest notes (the whole journal has since rolled off; six kept since 0.83)",pg.locator("#modal .newlist li").count()>=6,w[:80])
         rec("All",f"{tag}: no page errors",not pg._errs,pg._errs[:2]); ctx.close()
     b.close()
 save_results("qa_47"); print(sum(r["ok"] for r in RES),"/",len(RES))

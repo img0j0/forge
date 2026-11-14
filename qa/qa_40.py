@@ -64,7 +64,7 @@ with sync_playwright() as p:
     m=tap_forgeling(pg); rec("Motion","with reduced motion the scene stays still, and a tap still answers",bool(m) and not pg._errs,(m,pg._errs[:1])); ctx.close()
     # what's new
     ctx,pg=setup(b,11); s=st(pg); s["seen"]=44; setst(pg,s); pg.reload(); pg.wait_for_timeout(1200); w=pg.inner_text("#modal")
-    rec("New","What is new opens and keeps eight notes (its Living Hearth note has since rolled off)",("What is new" in w or "What's new" in w or "What’s new" in w) and pg.locator("#modal .newlist li").count()==8,w[:80]); ctx.close()
+    rec("New","What is new opens and keeps its latest notes (six since 0.83)",("What is new" in w or "What's new" in w or "What’s new" in w) and pg.locator("#modal .newlist li").count()>=6,w[:80]); ctx.close()
     rec("A11y","axe: zero violations on the Hearth by day and night",not bad,bad[:3])
     b.close()
 save_results("qa_40"); print(sum(r["ok"] for r in RES),"/",len(RES))

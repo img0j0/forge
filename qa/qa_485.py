@@ -1,3 +1,4 @@
+import json
 from lib import *
 import datetime
 # 0.48.5: the phone's date moving back a day or two (travel west after midnight, a clock changed by hand) holds the
@@ -14,13 +15,13 @@ with sync_playwright() as p:
     s0=snap(pg); rec("Clock","day 1 is done with one Forgeling",s0["status"]=="done" and s0["cards"]==1,s0)
     s1=go(pg,2026,11,4); rec("Clock","the date moving back a day keeps the finished day: still done, no new card on offer",s1["date"]=="2026-11-05" and s1["status"]=="done" and s1["today"]==s0["today"],s1)
     s1b=go(pg,2026,11,3,23); rec("Clock","two days back still holds the day",s1b["date"]=="2026-11-05" and s1b["status"]=="done",s1b)
-    tabto(pg,"hearth"); v0=pg.inner_text("#view-hearth"); import re as _re; vl=lambda t:(_re.search(r"Visits left today: (\d)",t) or [None,None])[1]
+    tabto(pg,"hearth"); v0=pg.inner_text("#view-hearth"); import re as _re; vl=lambda t:json.dumps(st(pg)["hearth"].get("visits"))  # 0.80: no counter on screen; read the save
     pg.evaluate("document.getElementById('hSnack').click()"); pg.wait_for_timeout(400)
     try: pg.locator("#modal [data-snack]").first.click(); pg.wait_for_timeout(500)
     except Exception: pass
     closemodals(pg); tabto(pg,"hearth"); used=vl(pg.inner_text("#view-hearth"))
     go(pg,2026,11,4); tabto(pg,"hearth"); after=vl(pg.inner_text("#view-hearth"))
-    rec("Clock","moving the date back does not give back Hearth visits",used is not None and after==used,(vl(v0),used,after))
+    rec("Clock","moving the date back does not give back Hearth visits",used not in (None,"null") and after==used,(vl(v0),used,after))
     s2=go(pg,2026,11,5); rec("Clock","back to the real date: still done, nothing logged twice",s2["date"]=="2026-11-05" and s2["status"]=="done" and s2["dup"]==0,s2)
     s3=go(pg,2026,11,6); rec("Clock","the next real day rolls over as usual",s3["date"]=="2026-11-06" and s3["status"]=="fresh" and s3["dup"]==0,s3)
     s4=go(pg,2026,11,9); h=st(pg)["history"]; miss=[x["date"] for x in h if x["status"]=="skipped"]

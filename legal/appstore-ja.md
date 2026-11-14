@@ -1,6 +1,6 @@
 # Forgelings: App Store listing in Japanese (日本語)
 
-Written November 12, 2026, for 0.57; description updated for 0.73 to match the English listing. Same limits as the English listing; counts are in characters.
+Written November 12, 2026, for 0.57; description updated for 0.83 to match the English listing. Same limits as the English listing; counts are in characters.
 A native speaker should read this before it goes live. In App Store Connect: add the Japanese localization, then paste
 these fields. The URLs, category, age rating and privacy answers are the same as the English listing.
 
@@ -14,7 +14,7 @@ these fields. The URLs, category, age rating and privacy answers are the same as
 **Keywords** (100 max, comma separated):
 習慣,日記,ドット絵,ペット,育成,コレクション,セルフケア,ルーティン,癒し,ゆるい,習慣化,記録,マインドフル,カード,ほっこり  (66)
 
-## Description (4,000 max; this one is 1423)
+## Description (4,000 max; this one is 1467)
 
 Forgelingsは、あなたにやさしい習慣日記です。
 
@@ -24,7 +24,7 @@ Forgelingsは、あなたにやさしい習慣日記です。
 途切れる連続記録はありません。休みの日はいつでも大丈夫。これまでの歩みがリセットされることも、何かを取りあげられることもありません。
 
 ひとりでに書かれていく日記
-アプリ全体がフィールド日記です。昼は罫線の紙、夜はランプの明かりのページ。カードのあと、フォージリングが小さな質問をひとつ。その答えが、その日のページになります。自分の言葉を書き足したり、写真をドット絵のポストカードにして貼ったりもできます（写真そのものは残しません）。ひと月ごとに小さな本に綴じられ、節目には相棒から手紙が届きます。
+アプリ全体がフィールド日記です。昼は罫線の紙、夜はランプの明かりのページ。カードのあと、フォージリングが小さな質問をひとつ。その答えが、その日のページになります。自分の言葉を書き足したり、写真をドット絵のポストカードにして貼ったりもできます（写真そのものは残しません）。ページはひと月ごとに章になって、一冊の本に。書記が章の物語をつづり、絵はがきやおみやげは届いた日のページにはさまれます。節目には相棒から手紙が届きます。
 
 帰ってきたくなる炉ばた
 お気に入りのフォージリングたちは、小さな火のそばに座っています。おやつをあげたり、お話を聞かせたり、5つのミニゲームで一緒に遊んだり。旅に出せば、棚に飾る珍品と旅先からのポストカードを持って帰ってきます。絆が深まると「絆の証」となり、ずっと消えない金色の光をまといます。

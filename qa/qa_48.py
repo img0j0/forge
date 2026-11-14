@@ -66,7 +66,7 @@ with sync_playwright() as p:
         tabto(pg,"hearth"); pg.wait_for_timeout(1500)
         s=st(pg); days(s,3); s["curios"]["acorn"]={"n":3,"cid":0,"at":s["date"]}; load(pg,s); tabto(pg,"hearth")
         r=pg.evaluate("()=>{const h=document.getElementById('hEmbers'),j=h.querySelector('.jroll');return {roll:!!j,add:j&&j.dataset.add,tc:h.textContent,it:h.innerText}}")
-        rec("Embers",f"{tag}: new embers roll up on the Hearth with a +N",r["roll"] and r["add"]=="+3" and r["tc"]==r["it"] and re.fullmatch(r"\d+ embers?",r["tc"]) is not None,r)
+        rec("Embers",f"{tag}: the Hearth's Forge button no longer counts embers (0.81: the count lives in the Forge)",not r["roll"] and re.search(r"\d",r["tc"] or "") is None,r)
         pg.wait_for_timeout(1600); tabto(pg,"today"); tabto(pg,"hearth")
         rec("Embers",f"{tag}: once seen, they do not roll again",pg.locator("#hEmbers .jroll").count()==0)
         # ---------- the Forge stamps it ----------

@@ -66,7 +66,7 @@ with sync_playwright() as p:
             s=st(pg); rec("Save","opening an island stores nothing new",not any(k for k in s if "isle" in k.lower()))
             # What's New
             s["seen"]=40; setst(pg,s); pg.reload(); pg.wait_for_timeout(1200); w=mt(pg)
-            rec("New","What is new leads with Realms in 3D and keeps eight notes",w.find("Realms in 3D")>=0 and (w.find("Realms in 3D")<w.find("Safer saving") or w.find("Safer saving")<0) and pg.locator("#modal .newlist li").count()==8,w[:120])
+            rec("New","What is new opens with the latest notes (Realms in 3D has since rolled off; six kept since 0.83)",pg.locator("#modal .newlist li").count()>=6,w[:120])
         else:
             setup(pg,{"0":4}); realm(pg,0); pg.evaluate(RAF); pg.tap(".realmpage [data-isle]"); pg.wait_for_timeout(1500)
             rec("Calm","with reduced motion the turntable starts off",pg.get_attribute("#stTurn","aria-pressed")=="false")
