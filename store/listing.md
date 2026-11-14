@@ -1,6 +1,6 @@
 # Forgelings: App Store listing
 
-Updated November 12, 2026, for 0.73 (choose your card, the journal that writes itself, postcards, letters, seasons, the widget, Japanese). Character limits are Apple's. Counts are included so edits stay inside them.
+Updated November 13, 2026, for 0.83 (your book in its own tab, chapters the Scribe writes, keepsakes on their day, a quieter Today; earlier: choose your card, the question, postcards, letters, seasons, the widget, Japanese). Character limits are Apple's. Counts are included so edits stay inside them.
 
 **Name** (30 max): Forgelings  (10)
 
@@ -20,7 +20,7 @@ habit,cozy,pixel,pet,daily,routine,self care,collect,gentle,mindful,tracker,crea
 **Privacy Policy URL:** https://img0j0.github.io/forge/privacy.html
 **Copyright:** 2026 Hunter Abrams (or the LLC's name)
 
-## Description (4,000 max; this one is 2938)
+## Description (4,000 max; this one is 3047)
 
 Forgelings is a habit journal that is gentle with you.
 
@@ -30,7 +30,7 @@ MISS A DAY? NOTHING IS LOST.
 There are no streaks to break. Rest days are always fine. Your progress never resets, and nothing is ever taken away.
 
 A JOURNAL THAT WRITES ITSELF
-The whole app is a field journal: ruled paper by day, lamplit pages at night. After each card, your Forgeling asks one small question, and your answer becomes that day's page. Add your own words if you like, or turn a photo into a pixel postcard for the page (the photo itself is never kept). Each month is bound into a little book, and your companion writes you a letter at milestones.
+The whole app is a field journal: ruled paper by day, lamplit pages at night. After each card, your Forgeling asks one small question, and your answer becomes that day's page. Add your own words if you like, or turn a photo into a pixel postcard for the page (the photo itself is never kept). Your pages become a book, a chapter for every month. The Scribe writes each chapter's story, postcards and curios are tucked into the day they came, and your companion writes you a letter at milestones.
 
 A HEARTH TO COME BACK TO
 Your favourite Forgelings sit by a small fire. Give them a snack, tell them a story, or play one of five little games together. Send one out to wander, and they come back with a curio for your shelf and a postcard from the road. Grow a bond far enough and a Forgeling becomes Forgebound, with a golden glow it keeps for good.
@@ -63,7 +63,7 @@ is enough. Upload them in order:
 
 1. One small thing a day (the three-card choice on a fresh morning)
 2. Each one drawn just for you (a Forgeling close up)
-3. A journal that writes itself (Closing the day: the page, a photo postcard and your words)
+3. Your days become a book (the Book tab at the latest spread: the find taped in, a photo postcard, the day's page)
 4. They keep you company (the Hearth at night)
 5. A binder that fills up (the Binder)
 6. A map that draws itself (the Map)

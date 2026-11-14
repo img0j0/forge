@@ -11,7 +11,7 @@ SLIDES = {
  'en': [
   ('1-choose.png',  'One small thing a day',        'Turn over three cards and choose the one you will do.'),
   ('2-card.png',    'Each one drawn just for you',  'Do it, and a pixel creature joins your journal. No two alike.'),
-  ('8-evening.png', 'A journal that writes itself', 'Answer one small question, and the day becomes a page.'),
+  ('9-book.png',    'Your days become a book',      'A chapter every month, a page every day, written as you go.'),
   ('3-hearth.png',  'They keep you company',        'Sit by the fire, play, and send them wandering.'),
   ('5-binder.png',  'A binder that fills up',       'Every day you showed up, kept for good.'),
   ('6-map.png',     'A map that draws itself',      'Wander, and the realms ink themselves in.'),
@@ -20,7 +20,7 @@ SLIDES = {
  'ja': [
   ('1-choose.png',  '一日ひとつ、小さなこと',         '3枚のカードをめくって、今日やることを選びます。'),
   ('2-card.png',    'どの子も、あなたのために',       'やりとげると、二つとない生きものが日記に。'),
-  ('8-evening.png', 'ひとりでに書かれていく日記',     '小さな質問に答えるだけで、その日がページに。'),
+  ('9-book.png',    'あなたの日々が、一冊の本に',     'ひと月にひとつの章、一日にひとつのページ。'),
   ('3-hearth.png',  '火のそばで、いつも一緒',         '炉ばたで遊んだり、旅に出したり。'),
   ('5-binder.png',  '少しずつ埋まっていくバインダー', '来た日のことが、ずっと残ります。'),
   ('6-map.png',     'ひとりでに描かれていく地図',     '旅をするほど、地方が描きこまれていきます。'),

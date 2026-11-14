@@ -44,6 +44,8 @@ with sync_playwright() as p:
     pg.evaluate("()=>{const b=document.getElementById('ovClose');b&&b.click()}"); closemodals(pg)
     openmap(pg); pg.evaluate("scrollTo(0,0)"); snap(pg, "6-map", 1200)
     tabto(pg, "hearth"); click(pg, "#hForge"); pg.evaluate("()=>{for(const e of document.querySelectorAll('#modal, #modal *'))if(e.scrollTop)e.scrollTop=0}"); snap(pg, "7-forge")
+    # 0.83: the book in its tab, open at the latest spread (the find taped in, the postcard, the day's page)
+    closemodals(pg); tabto(pg, "book"); pg.evaluate("()=>{const o=document.getElementById('bkOpenB');o&&o.click();const l=document.getElementById('bkLatest');l&&!l.disabled&&l.click()}"); pg.wait_for_timeout(600); pg.evaluate("scrollTo(0,0)"); snap(pg, "9-book", 1200)
     print("day", pg._errs[:3]); ctx.close()
     # Night by the fire (the season's weather), and closing the day
     ctx, pg = session(b, "21:30")
