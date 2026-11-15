@@ -1,6 +1,9 @@
 # Builds the native apps on GitHub's machines, so no Mac or Android Studio is needed to check them.
 # Android: a debug APK you can install on any Android phone (download it from the run's Artifacts).
 # iPhone: compiles the Xcode project for the simulator, unsigned, to prove the Swift code builds.
+# TestFlight: signs and uploads a real iPhone build, once the App Store Connect key is in the repository's secrets
+#   (ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY, APPLE_TEAM_ID; see store/TESTFLIGHT.md). Without them it says so and
+#   skips, so the other two jobs stay green.
 name: Native builds
 on:
   push:
@@ -44,3 +47,75 @@ jobs:
           test -d "$APP/PlugIns/ForgelingsWidget.appex" && echo "widget extension embedded"
           grep -rl WidgetBridgePlugin "$APP" | head -3
           test -n "$(grep -rl WidgetBridgePlugin "$APP")"
+  testflight:
+    runs-on: macos-latest
+    steps:
+      - name: Is the App Store Connect key in place?
+        id: key
+        env:
+          K: ${{ secrets.ASC_PRIVATE_KEY }}
+          I: ${{ secrets.ASC_KEY_ID }}
+          S: ${{ secrets.ASC_ISSUER_ID }}
+          T: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$K" ] && [ -n "$I" ] && [ -n "$S" ] && [ -n "$T" ]; then echo "on=yes" >> "$GITHUB_OUTPUT"; echo "Key found: building for TestFlight."
+          else echo "on=no" >> "$GITHUB_OUTPUT"; echo "TestFlight upload is off until the four secrets are added (store/TESTFLIGHT.md)."; fi
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.on == 'yes'
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.on == 'yes'
+        with: { node-version: 22 }
+      - if: steps.key.outputs.on == 'yes'
+        run: pip3 install pillow --break-system-packages || pip3 install pillow
+      - if: steps.key.outputs.on == 'yes'
+        run: npm ci && python3 build-www.py && npx cap sync ios && python3 ios-setup.py
+      - name: Put the key where Xcode looks for it
+        if: steps.key.outputs.on == 'yes'
+        env:
+          K: ${{ secrets.ASC_PRIVATE_KEY }}
+          I: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys ~/private_keys
+          printf '%s\n' "$K" > ~/.appstoreconnect/private_keys/AuthKey_$I.p8
+          cp ~/.appstoreconnect/private_keys/AuthKey_$I.p8 ~/private_keys/
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_$I.p8 ~/private_keys/AuthKey_$I.p8
+      - name: Archive (Xcode signs it automatically with the key, registering the app, iCloud and the App Group)
+        if: steps.key.outputs.on == 'yes'
+        shell: bash -eo pipefail {0}
+        env:
+          I: ${{ secrets.ASC_KEY_ID }}
+          S: ${{ secrets.ASC_ISSUER_ID }}
+          T: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive archive -allowProvisioningUpdates \
+            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_$I.p8 -authenticationKeyID "$I" -authenticationKeyIssuerID "$S" \
+            DEVELOPMENT_TEAM="$T" CURRENT_PROJECT_VERSION=$((100 + ${{ github.run_number }})) | tail -60
+      - name: Sign for App Store Connect and upload to TestFlight
+        if: steps.key.outputs.on == 'yes'
+        shell: bash -eo pipefail {0}
+        env:
+          I: ${{ secrets.ASC_KEY_ID }}
+          S: ${{ secrets.ASC_ISSUER_ID }}
+          T: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > build/ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>teamID</key><string>$T</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist build/ExportOptions.plist -exportPath build/export \
+            -allowProvisioningUpdates -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_$I.p8 \
+            -authenticationKeyID "$I" -authenticationKeyIssuerID "$S" | tail -40
+          ls build/export
+          xcrun altool --upload-app -f build/export/*.ipa -t ios --apiKey "$I" --apiIssuer "$S"
+          echo "Uploaded build $((100 + ${{ github.run_number }})). It shows in TestFlight after Apple processes it (usually 5 to 30 minutes)."
+      - name: Remove the key from the machine
+        if: always()
+        run: rm -rf ~/.appstoreconnect ~/private_keys
