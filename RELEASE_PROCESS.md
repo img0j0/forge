@@ -124,4 +124,4 @@ Update 0.83.1: patches read base831.html; base83.html removed. The curio shelf s
 Shipped 0.83.1: main/gh-pages 03ef300 (Pages success, live blob c873072 matches), ios-app 6d5addf (Native builds failed fetching Gradle libraries, a GitHub download hiccup; the next ios-app commit 0784a80 with the same app built successfully), Claude copy version 141. Store screenshots and listing retaken from 0.83.1 (ios-app 0784a80).
 Journey and monkeys on 0.83.1 (November 14): qa_journey 9/9 (125 days), monkeys 1-3 clean.
 Update 0.83.2: patches read base832.html; base831.html removed. Today's card uses the 0.72 back. Checked: qa_axe2, qa_contrast, qa_384, qa_22.
-Shipped 0.83.2: main/gh-pages b131ddb (Pages success, live blob 47edaad matches), ios-app 4c2e483 (Native builds success; TestFlight job skipped, no key yet), Claude copy version 142.
+Shipped 0.83.2: main/gh-pages b131ddb (Pages success, live blob 47edaad matches), ios-app 4c2e483 (GitHub cancelled the iPhone job; an empty commit a570d41 rebuilt it: Native builds success, TestFlight job skipped, no key yet), Claude copy version 142.
