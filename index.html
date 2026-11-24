@@ -205,8 +205,9 @@ body.arrive .app section:not([hidden])>*:nth-child(2){animation-delay:.2s}
 body.arrive .app section:not([hidden])>*:nth-child(3){animation-delay:.3s}
 body.arrive .app section:not([hidden])>*:nth-child(n+4){animation-delay:.38s}
 /* ---- 0.22: the daily card in pixels ---- */
-.heroback{background:var(--cbT) 0 0/100% 100% no-repeat !important;box-shadow:0 6px 0 rgba(46,42,71,.22) !important;align-content:end !important;padding-bottom:26px !important;text-shadow:0 2px 0 #2B2152}
+.heroback{background:var(--cbP) 0 0/100% 100% no-repeat !important;box-shadow:0 6px 0 rgba(46,42,71,.22) !important;align-content:end !important;padding-bottom:26px !important;text-shadow:0 2px 0 #2B2152}
 .heroback svg{display:none}
+.heroback>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .vface.vback{background:var(--cbT) 0 0/100% 100% no-repeat !important;justify-content:flex-end !important;padding-bottom:13% !important;border-radius:6px !important;text-shadow:0 2px 0 #2B2152}
 .vface.vback svg{display:none}
 .cover{background:var(--cbP) 0 0/100% 100% no-repeat !important;box-shadow:none !important}
@@ -2244,7 +2245,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeLoops(
 /* ================= Odds (published in Settings) ================= */
 const ODDS={daily:[55.7,27,12,5,0.3],allIn:[43.5,30,18,8,0.5],pack:[55.7,27,12,5,0.3],packLast:[0,47,37,15.4,0.6]};
 const PITY=14;
-const VERSION='prototype 0.83.1',APPVER='1.0.0';
+const VERSION='prototype 0.83.2',APPVER='1.0.0';
 /* ---- 0.32: running inside the iPhone app? (Capacitor injects window.Capacitor with its plugins.) ---- */
 const CAP=window.Capacitor,NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()),PL=(NATIVE&&CAP.Plugins)||{};
 const STORE=NATIVE||!!document.querySelector('meta[name="forge-build"][content="store"]'),EDITION=STORE?(LJ?JA[124]:'First Edition'):(LJ?JA[125]:'Pilot Edition');
