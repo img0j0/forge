@@ -19,7 +19,7 @@ jobs:
         run: |
           pip install playwright pillow
           python -m playwright install --with-deps chromium
-          (cd i18n && npm ci) && (cd qa && npm ci)
+          (cd i18n && npm ci) && (cd qa && npm install --no-save)
       - name: Build app.html
         run: python3 pwa.py
       - name: Japanese is complete
