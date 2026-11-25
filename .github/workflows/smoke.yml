@@ -1,0 +1,43 @@
+# Smoke tests on every push to dev (about 10 minutes): build app.html (English + Japanese), check the Japanese is
+# complete, then run the key suites against it over http. A FAIL line or a crash fails the run.
+name: Smoke tests
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install
+        run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+          (cd i18n && npm ci) && (cd qa && npm ci)
+      - name: Build app.html
+        run: python3 pwa.py
+      - name: Japanese is complete
+        run: |
+          cd i18n && node scan.mjs ../work.html | tee /tmp/scan.txt
+          ! grep -E "match nothing|untranslated markup" /tmp/scan.txt
+      - name: Serve
+        run: (python3 -m http.server 8772 --bind 127.0.0.1 >/dev/null 2>&1 &) && sleep 1
+      - name: Suites
+        env: { FORGE_HTML: 'http://127.0.0.1:8772/app.html', TZ: America/New_York }
+        run: |
+          fail=0
+          run(){ echo "::group::$*"; out=$(timeout 900 "$@" 2>&1); rc=$?; echo "$out"; echo "::endgroup::"
+                 if [ $rc -ne 0 ] || echo "$out" | grep -q '^FAIL' || ! echo "$out" | grep -q '^PASS'; then echo "::error::$* failed"; fail=1; fi; }
+          (cd qa && for t in qa_core qa_431 qa_43 qa_axe2; do run python3 $t.py; done; exit $fail) || fail=1
+          cd qa/fixtures
+          for L in "en 12:00" "ja 21:00"; do
+            run python3 ../../tools/qa_quiet84.py app.html $L
+            run python3 ../../tools/qa_booktab82.py app.html $L 390
+          done
+          exit $fail

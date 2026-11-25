@@ -3,10 +3,10 @@
 #   open the tab at that day, second reading only on the echo's day; 44 pt, no sideways scroll, axe.
 #   Run from a folder holding lived_store.json, dev root served at http://127.0.0.1:8772/ : python3 qa_booktab82.py app.html en|ja HH:MM WIDTH
 import sys,os,json,datetime as dt,copy,re
-sys.path.insert(0,'/home/claude/forge/qa'); B=sys.argv[1]; os.environ['FORGE_HTML']='http://127.0.0.1:8772/'+B
+QA=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','qa'); sys.path.insert(0,QA); B=sys.argv[1]; os.environ['FORGE_HTML']='http://127.0.0.1:8772/'+B
 LANG=sys.argv[2]; HH=sys.argv[3]; W=int(sys.argv[4]) if len(sys.argv)>4 else 390
 from lib import *
-AXE=open('/home/claude/forge/qa/node_modules/axe-core/axe.min.js').read()
+AXE=open(os.path.join(QA,'node_modules/axe-core/axe.min.js')).read()
 S=json.load(open('lived_store.json'));S['seen']=999;day=S['date']
 ms=int(dt.datetime.fromisoformat(day+f'T{HH}:00-05:00').timestamp()*1000)
 CLK="(()=>{const R=Date;const off=%d-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+off);}static now(){return R.now()+off;}}window.Date=D;})()"%ms

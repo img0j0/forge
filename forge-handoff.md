@@ -44,7 +44,7 @@ Open items:
 3. **Decisions waiting:** whether photo postcards stay (0.65); whether the cute-or-dark question on day 2 moves into the first-day walkthrough; a native review request around day 14 (the day-5 feedback prompt is hidden in the store build).
 4. **Store screenshots** were retaken November 14 from 0.83.1 (8 slides; slide 3 is now the book; English `ios-app/store/screens`, Japanese `store/screens-ja`), and the listing text in both languages describes 0.83. Rebuild after big visual changes; `tools/lived_save.py` makes the lived-in save, and `store/compose.py` needs the build's `@font-face` rules pulled into a file.
 5. **Testers:** Hunter and friends and family use the live link; feedback comes through Settings > Send my report. The number to watch is how many still open it after three weeks without a reminder.
-6. **Later ideas, not started:** Keeper unlock and tips in 1.1 (revenue doc https://claude.ai/artifact/YaCB7hJFFSAH5cwcVPxuqw), AR statues (.usdz) after TestFlight, a world that keeps growing with each era, a turntable share clip, qa_16 rebuild, a CI workflow that runs tests.
+6. **Later ideas, not started:** Keeper unlock and tips in 1.1 (revenue doc https://claude.ai/artifact/YaCB7hJFFSAH5cwcVPxuqw), AR statues (.usdz) after TestFlight, a world that keeps growing with each era, a turntable share clip, qa_16 rebuild, (done in 0.84: `.github/workflows/smoke.yml` runs key suites on every push to dev; add a suite there when a release gets its own).
 
 ## Key technical facts
 
