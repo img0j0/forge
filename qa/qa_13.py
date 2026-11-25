@@ -44,7 +44,7 @@ with sync_playwright() as p:
         pg.evaluate("document.getElementById('btnMargin').click()"); pg.wait_for_timeout(400); m=mt(pg)
         ok=ok and "Your own words" in m and "The Forge asks" not in m and pg.locator("#modal .sheet i").count()>=1
         pg.fill("#jIn","A line from the sheet"); pg.evaluate("document.getElementById('jSave').click()"); pg.wait_for_timeout(400)
-        ok=ok and st(pg)["journal"].get(st(pg)["date"],{}).get("text")=="A line from the sheet" and pg.evaluate("document.getElementById('modal').hidden") and "Edit your own words" in pg.inner_text("#view-today")
+        ok=ok and st(pg)["journal"].get(st(pg)["date"],{}).get("text")=="A line from the sheet" and pg.evaluate("document.getElementById('modal').hidden") and ("Edit your own words" in pg.inner_text("#view-today") or pg.evaluate("[...document.querySelectorAll('#view-today .ephid button')].some(b=>b.id==='btnMargin'&&b.textContent==='Edit your own words')"))
     rec("Theme","the margin is off Today; after the day's card, a link opens 'Your own words' (0.63; was 'In the margin') with the question in one voice (0.78), and saving goes to the journal",ok,(stt,has))
     html=open(S+"/work.html").read(); rec("Theme","no 'Something to sit with' remains anywhere in the app","Something to sit with" not in html)
     # preview tool still lands on the map

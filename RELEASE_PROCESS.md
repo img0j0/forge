@@ -125,3 +125,4 @@ Shipped 0.83.1: main/gh-pages 03ef300 (Pages success, live blob c873072 matches)
 Journey and monkeys on 0.83.1 (November 14): qa_journey 9/9 (125 days), monkeys 1-3 clean.
 Update 0.83.2: patches read base832.html; base831.html removed. Today's card uses the 0.72 back. Checked: qa_axe2, qa_contrast, qa_384, qa_22.
 Shipped 0.83.2: main/gh-pages b131ddb (Pages success, live blob 47edaad matches), ios-app 4c2e483 (GitHub cancelled the iPhone job; an empty commit a570d41 rebuilt it: Native builds success, TestFlight job skipped, no key yet), Claude copy version 142.
+Update 0.84: patches read base84.html; base832.html removed. Edit today's page sheet, Hearth counts off, one Map line, Japanese wrapping, games focus ring, packed web save (vendor/lz-string). Checked: qa_quiet84 (EN+JA), qa_431, qa_13, qa_19, qa_quiet80, qa_forge81, qa_look79, qa_booktab82.

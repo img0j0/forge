@@ -29,7 +29,11 @@ with sync_playwright() as p:
     pg2.close()
     good=st(pg); n=len(good["cards"])
     # ---------- unreadable save, with a safety copy ----------
-    rec("Daily","a safety copy is kept",raw(pg,KEY+"-daily") is not None and len(json.loads(raw(pg,KEY+"-daily"))["cards"])==n)
+    LZJ=open(S+'/vendor/lz-string-1.5.0.min.js').read()
+    def unpack(pg,k):  # 0.84: the safety copy is stored packed ("lz1:" + lz-string UTF-16)
+        if not pg.evaluate("typeof LZString!=='undefined'"): pg.add_script_tag(content=LZJ)
+        return pg.evaluate("k=>{const v=localStorage.getItem(k);return v&&v.startsWith('lz1:')?LZString.decompressFromUTF16(v.slice(4)):v}",k)
+    rec("Daily","a safety copy is kept, packed",(raw(pg,KEY+"-daily") or '').startswith('lz1:') and len(json.loads(unpack(pg,KEY+"-daily"))["cards"])==n)
     pg.evaluate("([k,b])=>localStorage.setItem(k,b)",[KEY,BROKEN]); pg.reload(); pg.wait_for_timeout(1500)
     t=mt(pg)
     rec("Recover","an unreadable save opens the recovery sheet, not the title","could not read your saved collection" in t and "Nothing has been deleted" in t and pg.locator("#titleGo").count()==0,t[:200])

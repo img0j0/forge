@@ -59,7 +59,7 @@ with sync_playwright() as p:
     # ---------- the Hearth grows ----------
     s=build(base,[1,1,1,0,0]); s["seen"]=99; s["hearth"]["slots"]=[c["id"] for c in s["cards"]]; s["hearth"]["fseen"]=[]; s["history"]=[]; ready(pg,s)
     tabto(pg,"hearth"); hsheet(pg,"furn"); t=mt(pg); closemodals(pg)
-    rec("Hearth","the list says 0 of 16 and shows how to get the first thing","By the fire, 0 of 16" in t and "After your first calling. 0 so far." in t,t[-400:])
+    rec("Hearth","the list shows how to get the first thing, with no count (0.84)","of 16" not in t and "so far" not in t and "After your first calling." in t,t[-400:])
     s=hist(st(pg),[("done",2),("rest",5),("done",2),("skipped",4),("done",2)]); s["hearth"]["fseen"]=[]; ready(pg,s)
     tabto(pg,"today"); r=pg.inner_text("#btnHearth")
     rec("Hearth","Today's Hearth row says something new is waiting and is marked ready","Something new is waiting by the fire" in r and pg.evaluate("document.getElementById('btnHearth').classList.contains('ready')"),r)
@@ -68,10 +68,10 @@ with sync_playwright() as p:
     tabto(pg,"today"); r=pg.inner_text("#btnHearth") if pg.locator("#btnHearth").count() else ""
     rec("Hearth","…after that, Today's row goes back to normal","Something new" not in r and not pg.evaluate("document.getElementById('btnHearth').classList.contains('ready')"),r)
     tabto(pg,"hearth"); hsheet(pg,"furn"); t=mt(pg); closemodals(pg)
-    rec("Hearth","the list explains each one in your own terms","You have given something your full attention 3 times." in t and "After 3 Clarity days. 0 so far." in t and "By the fire, 2 of 16" in t,t[-500:])
-    s=st(pg); s["history"].append({"date":s["history"][-1]["date"],"status":"done","v":2}); ready(pg,s)
+    rec("Hearth","the list explains each one in your own terms","You have given something your full attention 3 times." in t and "After 3 Clarity days." in t and "so far" not in t,t[-500:])
+    s=st(pg); s["history"]+=[{"date":s["history"][-1]["date"],"status":"done","v":2} for _ in range(5)]; ready(pg,s)
     tabto(pg,"hearth"); hsheet(pg,"furn")
-    rec("Hearth","a doubled day in a damaged history counts once","After 5 callings done. 3 so far." in mt(pg)); closemodals(pg)
+    rec("Hearth","a doubled day in a damaged history counts once (five copies do not earn the 5-callings piece)","After 5 callings done." in mt(pg),mt(pg)[-300:]); closemodals(pg)
     # one at a time: a single new thing gets its own name
     s=hist(st(pg),[("done",2)]*3+[("done",3)]*3); s["hearth"]["fseen"]=["pond","rug","lights"]; ready(pg,s); tabto(pg,"hearth")
     rec("Hearth","a single new thing is named",pg.inner_text("#hmsg")=="Something new by the fire: a paper kite.",pg.inner_text("#hmsg"))
@@ -92,7 +92,8 @@ with sync_playwright() as p:
         return n
     miss=[k for k,bx in BOX.items() if changed(bx)<4]
     rec("Hearth","every one of the 15 still things by the fire is visible in the scene",not miss,miss)
-    rec("Hearth","all 16 are counted once everything is earned","By the fire · 16 of 16" in pg.inner_text("#view-hearth"))
+    pg.evaluate("document.getElementById('hFurn').click()"); pg.wait_for_timeout(400)
+    rec("Hearth","all 16 are there once everything is earned, with no count (0.84)",pg.evaluate("document.querySelectorAll('#modal .furn li').length")==16 and "of 16" not in mt(pg) and "so far" not in mt(pg),mt(pg)[:120]); closemodals(pg)
     # asleep: nothing is announced until they wake
     s=hist(st(pg),[("done",i%12) for i in range(36)]); s["hearth"]["fseen"]=[]; s["hearth"]["sleep"]={"tier":1,"since":s["date"],"dream":0}; ready(pg,s); tabto(pg,"hearth")
     rec("Hearth","while your Forgelings are asleep, new things wait to be announced",st(pg)["hearth"]["fseen"]==[] and not pg._errs,pg._errs[:1])
